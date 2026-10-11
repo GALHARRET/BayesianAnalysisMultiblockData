@@ -1,0 +1,370 @@
+## =====================================================================
+##  OMCOA bayésienne parcimonieuse (spike-and-slab sur les Sigma_k)
+## ---------------------------------------------------------------------
+##  Modèle :  X_k = U Sigma_k V_k^T + E_k,   E_k ~ N(0, 1/tau_k) i.i.d.
+##            U  (N x R), U^T U = I, colonnes centrées
+##            V_k (p_k x R), V_k^T V_k = I
+##            Sigma_k = diag(sigma_k^(1..R))
+##            sigma_k^(r) = gamma_k^(r) * s_k^(r)
+##              gamma_k^(r) ~ Bernoulli(theta_r)         (spike : sigma = 0)
+##              s_k^(r)     ~ N+(0, 1/lambda)            (slab)
+##              theta_r     ~ Beta(a_theta, b_theta)
+##            tau_k ~ Gamma(a0, b0)
+##
+##  R est un rang MAXIMAL : une dimension r est
+##     - commune               si gamma_k^(r) = 1 pour tous les blocs,
+##     - partiellement commune si gamma_k^(r) = 1 pour certains blocs,
+##     - spécifique            si gamma_k^(r) = 1 pour un seul bloc,
+##     - inactive              si gamma_k^(r) = 0 pour tous les blocs.
+##  Le rang effectif = nombre de dimensions actives.
+##
+##  R de base uniquement.
+## =====================================================================
+
+## ---------------------------------------------------------------- outils vMF (cf. gibbs_omcoa.R)
+rvmf_vector <- function(f) {
+  m <- length(f); kappa <- sqrt(sum(f^2))
+  if (m == 1) return(sign(f) + (f == 0))
+  if (kappa < 1e-12) { z <- rnorm(m); return(z / sqrt(sum(z^2))) }
+  mu <- f / kappa
+  b  <- (m - 1) / (2 * kappa + sqrt(4 * kappa^2 + (m - 1)^2))
+  x0 <- (1 - b) / (1 + b)
+  cc <- kappa * x0 + (m - 1) * log(1 - x0^2)
+  repeat {
+    z <- rbeta(1, (m - 1) / 2, (m - 1) / 2)
+    w <- (1 - (1 + b) * z) / (1 - (1 - b) * z)
+    if (kappa * w + (m - 1) * log(1 - x0 * w) - cc >= log(runif(1))) break
+  }
+  v <- rnorm(m); v <- v - sum(v * mu) * mu; v <- v / sqrt(sum(v^2))
+  w * mu + sqrt(max(0, 1 - w^2)) * v
+}
+
+rmf_matrix_sweep <- function(F, W) {
+  m <- nrow(W); h <- ncol(W)
+  for (j in sample(h)) {
+    Nj <- if (h > 1) qr.Q(qr(W[, -j, drop = FALSE]), complete = TRUE)[, h:m, drop = FALSE] else diag(m)
+    W[, j] <- Nj %*% rvmf_vector(crossprod(Nj, F[, j]))
+  }
+  W
+}
+
+rtnorm_pos <- function(mean, sd) {
+  p0 <- pnorm(0, mean, sd)
+  pmax(qnorm(pmin(runif(length(mean), p0, 1), 1 - 1e-16), mean, sd), 1e-12)
+}
+
+## ---------------------------------------------------------------- OMCOA (initialisation)
+procrustes <- function(M) { s <- svd(M); s$u %*% t(s$v) }
+
+omcoa_als <- function(Xs, R, maxit = 2000, tol = 1e-10) {
+  K <- length(Xs); X <- do.call(cbind, Xs)
+  U <- svd(X, nu = R, nv = 0)$u
+  V <- lapply(Xs, function(Xk) procrustes(crossprod(Xk, U)))
+  S <- lapply(seq_len(K), function(k) diag(t(U) %*% Xs[[k]] %*% V[[k]]))
+  old <- Inf
+  for (it in seq_len(maxit)) {
+    Hm <- do.call(cbind, lapply(seq_len(K), function(k) diag(S[[k]], R) %*% t(V[[k]])))
+    U  <- procrustes(X %*% t(Hm))
+    V  <- lapply(seq_len(K), function(k) procrustes(crossprod(Xs[[k]], U) %*% diag(S[[k]], R)))
+    S  <- lapply(seq_len(K), function(k) diag(t(U) %*% Xs[[k]] %*% V[[k]]))
+    f  <- sum(sapply(seq_len(K), function(k) sum((Xs[[k]] - U %*% diag(S[[k]], R) %*% t(V[[k]]))^2)))
+    if (old - f < tol * f) break
+    old <- f
+  }
+  for (k in seq_len(K)) { sg <- sign(S[[k]]); sg[sg == 0] <- 1
+    V[[k]] <- sweep(V[[k]], 2, sg, "*"); S[[k]] <- S[[k]] * sg }
+  list(U = U, V = V, S = S)
+}
+
+## ---------------------------------------------------------------- échantillonneur parcimonieux
+## Xs     : liste de K blocs centrés ; R : rang maximal (R <= min p_k)
+## lambda : précision du slab (les blocs doivent être à une échelle comparable)
+gibbs_sparse_omcoa <- function(Xs, R, n_iter = 6000, burn = 2000, init = NULL,
+                               a0 = 1e-3, b0 = 1e-3, lambda = 1,
+                               a_theta = 1, b_theta = 1, verbose = TRUE) {
+  K <- length(Xs); N <- nrow(Xs[[1]]); P <- sapply(Xs, ncol)
+  stopifnot(R <= min(P))
+  Q <- qr.Q(qr(scale(diag(N), scale = FALSE)))[, 1:(N - 1)]   # base de 1^perp
+
+  if (is.null(init)) init <- omcoa_als(Xs, R)
+  s  <- svd(crossprod(Q, init$U)); Ut <- s$u %*% t(s$v); U <- Q %*% Ut
+  V  <- lapply(init$V, procrustes)
+  S  <- lapply(init$S, function(x) pmax(abs(x), 1e-3))
+  G  <- matrix(1L, K, R)                       # gamma_k^(r) : tout actif au départ
+  theta <- rep(0.5, R)
+  rss <- function(k) sum((Xs[[k]] - U %*% diag(S[[k]], R) %*% t(V[[k]]))^2)
+  tau <- sapply(seq_len(K), function(k) ((N - 1) * P[k]) / rss(k))
+
+  n_keep <- n_iter - burn
+  out <- list(S = array(NA, c(n_keep, K, R)), G = array(NA, c(n_keep, K, R)),
+              U = array(NA, c(n_keep, N, R)), theta = matrix(NA, n_keep, R),
+              tau = matrix(NA, n_keep, K), trace_S = array(NA, c(n_iter, K, R)))
+
+  for (it in seq_len(n_iter)) {
+    ## 1) U | .  ~ vMF(Q^T sum_k tau_k X_k V_k Sigma_k)
+    FU <- Reduce(`+`, lapply(seq_len(K), function(k) tau[k] * Xs[[k]] %*% V[[k]] %*% diag(S[[k]], R)))
+    Ut <- rmf_matrix_sweep(crossprod(Q, FU), Ut); U <- Q %*% Ut
+
+    for (k in seq_len(K)) {
+      ## 2) V_k | . ~ vMF(tau_k X_k^T U Sigma_k)  (colonne uniforme si sigma_k^(r) = 0)
+      V[[k]] <- rmf_matrix_sweep(tau[k] * crossprod(Xs[[k]], U) %*% diag(S[[k]], R), V[[k]])
+
+      ## 3) (gamma_k^(r), sigma_k^(r)) | .  : tirage conjoint, sigma intégré pour gamma
+      d    <- diag(t(U) %*% Xs[[k]] %*% V[[k]])
+      prec <- tau[k] + lambda
+      m    <- tau[k] * d / prec
+      log_bf <- log(2) + 0.5 * log(lambda / prec) + 0.5 * prec * m^2 +
+                pnorm(m * sqrt(prec), log.p = TRUE)          # log p(X|gamma=1)/p(X|gamma=0)
+      lo   <- log(theta) - log1p(-theta) + log_bf
+      p1   <- 1 / (1 + exp(-pmin(pmax(lo, -700), 700)))
+      G[k, ] <- rbinom(R, 1, p1)
+      S[[k]] <- ifelse(G[k, ] == 1, rtnorm_pos(m, 1 / sqrt(prec)), 0)
+
+      ## 4) tau_k | . ~ Gamma
+      tau[k] <- rgamma(1, a0 + (N - 1) * P[k] / 2, b0 + rss(k) / 2)
+    }
+    ## 5) theta_r | . ~ Beta
+    theta <- rbeta(R, a_theta + colSums(G), b_theta + K - colSums(G))
+
+    out$trace_S[it, , ] <- do.call(rbind, S)
+    if (it > burn) {
+      i <- it - burn
+      out$S[i, , ] <- do.call(rbind, S); out$G[i, , ] <- G
+      out$U[i, , ] <- U; out$theta[i, ] <- theta; out$tau[i, ] <- tau
+    }
+    if (verbose && it %% 1000 == 0) cat("itération", it, "/", n_iter, "\n")
+  }
+  out
+}
+
+## ---------------------------------------------------------------- alignement
+perms <- function(n) {
+  if (n == 1) return(matrix(1))
+  p <- perms(n - 1)
+  do.call(rbind, lapply(seq_len(n), function(i) cbind(i, ifelse(p >= i, p + 1, p))))
+}
+## Aligne chaque tirage sur U_ref (par défaut : premier tirage après burn-in).
+align_sparse <- function(out, U_ref = out$U[1, , ]) {
+  R <- ncol(U_ref); PP <- perms(R)
+  for (i in seq_len(dim(out$S)[1])) {
+    C <- crossprod(U_ref, out$U[i, , ])
+    p <- PP[which.max(apply(PP, 1, function(q) sum(abs(C[cbind(1:R, q)])))), ]
+    out$S[i, , ] <- out$S[i, , p]; out$G[i, , ] <- out$G[i, , p]
+    out$U[i, , ] <- sweep(out$U[i, , p], 2, sign(C[cbind(1:R, p)]), "*")
+  }
+  out
+}
+
+rinvgamma <- function(n, shape, rate) 1 / rgamma(n, shape, rate)
+
+gibbs_horseshoe_omcoa <- function(Xs, R, n_iter = 6000, burn = 2000, init = NULL,
+                                  a0 = 1e-3, b0 = 1e-3, zeta0 = 1,
+                                  scale_by_noise = TRUE, verbose = TRUE) {
+  ## scale_by_noise = TRUE : sigma_k^(r) ~ N+(0, eta^2 zeta^2 / tau_k)  (Wang et al., 2025)
+  ## scale_by_noise = FALSE: sigma_k^(r) ~ N+(0, eta^2 zeta^2)
+  K <- length(Xs); N <- nrow(Xs[[1]]); P <- sapply(Xs, ncol)
+  stopifnot(R <= min(P))
+  Q <- qr.Q(qr(scale(diag(N), scale = FALSE)))[, 1:(N - 1)]
+
+  if (is.null(init)) init <- omcoa_als(Xs, R)
+  s  <- svd(crossprod(Q, init$U)); Ut <- s$u %*% t(s$v); U <- Q %*% Ut
+  V  <- lapply(init$V, procrustes)
+  Sm <- do.call(rbind, lapply(init$S, function(x) pmax(abs(x), 1e-3)))   # K x R
+  eta2 <- matrix(1, K, R); nu <- matrix(1, K, R); zeta2 <- 1; xi <- 1
+  rss <- function(k) sum((Xs[[k]] - U %*% diag(Sm[k, ], R) %*% t(V[[k]]))^2)
+  tau <- sapply(seq_len(K), function(k) ((N - 1) * P[k]) / rss(k))
+
+  n_keep <- n_iter - burn
+  out <- list(S = array(NA, c(n_keep, K, R)), kappa = array(NA, c(n_keep, K, R)),
+              U = array(NA, c(n_keep, N, R)), zeta2 = numeric(n_keep),
+              tau = matrix(NA, n_keep, K), trace_S = array(NA, c(n_iter, K, R)))
+
+  for (it in seq_len(n_iter)) {
+    ## 1) U | .
+    FU <- Reduce(`+`, lapply(seq_len(K), function(k) tau[k] * Xs[[k]] %*% V[[k]] %*% diag(Sm[k, ], R)))
+    Ut <- rmf_matrix_sweep(crossprod(Q, FU), Ut); U <- Q %*% Ut
+
+    for (k in seq_len(K)) {
+      ## 2) V_k | .
+      V[[k]] <- rmf_matrix_sweep(tau[k] * crossprod(Xs[[k]], U) %*% diag(Sm[k, ], R), V[[k]])
+      ## 3) sigma_k | . ~ N+(m, 1/prec),  prec = tau_k + 1/(eta^2 zeta^2)
+      d    <- diag(t(U) %*% Xs[[k]] %*% V[[k]])
+      w    <- if (scale_by_noise) tau[k] else 1          # facteur d'échelle du prior
+      prec <- tau[k] + w / (eta2[k, ] * zeta2)
+      Sm[k, ] <- rtnorm_pos(tau[k] * d / prec, 1 / sqrt(prec))
+      ## 4) tau_k | .  (le prior de sigma_k contribue si scale_by_noise)
+      if (scale_by_noise)
+        tau[k] <- rgamma(1, a0 + ((N - 1) * P[k] + R) / 2,
+                         b0 + rss(k) / 2 + sum(Sm[k, ]^2 / (eta2[k, ] * zeta2)) / 2)
+      else
+        tau[k] <- rgamma(1, a0 + (N - 1) * P[k] / 2, b0 + rss(k) / 2)
+    }
+    ## 5) échelles locales et globale (horseshoe)
+    W     <- if (scale_by_noise) matrix(tau, K, R) else matrix(1, K, R)
+    eta2  <- matrix(rinvgamma(K * R, 1, 1 / nu + W * Sm^2 / (2 * zeta2)), K, R)
+    nu    <- matrix(rinvgamma(K * R, 1, 1 + 1 / eta2), K, R)
+    zeta2 <- rinvgamma(1, (K * R + 1) / 2, 1 / xi + sum(W * Sm^2 / eta2) / 2)
+    xi    <- rinvgamma(1, 1, 1 / zeta0^2 + 1 / zeta2)
+
+    out$trace_S[it, , ] <- Sm
+    if (it > burn) {
+      i <- it - burn
+      out$S[i, , ] <- Sm
+      out$kappa[i, , ] <- if (scale_by_noise) 1 / (1 + eta2 * zeta2) else 1 / (1 + tau * eta2 * zeta2)
+      out$U[i, , ] <- U; out$zeta2[i] <- zeta2; out$tau[i, ] <- tau
+    }
+    if (verbose && it %% 1000 == 0) cat("itération", it, "/", n_iter, "\n")
+  }
+  out
+}
+
+align_hs <- function(out, U_ref = out$U[1, , ]) {
+  R <- ncol(U_ref); PP <- perms(R)
+  for (i in seq_len(dim(out$S)[1])) {
+    C <- crossprod(U_ref, out$U[i, , ])
+    p <- PP[which.max(apply(PP, 1, function(q) sum(abs(C[cbind(1:R, q)])))), ]
+    out$S[i, , ] <- out$S[i, , p]; out$kappa[i, , ] <- out$kappa[i, , p]
+    out$U[i, , ] <- sweep(out$U[i, , p], 2, sign(C[cbind(1:R, p)]), "*")
+  }
+  out
+}
+
+## Résumé : pour chaque (k, r)
+##  - 1 - E[kappa]  : règle classique du horseshoe (Carvalho et al., 2010) ;
+##  - P(share > c)  : probabilité a posteriori que la dimension r explique plus
+##                    d'une part c de la variance du bloc k (share = sigma^2 / ||X_k||^2).
+hs_summary <- function(out, Xs, c = 0.01) {
+  K <- dim(out$S)[2]; R <- dim(out$S)[3]
+  do.call(rbind, lapply(1:K, function(k) do.call(rbind, lapply(1:R, function(r) {
+    x <- out$S[, k, r]; share <- x^2 / sum(Xs[[k]]^2)
+    data.frame(block = k, dim = r,
+               one_minus_kappa = 1 - mean(out$kappa[, k, r]),
+               p_share = mean(share > c),
+               mean = mean(x), lower = unname(quantile(x, .025)), upper = unname(quantile(x, .975)),
+               share_mean = mean(share))
+  }))))
+}
+
+
+## ---------------------------------------------------------------- résumés
+## Probabilités d'inclusion a posteriori P(gamma_k^(r) = 1 | X)
+pip <- function(out) apply(out$G, c(2, 3), mean)
+## Moyenne a posteriori de sigma_k^(r) et IC 95 %
+sigma_summary <- function(out) {
+  K <- dim(out$S)[2]; R <- dim(out$S)[3]
+  do.call(rbind, lapply(1:K, function(k) do.call(rbind, lapply(1:R, function(r) {
+    x <- out$S[, k, r]
+    data.frame(block = k, dim = r, pip = mean(out$G[, k, r]), mean = mean(x),
+               lower = unname(quantile(x, .025)), upper = unname(quantile(x, .975)))
+  }))))
+}
+## Loi a posteriori du rang effectif (dimensions actives dans au moins un bloc)
+rank_posterior <- function(out) table(apply(out$G, 1, function(g) sum(colSums(g) > 0))) / dim(out$G)[1]
+
+## =====================================================================
+##  Démonstration : structure commune / partiellement commune / spécifique,
+##  rang maximal R = 4 alors que le vrai rang est 3.
+## =====================================================================
+N <- 100; P <- c(10, 5, 15); K <- 3; R_true <- 3; R <- 4
+#                  dim1  dim2  dim3
+sig_true <- rbind(c(.7,  .5,   0),     # bloc 1
+                  c(.6,  .4,   0),     # bloc 2
+                  c(.5,   0,  .6))     # bloc 3
+# dim1 : commune ; dim2 : partagée par les blocs 1-2 ; dim3 : spécifique au bloc 3
+orth <- function(n, h) qr.Q(qr(matrix(rnorm(n * h), n, h)))
+U0 <- qr.Q(qr(scale(matrix(rnorm(N * R_true), N, R_true), scale = FALSE)))
+B<-1000
+resSlSl<-list()
+resHS<-list()
+for(b in 1:B){
+  Xs <- lapply(1:K, function(k) {
+    S <- U0 %*% diag(sig_true[k, ]) %*% t(orth(P[k], R_true))
+    E <- scale(matrix(rnorm(N * P[k]), N, P[k]), scale = FALSE)
+    S + E * sqrt(0.10 / 0.90 * sum(S^2) / sum(E^2))
+  })
+  t0 <- Sys.time()
+  out <- gibbs_sparse_omcoa(Xs, R, n_iter = 6000, burn = 2000)
+  cat("Durée :", format(Sys.time() - t0), "\n")
+  
+  # alignement sur le vrai U complété par une 4e colonne quelconque (démo uniquement)
+  U_ref <- cbind(U0, qr.Q(qr(cbind(U0, scale(rnorm(N), scale = FALSE))))[, R_true + 1])
+  out <- align_sparse(out, U_ref)
+  resSlSl[[b]] <- sigma_summary(out)
+  
+  #cat("\nProbabilités d'inclusion a posteriori (lignes = blocs, colonnes = dimensions) :\n")
+  #print(round(pip(out), 3))
+  #cat("\nVraie structure :\n"); print(cbind(sig_true, 0) > 0)
+  out <- gibbs_horseshoe_omcoa(Xs, R)
+  cat("Durée :", format(Sys.time() - t0), "\n")
+  U_ref <- cbind(U0, qr.Q(qr(cbind(U0, scale(rnorm(N), scale = FALSE))))[, R_true + 1])
+  out <- align_hs(out, U_ref)
+
+  resHS[[b]] <- hs_summary(out, Xs, c = 0.01)
+  
+  
+}
+resF<-list(resSlSl,resHS)
+#save(resF,file="C:/Users/j.galharret/Documents/bayesianCanonicalFactorization/RCodes/res0.RData")
+
+
+load("C:/Users/j.galharret/Documents/bayesianCanonicalFactorization/RCodes/res0.RData")
+## Graphiques
+
+res<-resF[[1]]
+RES<-NULL
+for(b in 1:length(res)){
+RES<-rbind(RES,res[[b]])
+}
+
+
+library(ggplot2)
+ggplot(RES,aes(x=as.factor(dim),y=pip))+
+  geom_boxplot()+
+  facet_grid(~block)+
+  theme_bw()
+
+RES$true<-rep(c(1,1,0,0,1,1,0,0,1,0,1,0),1000)
+
+RES$Pred<-as.numeric(RES$pip>0.5)
+table(RES$Pred,RES$true)
+
+library(dplyr)
+
+tab<-RES |>
+  group_by(block,dim) |>
+  summarise(M=mean(mean),Q5=quantile(mean,probs=.025),Q95=quantile(mean,probs=.975))
+
+tab$true<- c(c(.7,.5,.0,.0),     # bloc 1
+             c(.6,.4,.0,.0),     # bloc 2
+             c(.5,.0,.6,.0))     # bloc 3
+
+
+ggplot(tab,aes(x=as.factor(block),y=M,fill=as.factor(dim)))+
+  geom_bar(stat="identity",position="dodge")+
+  theme_bw()+
+  geom_errorbar(aes(ymin=Q5,ymax=Q95),width=.1)
+
+
+  #res$truth <- cbind(sig_true, 0)[cbind(res$block, res$dim)]
+  #cat("\nsigma_k^(r) : moyenne a posteriori et IC 95 % :\n"); print(res, digits = 3)
+  #cat("\nLoi a posteriori du rang effectif :\n"); print(rank_posterior(out))
+
+  ## Figure : probabilités d'inclusion
+  #library(ggplot2)
+  #P_inc <- pip(out)
+  #d <- expand.grid(block = paste("Bloc", 1:K), dim = paste0("Dim", 1:R))
+  #d$pip <- as.vector(P_inc)
+  #d$truth <- as.vector(cbind(sig_true, 0) > 0)
+  # g <- ggplot(d, aes(dim, block, fill = pip)) +
+  #   geom_tile(colour = "white", linewidth = 1.5) +
+  #   geom_text(aes(label = sprintf("%.2f", pip), colour = pip > 0.5), size = 5) +
+  #   scale_fill_gradient(low = "#f2f1ed", high = "#2a78d6", limits = c(0, 1),
+  #                       name = "P(γ = 1 | X)") +
+  #   scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "#0b0b0b"), guide = "none") +
+  #   scale_y_discrete(limits = rev) +
+  #   labs(x = NULL, y = NULL,
+  #        title = "Probabilités d'inclusion a posteriori (R = 4, vrai rang = 3)",
+  #        subtitle = "Dim1 commune · Dim2 blocs 1–2 · Dim3 spécifique au bloc 3 · Dim4 inactive") +
+  #   theme_minimal(base_size = 12)
+  # ggsave("gibbs_sparse_pip.png", g, width = 8, height = 3.6, dpi = 200)
+

@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\vMF}{vMF}
+\DeclareMathOperator{\Ga}{Gamma}
+\DeclareMathOperator{\Be}{Beta}
+\DeclareMathOperator{\Bern}{Bernoulli}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\X}{\mathbf{X}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\V}{\mathbf{V}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\F}{\mathbf{F}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\I}{\mathbf{I}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\Stiefel}[2]{\mathcal V_{#1,#2}}
+
+\title{A sparse Gibbs sampler for Optimal Multiple Co-Inertia Analysis:\\
+selecting common, partially common and specific dimensions}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+
+In OMCOA, each block is approximated as $\X_k\approx\U\Sigma_k\V_k^\intercal$, where the diagonal matrix
+$\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each latent dimension $\uu^{(r)}$ contributes to
+block $k$. The structure of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension
+$r$ is
+\begin{itemize}
+  \item \emph{common} if $\sigma_k^{(r)}>0$ for all $k$;
+  \item \emph{partially common} if $\sigma_k^{(r)}>0$ for some blocks only;
+  \item \emph{specific} to block $k$ if $\sigma_k^{(r)}>0$ for this block only;
+  \item \emph{inactive} if $\sigma_k^{(r)}=0$ for all $k$.
+\end{itemize}
+OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose
+a Bayesian version of OMCOA in which a spike-and-slab prior on the weights $\sigma_k^{(r)}$ allows them to be exactly
+zero. The dimension $R$ is then a \emph{maximal} rank: inactive dimensions are switched off by the sampler, and the
+effective rank is inferred from the data.
+
+\section{Model}
+
+Let $\X_1,\ldots,\X_K$ be column-centered blocks, $\X_k\in\mathcal M_{N,p_k}(\mathbb R)$, and let $R\leq\min_kp_k$ be the
+maximal dimension of the latent space. We denote by $\Stiefel{m}{R}=\{\mathbf W\in\mathcal M_{m,R}(\mathbb R):\mathbf W^\intercal\mathbf W=\I_R\}$
+the Stiefel manifold. The model reads
+\begin{equation}
+  \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad \EE_k\ \text{with i.i.d.\ entries}\ \mathcal N(0,\tau_k^{-1}),\qquad k=1,\ldots,K,
+  \label{eq:model}
+\end{equation}
+with $\U\in\Stiefel{N}{R}$, $\one_N^\intercal\U=0$, $\V_k\in\Stiefel{p_k}{R}$, and
+\begin{equation}
+  \sigma_k^{(r)}=\gamma_k^{(r)}\,s_k^{(r)},\qquad \gamma_k^{(r)}\in\{0,1\},\quad s_k^{(r)}>0 .
+  \label{eq:spike}
+\end{equation}
+
+\paragraph{Priors.}
+\begin{itemize}
+  \item $\U$ and $\V_1,\ldots,\V_K$: uniform on their Stiefel manifolds;
+  \item spike-and-slab on the weights:
+        $\gamma_k^{(r)}\mid\theta_r\sim\Bern(\theta_r)$ and $s_k^{(r)}\sim\mathcal N^+(0,\lambda^{-1})$, i.e.\
+        \[
+          p\bigl(\sigma_k^{(r)}\mid\theta_r\bigr)=(1-\theta_r)\,\delta_0\bigl(\sigma_k^{(r)}\bigr)+\theta_r\,\mathcal N^+\bigl(\sigma_k^{(r)};0,\lambda^{-1}\bigr);
+        \]
+  \item $\theta_r\sim\Be(a_\theta,b_\theta)$, one inclusion probability per dimension, shared by the $K$ blocks;
+  \item $\tau_k\sim\Ga(a_0,b_0)$.
+\end{itemize}
+Sharing $\theta_r$ across blocks borrows strength: a dimension that is active in several blocks is more likely
+to be active in another one, and a dimension that is inactive everywhere sees $\theta_r$ shrink towards zero.
+
+\section{Full conditional distributions}
+
+As in the non-sparse case, the orthonormality of $\U$ and $\V_k$ gives
+\begin{equation}
+  \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X_k\|^2-2\sum_{r=1}^R\sigma_k^{(r)}d_k^{(r)}+\sum_{r=1}^R\bigl(\sigma_k^{(r)}\bigr)^2,
+  \qquad d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)} .
+  \label{eq:expand}
+\end{equation}
+
+\begin{proposition}[Full conditionals]\label{prop:cond}
+Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\perp$ and write $\U=\Q\tilde\U$.
+\begin{enumerate}
+  \item \textbf{Common space:} $\tilde\U\mid\cdot\sim\vMF(\Q^\intercal\F_{\U})$ with $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$.
+  \item \textbf{Block loadings:} $\V_k\mid\cdot\sim\vMF(\F_{\V_k})$ with $\F_{\V_k}=\tau_k\X_k^\intercal\U\Sigma_k$.
+        When $\sigma_k^{(r)}=0$, the $r$-th column of $\F_{\V_k}$ is zero and $\vv_k^{(r)}$ is uniform on the orthogonal
+        complement of the other columns.
+  \item \textbf{Weights (joint update of $\gamma_k^{(r)}$ and $\sigma_k^{(r)}$).} Let
+        \[
+          \omega_k=\tau_k+\lambda,\qquad m_k^{(r)}=\frac{\tau_k\,d_k^{(r)}}{\omega_k}.
+        \]
+        Then, with $\sigma_k^{(r)}$ integrated out,
+        \[
+          P\bigl(\gamma_k^{(r)}=1\mid\cdot\bigr)=\frac{\theta_r B_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r},\qquad
+          B_k^{(r)}=2\sqrt{\frac{\lambda}{\omega_k}}\,
+          \exp\Bigl(\frac{\omega_k\bigl(m_k^{(r)}\bigr)^2}{2}\Bigr)\,\Phi\Bigl(m_k^{(r)}\sqrt{\omega_k}\Bigr),
+        \]
+        where $\Phi$ is the standard normal c.d.f.; and
+        \[
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\cdot\ \sim\ \mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr),\qquad
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=0,\cdot\ =\ 0 .
+        \]
+  \item \textbf{Inclusion probabilities:}
+        $\theta_r\mid\cdot\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$.
+  \item \textbf{Noise precisions:}
+        $\tau_k\mid\cdot\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Sketch of proof]
+Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
+conjugacy). For item 3, the terms of the log-posterior involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand},
+$\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is
+$0$. Under $\gamma_k^{(r)}=1$, integrating against the half-normal slab of density
+$2\sqrt{\lambda/(2\pi)}\exp(-\lambda s^2/2)$ on $(0,\infty)$ gives
+\[
+  2\sqrt{\frac{\lambda}{2\pi}}\int_0^{\infty}\exp\Bigl(-\frac{\omega_k}{2}s^2+\tau_kd_k^{(r)}s\Bigr)ds
+  =2\sqrt{\frac{\lambda}{\omega_k}}\exp\Bigl(\frac{\omega_k(m_k^{(r)})^2}{2}\Bigr)\Phi\bigl(m_k^{(r)}\sqrt{\omega_k}\bigr)=B_k^{(r)},
+\]
+which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The conditional of $\sigma_k^{(r)}$ given
+$\gamma_k^{(r)}=1$ is obtained by completing the square.
+\end{proof}
+
+Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
+drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$.
+In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow.
+
+\section{Algorithm}
+
+The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column
+being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, as in the non-sparse sampler.
+
+\begin{algorithm}[ht]
+\caption{Sparse Gibbs sampler for OMCOA}\label{alg:sparse}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R\leq\min_kp_k$; iterations $T$; burn-in $T_0$;
+           hyperparameters $a_0,b_0,\lambda,a_\theta,b_\theta$
+  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions; $\gamma_k^{(r)}\gets1$; $\theta_r\gets1/2$;
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State update $\tilde\U$ by one sweep of $\vMF\bigl(\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k\bigr)$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State update $\V_k$ by one sweep of $\vMF\bigl(\tau_k\X_k^\intercal\U\Sigma_k\bigr)$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$,\quad $\omega_k\gets\tau_k+\lambda$,\quad $m_k^{(r)}\gets\tau_kd_k^{(r)}/\omega_k$
+           \State draw $\gamma_k^{(r)}\sim\Bern\Bigl(\dfrac{\theta_rB_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r}\Bigr)$
+           \State \textbf{if} $\gamma_k^{(r)}=1$ \textbf{then} draw $\sigma_k^{(r)}\sim\mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr)$ \textbf{else} $\sigma_k^{(r)}\gets0$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \For{$r=1,\ldots,R$}
+        \State draw $\theta_r\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\Sigma_1,\ldots,\Sigma_K,\boldsymbol\gamma,\boldsymbol\theta,\boldsymbol\tau\bigr)$ \EndIf
+  \EndFor
+  \State align the stored draws (permutation and signs) on a reference $\U_{\mathrm{ref}}$
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+\section{Posterior summaries}
+
+After alignment of the $T-T_0$ stored draws (indexed by $t$) on a reference solution, as in the non-sparse sampler:
+\begin{itemize}
+  \item \textbf{Posterior inclusion probabilities.}
+        $\hat P_k^{(r)}=\frac{1}{T-T_0}\sum_t\gamma_k^{(r),t}$ estimates $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)$. The
+        $K\times R$ matrix $(\hat P_k^{(r)})$ summarizes the structure of the blocks; a dimension is declared active in
+        block $k$ when $\hat P_k^{(r)}>1/2$ (median probability model).
+  \item \textbf{Effective rank.} $R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\}$, whose posterior distribution is
+        estimated by its empirical distribution over the draws.
+  \item \textbf{Block weights.} Posterior means and credible intervals of $\sigma_k^{(r)}$; for active entries they are
+        computed conditionally on $\gamma_k^{(r)}=1$.
+\end{itemize}
+
+\section{Illustration}
+
+We simulated $K=3$ blocks with $N=100$, $(p_1,p_2,p_3)=(10,5,15)$, $10\%$ of noise and a true rank of $3$:
+\[
+  \Sigma_1=\diag(0.7,\,0.5,\,0),\qquad \Sigma_2=\diag(0.6,\,0.4,\,0),\qquad \Sigma_3=\diag(0.5,\,0,\,0.6),
+\]
+so that dimension 1 is common, dimension 2 is shared by blocks 1 and 2, and dimension 3 is specific to block 3.
+The sampler was run with a maximal rank $R=4$ ($T=6000$, $T_0=2000$, $\lambda=1$, $a_\theta=b_\theta=1$).
+Table~\ref{tab:pip} reports the posterior inclusion probabilities: the structure is recovered exactly, the fourth
+dimension is switched off, and $P(R_{\mathrm{eff}}=3\mid\X)=0.96$. All the true non-zero weights lie in their $95\%$
+credible intervals.
+
+\begin{table}[ht]
+\centering
+\caption{Posterior inclusion probabilities $\hat P_k^{(r)}$ (true non-zero entries in bold).}\label{tab:pip}
+\begin{tabular}{lcccc}
+\toprule
+        & Dim 1 & Dim 2 & Dim 3 & Dim 4 \\
+\midrule
+Block 1 & \textbf{1.00} & \textbf{1.00} & 0.02 & 0.01 \\
+Block 2 & \textbf{1.00} & \textbf{1.00} & 0.03 & 0.02 \\
+Block 3 & \textbf{1.00} & 0.04 & \textbf{1.00} & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Remarks}
+
+\begin{remark}[Choice of $\lambda$]
+The Bayes factor $B_k^{(r)}$ contains the factor $\sqrt{\lambda/\omega_k}$: a very diffuse slab ($\lambda\to0$) always favours
+the spike (Lindley's paradox). The slab precision must therefore be chosen on the scale of the data, e.g.\ $\lambda=1$
+when the blocks are scaled so that $\|\X_k\|^2$ is of order one, which is the case when each block is divided by its
+Frobenius norm, as is usual in multiblock analysis.
+\end{remark}
+
+\begin{remark}[Choice of $R$]
+$R$ must satisfy $R\leq\min_kp_k$, because of the orthonormality of $\V_k$. It should be chosen larger than the expected
+rank; the superfluous dimensions are switched off. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
+$a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
+\end{remark}
+
+\begin{remark}[Mixing]
+When $\sigma_k^{(r)}=0$, the loading $\vv_k^{(r)}$ is drawn uniformly, so that $d_k^{(r)}$ is small and the dimension is
+unlikely to be switched back on in the next iterations. Starting from the full model ($\gamma_k^{(r)}=1$, OMCOA
+solution) and letting the sampler switch off the superfluous entries works well in practice; several chains
+started from different initializations should be compared when the structure is ambiguous.
+\end{remark}
+
+\begin{remark}[Link with OMCOA]
+When all $\gamma_k^{(r)}=1$, $\lambda\to0$ and $\tau_1=\cdots=\tau_K$, the modes of the full conditionals are the OMCOA updates.
+The sparse sampler can therefore be seen as OMCOA with an automatic selection of the non-zero entries of
+$\Sigma_1,\ldots,\Sigma_K$, together with a measure of uncertainty on this selection.
+\end{remark}
+
+\begin{thebibliography}{9}
+\bibitem{george1993} E.~I.~George and R.~E.~McCulloch (1993). Variable selection via Gibbs sampling.
+  \emph{Journal of the American Statistical Association}, 88(423), 881--889.
+\bibitem{hoff2007} P.~D.~Hoff (2007). Model averaging and dimension selection for the singular value decomposition.
+  \emph{Journal of the American Statistical Association}, 102(478), 674--685.
+\bibitem{hoff2009} P.~D.~Hoff (2009). Simulation of the matrix Bingham--von Mises--Fisher distribution, with
+  applications to multivariate and relational data. \emph{Journal of Computational and Graphical Statistics}, 18(2), 438--456.
+\bibitem{mitchell1988} T.~J.~Mitchell and J.~J.~Beauchamp (1988). Bayesian variable selection in linear regression.
+  \emph{Journal of the American Statistical Association}, 83(404), 1023--1032.
+\bibitem{wood1994} A.~T.~A.~Wood (1994). Simulation of the von Mises Fisher distribution.
+  \emph{Communications in Statistics -- Simulation and Computation}, 23(1), 157--164.
+\end{thebibliography}
+
+\end{document}

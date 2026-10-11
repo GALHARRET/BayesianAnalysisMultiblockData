@@ -1,0 +1,143 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+
+\title{Proof of Proposition 1 -- OMCOA}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{proposition}
+The successive updates of $T$, $P_k$, and $D_k$ guarantee that the criterion defined in~(4)
+decreases or remains constant at each step, ensuring convergence of the algorithm.
+\end{proposition}
+
+\medskip
+\noindent
+The criterion to be minimized is:
+\[
+  \mathcal{L}(T, P_1, \ldots, P_K, D_1, \ldots, D_K)
+  = \sum_{k=1}^{K} \bigl\| X_k - T D_k P_k^\top \bigr\|^2,
+\]
+subject to $T^\top T = I_H$ and $P_k^\top P_k = I_H$ for all $k = 1, \ldots, K$.
+
+The algorithm is of the \emph{Alternating Least Squares} (ALS) type: at each iteration, the
+criterion is minimized successively with respect to each parameter, while the others are held
+fixed. It therefore suffices to show that \textbf{each individual update decreases or maintains
+$\mathcal{L}$}.
+
+%---------------------------------------------------------------
+\subsection*{Update of $T$}
+
+With $P_k$ and $D_k$ fixed, let $H_k = D_k P_k^\top \in \mathcal{M}_{H,p_k}(\mathbb{R})$ and
+$H = [H_1 \mid \cdots \mid H_K] \in \mathcal{M}_{H,P}(\mathbb{R})$. Then:
+\[
+  \mathcal{L} = \sum_{k=1}^{K} \|X_k - T H_k\|^2 = \|X - T H^\top\|^2.
+\]
+Expanding:
+\[
+  \|X - T H^\top\|^2
+  = \|X\|^2 - 2\,\operatorname{trace}(X^\top T H^\top) + \|T H^\top\|^2.
+\]
+Since $T^\top T = I_H$:
+\[
+  \|T H^\top\|^2
+  = \operatorname{trace}(H T^\top T H^\top)
+  = \operatorname{trace}(H H^\top)
+  = \|H\|^2 \quad \text{(constant w.r.t.\ } T\text{)}.
+\]
+Minimizing $\mathcal{L}$ with respect to $T$ is therefore equivalent to
+\textbf{maximizing} $\operatorname{trace}(X^\top T H^\top) = \operatorname{trace}(T^\top X H)$
+subject to $T^\top T = I_H$.
+
+By \textbf{Lemma~1} (Cliff, 1966), the maximum is attained at $T^* = UV^\top$, where $U$
+(resp.\ $V$) are the matrices of the $H$ leading left (resp.\ right) singular vectors of $XH$.
+This update is the global minimizer of $\mathcal{L}$ with respect to $T$, hence:
+\[
+  \mathcal{L}(T^*, \ldots) \leq \mathcal{L}(T_{\mathrm{old}}, \ldots).
+\]
+
+%---------------------------------------------------------------
+\subsection*{Update of $P_k$}
+
+With $T$ and $D_k$ fixed, expanding the contribution of block $k$:
+\[
+  \|X_k - T D_k P_k^\top\|^2
+  = \|X_k\|^2
+    - 2\,\operatorname{trace}(X_k^\top T D_k P_k^\top)
+    + \|T D_k P_k^\top\|^2.
+\]
+Since $T^\top T = I_H$ and $P_k^\top P_k = I_H$:
+\[
+  \|T D_k P_k^\top\|^2
+  = \operatorname{trace}(P_k D_k^\top T^\top T D_k P_k^\top)
+  = \operatorname{trace}(D_k^2)
+  \quad \text{(constant w.r.t.\ } P_k\text{)}.
+\]
+Minimizing therefore reduces to \textbf{maximizing}
+$\operatorname{trace}(X_k^\top T D_k P_k^\top) = \operatorname{trace}(P_k D_k T^\top X_k)$
+subject to $P_k^\top P_k = I_H$.
+
+By \textbf{Lemma~1} applied to the SVD of $X_k^\top T$ (since $D_k > 0$ is diagonal and does
+not affect the singular vectors), the maximum is attained at $P_k^* = UV^\top$. Hence:
+\[
+  \mathcal{L}(\ldots, P_k^*, \ldots) \leq \mathcal{L}(\ldots, P_{k,\mathrm{old}}, \ldots).
+\]
+
+%---------------------------------------------------------------
+\subsection*{Update of $D_k$}
+
+With $T$ and $P_k$ fixed (both having orthonormal columns), and $D_k = \operatorname{diag}(d_1,
+\ldots, d_H)$, the contribution of block $k$ is:
+\[
+  \|X_k - T D_k P_k^\top\|^2
+  = \|X_k\|^2
+    - 2\,\operatorname{trace}(P_k^\top X_k^\top T D_k)
+    + \operatorname{trace}(D_k^2).
+\]
+Since $D_k$ is diagonal, this decomposes into a sum of $H$ independent scalar terms in $d_h$:
+\[
+  \sum_{h=1}^{H} \Bigl[ d_h^2 - 2\,(T^\top X_k P_k)_{hh} \cdot d_h \Bigr] + \text{const}.
+\]
+Each term is a convex parabola in $d_h$, minimized at:
+\[
+  d_h^* = (T^\top X_k P_k)_{hh},
+\]
+or, in matrix form:
+\[
+  D_k^* = \operatorname{diag}(T^\top X_k P_k).
+\]
+This update is therefore the exact minimizer with respect to $D_k$, and:
+\[
+  \mathcal{L}(\ldots, D_k^*, \ldots) \leq \mathcal{L}(\ldots, D_{k,\mathrm{old}}, \ldots).
+\]
+
+%---------------------------------------------------------------
+\subsection*{Global Convergence}
+
+At each complete iteration (update of $T$, then all $P_k$, then all $D_k$), the criterion
+$\mathcal{L}$ is \textbf{monotonically non-increasing} and \textbf{bounded below by zero}.
+By the monotone convergence theorem, the sequence of values $(\mathcal{L}^{(t)})_{t \geq 0}$
+converges:
+\[
+  \mathcal{L}^{(t+1)} \leq \mathcal{L}^{(t)}, \quad \mathcal{L}^{(t)} \geq 0
+  \implies
+  \mathcal{L}^{(t)} \xrightarrow[t \to \infty]{} \ell^* \geq 0.
+\]
+
+This completes the proof of Proposition~1. \hfill$\blacksquare$
+
+\medskip
+\noindent
+\textbf{Remark.} This proof guarantees convergence of the \emph{values} of the criterion, but not
+necessarily uniqueness of the limit point. Uniqueness of the solution is established separately,
+via the orthogonality of the columns of $P_k$ for all $k$ (cf.\ equation~(4) in the paper).
+
+\end{document}

@@ -1,0 +1,61 @@
+---
+title: "Bayesian SVD"
+format: html
+editor: visual
+---
+
+# Introduction
+
+Soit $Y\in \mathcal M_{n,p}(\mathbb R)$. On suppose que $Y$ s'écrit : $$Y = A.B^T + E,$$ où
+
+-   $E_{ij} \sim N(0, \sigma^2).$
+
+-   $A=[A_{\bullet 1}|...|A_{\bullet r}]=[A_{1\bullet}^T|...|A_{n \bullet}^T]^T$ est une matrice $n,r$
+
+-   $B=[B_{\bullet 1}|...|B_{\bullet r}]=[B_{1\bullet}^T|...|B_{p \bullet}^T]^T$ est une matrice $p,r$
+
+-   On ne connait pas la valeur de $r$.... on le choisit grand (borne supérieure des rangs).
+
+# Model
+
+## Likelihood + priors :
+
+Automatic Relevance Determination (ARD) on factors allows to infer rank.
+
+-   ARD (column-wise) precisions $\alpha=(\alpha_1,...,\alpha_r)$, for $k = 1..r$ : $A_{\bullet  k}\sim \mathcal N(0,\alpha_{-k}I_n)$ $B_{\bullet k}\sim \mathcal N(0,\alpha_{-k}I_p)$
+
+-   Hyperpriors: $\alpha_k ~ \Gamma(a_0, b_0)$ (shape/rate or shape/scale – here use shape/rate) $\tau= 1/\sigma^2 \sim \Gamma(c_0, d_0)$
+
+Remarques :
+
+-   ARD couples $U$ and $V$ by the same $\alpha_k$; implies large $\alpha_k$ -\> shrinks column $k$ toward zero -\> effective rank selection.
+
+-   Using Gaussian priors gives conditional conjugacy, enabling efficient inference.
+
+## Conditional posteriors :
+
+Compute $S_A = A^T.A$ and $S_B = B^T.B$.
+
+-   Each row of $A$ : $A_{i \bullet}|Y,B,\alpha,\tau \sim \mathcal N(\mu_i,\Sigma_A)$ where $\Sigma_A=(\tau S_B+\text{diag}(\alpha))^{-1}$ and $\mu_i=\tau \Sigma_A.B^T.Y_{i\bullet}^T$
+
+-   Each row of $B$ : $B_{j \bullet}|Y,A,\alpha,\tau \sim \mathcal N(\nu_j,\Sigma_B)$ where $\Sigma_B=(\tau S_A+\text{diag}(\alpha))^{-1}$ and $\nu_j=\tau \Sigma_B.A^T.Y_{\bullet j}^T$.
+
+-   For $k = 1,...,r$ $\alpha_k|A,B \sim \Gamma \left(a_0+\frac{n+p}{2},b_0+0.5( \sum_{i=1}^n a_{ik}^2+\sum_{j=1}^p b_{jk}^2)\right).$
+
+-   For $\tau$: $\tau|Y,U,V\sim \Gamma \left(c_0+\frac{np}{2},d_0+0.5\Vert Y-A.B^T\Vert^2 \right).$
+
+From posterior samples $(A^{(s)},B^{(s)})$ built $X^{(s)}=A^{(s)}.{B^{(s)}}^T$ and compute the SVD of $X^{(s)}=U^{(s)}.D^{(s)}.{V^{(s)}}^T$
+
+# Version sparse :
+
+On ajoute un prior spike-and-slab approché (mixture of normals) sur les coefficients de $B$ (les "loadings" / features × composantes) pour encourager des colonnes de $B$ clairsemées. Le spike est un gaussien très concentré près de zéro (variance ≈ 1/spike_prec), la slab est un gaussien dont la variance est contrôlée par α_k (ARD par composante). On conserve ARD pour les colonnes $\alpha_k$ et on apprend la probabilité d'inclusion $\pi_k$ par composante.
+
+Usage et idées clés :
+
+-   $B$ est $p \times r$ et devient clairsemé via $z_{jk} \in {0,1}$. Si $z_{jk} = 0$ l'élément est fortement contraint vers 0 (spike), sinon il appartient à la slab.
+
+-   $A$ reste dense (éléments gaussiens avec variance dépendant de $\alpha_k$).
+
+-   Hyperparamètres : $a_0,b_0$ pour $\alpha$ $a_\pi,b_\pi$ pour $\pi_k$, $spike\_prec$ pour la précision du spike (grand nombre, ex 1e6).
+
+On renvoie : $\hat{X}= \mathbb E[A B^T]$ (moyenne postérieure), moyennes de $\alpha$ et $\pi$, traces des valeurs singulières sauvegardées.

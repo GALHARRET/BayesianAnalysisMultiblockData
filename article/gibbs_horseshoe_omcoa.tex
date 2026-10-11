@@ -1,0 +1,249 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\vMF}{vMF}
+\DeclareMathOperator{\Ga}{Gamma}
+\DeclareMathOperator{\IG}{IG}
+\DeclareMathOperator{\E}{E}
+
+\newcommand{\X}{\mathbf{X}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\V}{\mathbf{V}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\I}{\mathbf{I}}
+\newcommand{\one}{\mathbf{1}}
+
+\title{A horseshoe prior for sparse Optimal Multiple Co-Inertia Analysis:\\
+model, Gibbs sampler and discussion of the selection rule}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+In the sparse version of OMCOA, the block weights $\sigma_k^{(r)}$ of
+$\X_k\approx\U\Sigma_k\V_k^\intercal$, $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$, are shrunk towards zero so
+that the pattern of non-zero weights reveals common, partially common, specific and inactive dimensions. A first
+solution uses a spike-and-slab prior, which puts a point mass at zero. An alternative is the horseshoe prior
+\cite{carvalho2010}, a continuous global--local shrinkage prior, which was recently used on the singular values of a
+Bayesian SVD by Wang et al.\ \cite{wang2025}. This note adapts their approach to OMCOA, gives the corresponding Gibbs
+sampler, and discusses the main practical issue raised by a continuous prior in this context: the rule used to
+decide which weights are non-zero.
+
+\section{Model}
+
+Let $\X_1,\ldots,\X_K$ be column-centered blocks with $\X_k\in\mathcal M_{N,p_k}(\mathbb R)$ and $R\leq\min_kp_k$ a maximal rank:
+\begin{equation}
+  \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad \EE_k\ \text{with i.i.d.\ entries}\ \mathcal N(0,\tau_k^{-1}),
+  \label{eq:model}
+\end{equation}
+with $\U^\intercal\U=\I_R$, $\one_N^\intercal\U=0$ and $\V_k^\intercal\V_k=\I_R$. Following \cite{wang2025}, the weights receive a
+horseshoe prior truncated to $(0,\infty)$ and scaled by the noise level of their block:
+\begin{equation}
+  \sigma_k^{(r)}\mid\eta_k^{(r)},\zeta,\tau_k\ \sim\ \mathcal N^+\Bigl(0,\ \frac{(\eta_k^{(r)})^2\zeta^2}{\tau_k}\Bigr),\qquad
+  \eta_k^{(r)}\sim\mathcal C^+(0,1),\qquad \zeta\sim\mathcal C^+(0,1),
+  \label{eq:hs}
+\end{equation}
+where $\mathcal C^+(0,1)$ is the standard half-Cauchy distribution. The local scales $\eta_k^{(r)}$ let individual
+weights escape shrinkage, while the global scale $\zeta$ adapts the overall level of shrinkage to the number and
+size of the signals. As in the non-sparse sampler, $\U$ and $\V_k$ are uniform on their Stiefel manifolds and
+$\tau_k\sim\Ga(a_0,b_0)$.
+
+\paragraph{Auxiliary variables.} The half-Cauchy distribution is a scale mixture of inverse-gamma distributions
+\cite{makalic2016}: if $x^2\mid a\sim\IG(1/2,1/a)$ and $a\sim\IG(1/2,1/A^2)$, then $x\sim\mathcal C^+(0,A)$. Hence
+\begin{gather*}
+  (\eta_k^{(r)})^2\mid\nu_k^{(r)}\sim\IG\bigl(1/2,1/\nu_k^{(r)}\bigr),\qquad \nu_k^{(r)}\sim\IG(1/2,1),\\
+  \zeta^2\mid\xi\sim\IG(1/2,1/\xi),\qquad \xi\sim\IG(1/2,1),
+\end{gather*}
+and all the full conditional distributions are standard.
+
+\section{Full conditional distributions}
+
+With $d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$ and the decomposition
+$\|\X_k-\U\Sigma_k\V_k^\intercal\|^2=\|\X_k\|^2-2\sum_r\sigma_k^{(r)}d_k^{(r)}+\sum_r(\sigma_k^{(r)})^2$:
+
+\begin{proposition}\label{prop:cond}
+\begin{enumerate}
+  \item $\U$ and $\V_k$: matrix von Mises--Fisher distributions, as in the non-sparse sampler, with parameters
+        $\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k$ for $\tilde\U$ (where $\U=\Q\tilde\U$) and $\tau_k\X_k^\intercal\U\Sigma_k$ for $\V_k$.
+  \item Weights: with $\omega_k^{(r)}=\tau_k\bigl(1+1/((\eta_k^{(r)})^2\zeta^2)\bigr)$,
+        \[
+          \sigma_k^{(r)}\mid\cdot\ \sim\ \mathcal N^+\Bigl((1-\kappa_k^{(r)})\,d_k^{(r)},\ \frac{1}{\omega_k^{(r)}}\Bigr),\qquad
+          \kappa_k^{(r)}=\frac{1}{1+(\eta_k^{(r)})^2\zeta^2}\in(0,1).
+        \]
+  \item Local and global scales:
+        \[
+          (\eta_k^{(r)})^2\mid\cdot\sim\IG\Bigl(1,\ \frac{1}{\nu_k^{(r)}}+\frac{\tau_k(\sigma_k^{(r)})^2}{2\zeta^2}\Bigr),\qquad
+          \nu_k^{(r)}\mid\cdot\sim\IG\Bigl(1,\ 1+\frac{1}{(\eta_k^{(r)})^2}\Bigr),
+        \]
+        \[
+          \zeta^2\mid\cdot\sim\IG\Bigl(\frac{KR+1}{2},\ \frac{1}{\xi}+\sum_{k,r}\frac{\tau_k(\sigma_k^{(r)})^2}{2(\eta_k^{(r)})^2}\Bigr),\qquad
+          \xi\mid\cdot\sim\IG\Bigl(1,\ 1+\frac{1}{\zeta^2}\Bigr).
+        \]
+  \item Noise precisions (the prior \eqref{eq:hs} depends on $\tau_k$):
+        \[
+          \tau_k\mid\cdot\sim\Ga\Bigl(a_0+\frac{(N-1)p_k+R}{2},\ b_0+\frac{\|\X_k-\U\Sigma_k\V_k^\intercal\|^2}{2}
+          +\sum_r\frac{(\sigma_k^{(r)})^2}{2(\eta_k^{(r)})^2\zeta^2}\Bigr).
+        \]
+\end{enumerate}
+\end{proposition}
+
+The quantity $\kappa_k^{(r)}$ is the \emph{shrinkage factor}: the conditional mean of $\sigma_k^{(r)}$ is
+$(1-\kappa_k^{(r)})d_k^{(r)}$, so that $\kappa_k^{(r)}\approx1$ means that the weight is shrunk to zero and
+$\kappa_k^{(r)}\approx0$ that it is left almost untouched.
+
+\begin{algorithm}[ht]
+\caption{Horseshoe Gibbs sampler for sparse OMCOA}\label{alg:hs}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R$; iterations $T$; burn-in $T_0$; $a_0,b_0$
+  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions; $\eta_k^{(r)}=\nu_k^{(r)}=\zeta=\xi=1$;
+         $\tau_k\gets(N-1)p_k/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+    \State update $\U$, then each $\V_k$, by one column-wise sweep of their von Mises--Fisher conditionals
+    \For{$k=1,\ldots,K$}
+      \State draw $\sigma_k^{(1)},\ldots,\sigma_k^{(R)}$ from their truncated normal conditionals; draw $\tau_k$
+    \EndFor
+    \State draw $(\eta_k^{(r)})^2$, $\nu_k^{(r)}$ for all $(k,r)$, then $\zeta^2$ and $\xi$
+    \If{$t>T_0$} store $\U$, $\Sigma_k$, $\kappa_k^{(r)}$, $\tau_k$ \EndIf
+  \EndFor
+  \State align the stored draws (permutation and signs of the dimensions) on a reference $\U_{\mathrm{ref}}$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Simulation}
+
+We used the same design as for the spike-and-slab sampler: $K=3$, $N=100$, $(p_1,p_2,p_3)=(10,5,15)$, $10\%$ of noise,
+true rank $3$ with
+\[
+  \Sigma_1=\diag(0.7,\,0.5,\,0),\qquad\Sigma_2=\diag(0.6,\,0.4,\,0),\qquad\Sigma_3=\diag(0.5,\,0,\,0.6),
+\]
+(dimension 1 common, dimension 2 shared by blocks 1 and 2, dimension 3 specific to block 3), and a maximal rank $R=4$
+($T=6000$, $T_0=2000$). Table~\ref{tab:hs} reports, for each weight, the posterior mean, the quantity
+$1-\E[\kappa_k^{(r)}\mid\X]$, and the posterior probability that the dimension explains more than $1\%$ of the
+variance of the block (Section~\ref{sec:rules}).
+
+\begin{table}[ht]
+\centering
+\caption{Horseshoe sampler: posterior summaries of the weights (true non-zero entries in bold).}\label{tab:hs}
+\begin{tabular}{ccrrrr}
+\toprule
+Block & Dim & True $\sigma_k^{(r)}$ & $\E[\sigma_k^{(r)}\mid\X]$ & $1-\E[\kappa_k^{(r)}\mid\X]$ & $P(s_k^{(r)}>1\%\mid\X)$ \\
+\midrule
+1 & 1 & \textbf{0.7} & 0.710 & 1.000 & 1.000 \\
+1 & 2 & \textbf{0.5} & 0.511 & 0.999 & 1.000 \\
+1 & 3 & 0   & 0.011 & 0.804 & 0.000 \\
+1 & 4 & 0   & 0.021 & 0.853 & 0.000 \\
+2 & 1 & \textbf{0.6} & 0.600 & 0.999 & 1.000 \\
+2 & 2 & \textbf{0.4} & 0.392 & 0.999 & 1.000 \\
+2 & 3 & 0   & 0.015 & 0.793 & 0.000 \\
+2 & 4 & 0   & 0.020 & 0.807 & 0.004 \\
+3 & 1 & \textbf{0.5} & 0.499 & 1.000 & 1.000 \\
+3 & 2 & 0   & 0.008 & 0.756 & 0.000 \\
+3 & 3 & \textbf{0.6} & 0.602 & 1.000 & 1.000 \\
+3 & 4 & 0   & 0.019 & 0.869 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As an estimator, the horseshoe behaves as expected: the non-zero weights are estimated without visible bias, and
+the null weights are shrunk to values between $0.008$ and $0.021$, i.e.\ one to two orders of magnitude below the
+signals. The question is how to turn these continuous estimates into a decision.
+
+\section{Discussion: which selection rule?}\label{sec:rules}
+
+\subsection{The standard rule fails}
+
+In the normal-means problem $y\sim\mathcal N(\beta,1)$, Carvalho et al.\ \cite{carvalho2010} declare $\beta$ non-zero when
+$1-\E[\kappa\mid y]>1/2$, i.e.\ when the posterior mean keeps more than half of the observation. Applied to OMCOA,
+this rule declares \emph{every} weight active (Table~\ref{tab:hs}): the null weights have $1-\E[\kappa]$ between $0.76$
+and $0.87$.
+
+The reason is specific to SVD-type models. The rule is calibrated for an observation equal to the parameter plus
+a standard noise. In OMCOA, the ``observation'' of $\sigma_k^{(r)}$ is $d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$, and the
+directions $\uu^{(r)}$ and $\vv_k^{(r)}$ are themselves fitted to the data. For a null weight, $\vv_k^{(r)}$ is chosen on a
+sphere of dimension $p_k-R$ so as to maximize $d_k^{(r)}$: it aligns with the largest noise direction available, and
+$d_k^{(r)}$ is of the order of $\sqrt{p_k-R+1}$ noise standard deviations, or more when $\uu^{(r)}$ is free as well. Measured
+in units of the noise standard deviation, a null weight therefore looks like a small but genuine signal, and the
+horseshoe, correctly, does not shrink it completely. In other words, the shrinkage factor $\kappa_k^{(r)}$ is a
+relevant measure of shrinkage, but $1/2$ is not a relevant threshold here.
+
+This is consistent with Wang et al.\ \cite{wang2025}, who do not use $\kappa$ to select the rank of their Bayesian SVD,
+but the ratio of consecutive posterior singular values (see below).
+
+\subsection{Alternative rules}
+
+\paragraph{Explained variance.} A natural criterion in multiblock analysis is the share of the variance of block $k$
+explained by dimension $r$, $s_k^{(r)}=(\sigma_k^{(r)})^2/\|\X_k\|^2$. A weight is declared active when
+$P(s_k^{(r)}>c\mid\X)>1/2$ for a threshold $c$ fixed by the user. With $c=1\%$, the structure is recovered exactly
+(last column of Table~\ref{tab:hs}). The separation is wide: the posterior mean of $s_k^{(r)}$ is at most $0.12\%$ for the
+null weights and at least $27\%$ for the non-zero ones, so the result is not sensitive to the choice of $c$ in a
+broad range. The drawback is that $c$ is a substantive choice rather than a statistical one.
+
+\paragraph{Ratio of consecutive weights.} Following \cite{wang2025}, the posterior means of the weights of each block can be
+sorted in decreasing order, $\hat\sigma_{k,(1)}\geq\cdots\geq\hat\sigma_{k,(R)}$, and the number of active dimensions of block
+$k$ taken as $\hat R_k=\arg\max_j\hat\sigma_{k,(j)}/\hat\sigma_{k,(j+1)}$. In the simulation the largest ratios are $24.6$,
+$20.0$ and $26.4$ for blocks 1, 2 and 3, all located between the second and third largest weights, so that
+$\hat R_k=2$ for each block and the structure is recovered. This scree-type rule requires no threshold, but it
+always declares at least one active dimension per block and cannot conclude that all $R$ dimensions are active; it
+is also less natural when $R$ is small.
+
+\paragraph{Noise floor.} The argument above suggests a calibrated threshold: compare $\sigma_k^{(r)}$ with the value
+expected for a null weight, of the order of $c_k=\sqrt{(p_k-R+1)/\tau_k}$, and declare the weight active when
+$P(\sigma_k^{(r)}>\rho\,c_k\mid\X)>1/2$ for a constant $\rho>1$. This rule adapts to the noise level and to the
+dimension of each block; its calibration (choice of $\rho$, e.g.\ by permutation of the rows of each block) has
+not been studied yet.
+
+\subsection{Horseshoe versus spike-and-slab}
+
+\begin{table}[ht]
+\centering
+\caption{Comparison of the two sparse priors for OMCOA.}\label{tab:comp}
+\begin{tabular}{p{4.2cm}p{5.1cm}p{5.1cm}}
+\toprule
+ & Spike-and-slab & Horseshoe \\
+\midrule
+Exact zeros & yes & no (continuous shrinkage) \\
+Selection & posterior inclusion probabilities, threshold $1/2$ & requires an additional rule (explained variance, ratio, noise floor) \\
+Structure common / specific & read directly from $\gamma_k^{(r)}$ & deduced from the selection rule \\
+Tuning & slab precision $\lambda$ (Lindley's paradox) & no slab scale; threshold of the selection rule \\
+Mixing & switched-off dimensions are hard to switch on again & smoother (no discrete moves) \\
+Uncertainty on the structure & yes ($P(\gamma_k^{(r)}=1\mid\X)$) & indirect ($P(s_k^{(r)}>c\mid\X)$) \\
+Estimation of the weights & good & good, with adaptive shrinkage \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Both priors estimate the non-zero weights equally well in our simulation. They differ in how the structure is
+obtained (Table~\ref{tab:comp}). The spike-and-slab prior answers the question of interest directly, through the
+probability that dimension $r$ is present in block $k$, at the price of choosing the slab precision. The horseshoe
+avoids this choice and mixes more easily, but its continuous nature moves the selection problem to a post-processing
+rule, and the standard rule based on $\kappa$ is not calibrated for SVD-type models. For the identification of
+common, partially common and specific structures, the spike-and-slab prior is therefore the more natural choice; the
+horseshoe is attractive when the goal is primarily the estimation of the weights, or as a robustness check of the
+structure selected by the spike-and-slab sampler.
+
+\begin{thebibliography}{9}
+\bibitem{carvalho2010} C.~M.~Carvalho, N.~G.~Polson and J.~G.~Scott (2010). The horseshoe estimator for sparse signals.
+  \emph{Biometrika}, 97(2), 465--480.
+\bibitem{hoff2007} P.~D.~Hoff (2007). Model averaging and dimension selection for the singular value decomposition.
+  \emph{Journal of the American Statistical Association}, 102(478), 674--685.
+\bibitem{makalic2016} E.~Makalic and D.~F.~Schmidt (2016). A simple sampler for the horseshoe estimator.
+  \emph{IEEE Signal Processing Letters}, 23(1), 179--182.
+\bibitem{wang2025} J.~Wang, Y.~Gong, H.~Lin, R.~Zhang and W.~Zhao (2025). Bayesian singular value decomposition procedure
+  based on the horseshoe prior. \emph{Journal of Applied Statistics}, doi:10.1080/02664763.2025.2589992.
+\end{thebibliography}
+
+\end{document}

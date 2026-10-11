@@ -1,0 +1,245 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{hyperref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\vMF}{vMF}
+\DeclareMathOperator{\Ga}{Gamma}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\X}{\mathbf{X}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\V}{\mathbf{V}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\F}{\mathbf{F}}
+\newcommand{\W}{\mathbf{W}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\ww}{\mathbf{w}}
+\newcommand{\f}{\mathbf{f}}
+\newcommand{\z}{\mathbf{z}}
+\newcommand{\I}{\mathbf{I}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\Stiefel}[2]{\mathcal V_{#1,#2}}
+
+\title{A Gibbs sampler for Optimal Multiple Co-Inertia Analysis}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Probabilistic model}
+
+We consider $K$ column-centered blocks $\X_1,\ldots,\X_K$, with $\X_k\in\mathcal M_{N,p_k}(\mathbb R)$, and a
+latent space of dimension $H\leq\min_k p_k$. OMCOA minimizes
+\begin{equation}
+  \sum_{k=1}^K\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2
+  \quad\text{subject to}\quad \U^\intercal\U=\I_H,\ \ \V_k^\intercal\V_k=\I_H,\ \ \Sigma_k=\diag\bigl(\sigma_k^{(1)},\ldots,\sigma_k^{(H)}\bigr).
+  \label{eq:crit}
+\end{equation}
+A probabilistic counterpart of \eqref{eq:crit} is obtained by assuming a Gaussian noise:
+\begin{equation}
+  \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad
+  \EE_k\ \text{with i.i.d.\ entries}\ \mathcal N\bigl(0,\tau_k^{-1}\bigr),\qquad k=1,\ldots,K,
+  \label{eq:model}
+\end{equation}
+where $\tau_k$ is the noise precision of block $k$. Let $\Stiefel{m}{H}=\{\W\in\mathcal M_{m,H}(\mathbb R):\W^\intercal\W=\I_H\}$
+denote the Stiefel manifold. Since the blocks are centered, the latent components are constrained to be
+centered as well: $\U\in\Stiefel{N}{H}$ with $\one_N^\intercal\U=0$.
+
+\paragraph{Priors.} We use the following independent priors:
+\begin{itemize}
+  \item $\U$ and $\V_1,\ldots,\V_K$ are uniformly distributed on their Stiefel manifolds (non-informative);
+  \item $\sigma_k^{(h)}\sim\mathcal N^+\bigl(0,\lambda^{-1}\bigr)$, a half-normal distribution with a small precision
+        $\lambda$ (e.g.\ $\lambda=10^{-2}$); the positivity constraint removes the sign indeterminacy between
+        $\sigma_k^{(h)}$ and $\vv_k^{(h)}$;
+  \item $\tau_k\sim\Ga(a_0,b_0)$ with small hyperparameters (e.g.\ $a_0=b_0=10^{-3}$).
+\end{itemize}
+
+\section{Full conditional distributions}
+
+\paragraph{Likelihood.} Because $\U$ and $\V_k$ have orthonormal columns and $\Sigma_k$ is diagonal,
+\begin{equation}
+  \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2
+  =\|\X_k\|^2-2\trace\bigl(\Sigma_k\V_k^\intercal\X_k^\intercal\U\bigr)+\sum_{h=1}^H\bigl(\sigma_k^{(h)}\bigr)^2 .
+  \label{eq:expand}
+\end{equation}
+Since the blocks are centered, each $\X_k$ carries $(N-1)p_k$ degrees of freedom, and the log-likelihood reads
+\[
+  \log p(\X_1,\ldots,\X_K\mid\cdot)=\sum_{k=1}^K\Bigl[\tfrac{(N-1)p_k}{2}\log\tau_k
+  -\tfrac{\tau_k}{2}\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2\Bigr]+\text{const}.
+\]
+By \eqref{eq:expand}, $\U$ and $\V_k$ only appear in the linear term $\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)$.
+This is the key property: all the full conditionals belong to standard families.
+
+\paragraph{Matrix von Mises--Fisher distribution.} A random matrix $\W\in\Stiefel{m}{H}$ follows the matrix
+von Mises--Fisher distribution $\vMF(\F)$, with parameter $\F\in\mathcal M_{m,H}(\mathbb R)$, if its density with
+respect to the uniform measure on $\Stiefel{m}{H}$ is proportional to $\exp\{\trace(\F^\intercal\W)\}$
+\cite{hoff2009}. If $\F=\mathbf A\mathbf D\mathbf B^\intercal$ is the (thin) SVD of $\F$, the mode of $\vMF(\F)$ is the
+polar factor $\mathbf A\mathbf B^\intercal$, and the distribution concentrates around it as the singular values of $\F$ increase.
+
+\begin{proposition}[Full conditionals]\label{prop:cond}
+Under model \eqref{eq:model} and the above priors:
+\begin{enumerate}
+  \item \textbf{Common space.} Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of
+        $\one_N^\perp$ and write $\U=\Q\tilde\U$ with $\tilde\U\in\Stiefel{N-1}{H}$. Then
+        \[
+          \tilde\U\mid\cdot\ \sim\ \vMF\bigl(\Q^\intercal\F_{\U}\bigr),\qquad
+          \F_{\U}=\sum_{k=1}^K\tau_k\,\X_k\V_k\Sigma_k .
+        \]
+  \item \textbf{Block loadings.} For $k=1,\ldots,K$,
+        \[
+          \V_k\mid\cdot\ \sim\ \vMF\bigl(\F_{\V_k}\bigr),\qquad \F_{\V_k}=\tau_k\,\X_k^\intercal\U\Sigma_k .
+        \]
+  \item \textbf{Block weights.} For $k=1,\ldots,K$ and $h=1,\ldots,H$, let $d_k^{(h)}={\uu^{(h)}}^\intercal\X_k\vv_k^{(h)}$. Then
+        \[
+          \sigma_k^{(h)}\mid\cdot\ \sim\ \mathcal N^+\Bigl(\frac{\tau_k\,d_k^{(h)}}{\tau_k+\lambda},\ \frac{1}{\tau_k+\lambda}\Bigr),
+        \]
+        a normal distribution truncated to $(0,+\infty)$.
+  \item \textbf{Noise precisions.} For $k=1,\ldots,K$,
+        \[
+          \tau_k\mid\cdot\ \sim\ \Ga\Bigl(a_0+\frac{(N-1)p_k}{2},\ b_0+\frac{1}{2}\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2\Bigr).
+        \]
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Sketch of proof]
+(1)--(2): by \eqref{eq:expand}, the conditional density of $\U$ is proportional to
+$\exp\{\sum_k\tau_k\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)\}=\exp\{\trace(\F_{\U}^\intercal\U)\}$, and
+$\trace(\F_{\U}^\intercal\Q\tilde\U)=\trace\bigl((\Q^\intercal\F_{\U})^\intercal\tilde\U\bigr)$; the same argument applies to $\V_k$
+with $\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)=\trace(\F_{\V_k}^\intercal\V_k)/\tau_k$.
+(3): the terms of \eqref{eq:expand} involving $\sigma_k^{(h)}$ are $-\frac{\tau_k}{2}\bigl[(\sigma_k^{(h)})^2-2\sigma_k^{(h)}d_k^{(h)}\bigr]$;
+adding the log-prior $-\frac{\lambda}{2}(\sigma_k^{(h)})^2$ and completing the square gives a Gaussian kernel, restricted to
+$\sigma_k^{(h)}>0$.
+(4): the Gamma prior is conjugate for the precision of a Gaussian likelihood.
+\end{proof}
+
+\section{Sampling from the matrix von Mises--Fisher distribution}
+
+Direct sampling from $\vMF(\F)$ is not straightforward, but its column-wise conditionals are vector von
+Mises--Fisher distributions \cite{hoff2009}. Let $\W_{-j}$ be $\W$ without its $j$-th column and
+$\mathbf N_j\in\mathcal M_{m,m-H+1}(\mathbb R)$ an orthonormal basis of $\mathrm{span}(\W_{-j})^\perp$. Then
+\[
+  \ww_j=\mathbf N_j\z,\qquad \z\sim\vMF\bigl(\mathbf N_j^\intercal\f_j\bigr)\ \text{on the unit sphere } \mathbb S^{m-H},
+\]
+where $\f_j$ is the $j$-th column of $\F$. One sweep over the $H$ columns (in random order) is a valid Gibbs update
+of $\W$, which is enough inside the Gibbs sampler. The vector distribution $\vMF(\f)$, with density
+proportional to $\exp(\f^\intercal\z)$ on $\mathbb S^{m-1}$, is sampled with the rejection algorithm of Wood \cite{wood1994}
+(Algorithm~\ref{alg:wood}).
+
+\begin{algorithm}[ht]
+\caption{Sampling $\z\sim\vMF(\f)$ on $\mathbb S^{m-1}$ (Wood, 1994)}\label{alg:wood}
+\begin{algorithmic}[1]
+  \State $\kappa\gets\|\f\|$,\quad $\boldsymbol\mu\gets\f/\kappa$
+  \State $b\gets (m-1)\big/\bigl(2\kappa+\sqrt{4\kappa^2+(m-1)^2}\bigr)$,\quad $x_0\gets(1-b)/(1+b)$,\quad
+         $c\gets\kappa x_0+(m-1)\log(1-x_0^2)$
+  \Repeat
+     \State draw $\zeta\sim\mathrm{Beta}\bigl(\tfrac{m-1}{2},\tfrac{m-1}{2}\bigr)$ and $\upsilon\sim\mathcal U(0,1)$
+     \State $w\gets\bigl(1-(1+b)\zeta\bigr)\big/\bigl(1-(1-b)\zeta\bigr)$
+  \Until{$\kappa w+(m-1)\log(1-x_0w)-c\geq\log\upsilon$}
+  \State draw $\boldsymbol\xi\sim\mathcal N(\mathbf 0,\I_m)$, set $\boldsymbol\xi\gets\boldsymbol\xi-(\boldsymbol\mu^\intercal\boldsymbol\xi)\boldsymbol\mu$
+         and $\boldsymbol\xi\gets\boldsymbol\xi/\|\boldsymbol\xi\|$
+  \State \Return $\z=w\,\boldsymbol\mu+\sqrt{1-w^2}\,\boldsymbol\xi$
+\end{algorithmic}
+\end{algorithm}
+
+\noindent The expression of $b$ used in Algorithm~\ref{alg:wood} is algebraically equivalent to Wood's original one,
+$b=\bigl(-2\kappa+\sqrt{4\kappa^2+(m-1)^2}\bigr)/(m-1)$, but avoids a numerical cancellation when $\kappa$ is large,
+which is the typical situation here since $\kappa$ scales with the noise precisions $\tau_k$.
+
+\section{The Gibbs sampler}
+
+\begin{algorithm}[ht]
+\caption{Gibbs sampler for OMCOA}\label{alg:gibbs}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; dimension $H$; number of iterations $T$; burn-in $T_0$;
+           hyperparameters $a_0,b_0,\lambda$
+  \State \textbf{Initialization:} $\U=\Q\tilde\U$, $\V_k$, $\Sigma_k$ from OMCOA (or MCOA, or at random);
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State $\F_{\U}\gets\sum_{k}\tau_k\,\X_k\V_k\Sigma_k$;\quad update $\tilde\U$ by one column-wise sweep of $\vMF(\Q^\intercal\F_{\U})$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State $\F_{\V_k}\gets\tau_k\,\X_k^\intercal\U\Sigma_k$;\quad update $\V_k$ by one column-wise sweep of $\vMF(\F_{\V_k})$
+        \For{$h=1,\ldots,H$}
+           \State $d_k^{(h)}\gets{\uu^{(h)}}^\intercal\X_k\vv_k^{(h)}$;\quad draw
+                  $\sigma_k^{(h)}\sim\mathcal N^+\bigl(\tau_kd_k^{(h)}/(\tau_k+\lambda),\,1/(\tau_k+\lambda)\bigr)$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\V_1,\ldots,\V_K,\Sigma_1,\ldots,\Sigma_K,\tau_1,\ldots,\tau_K\bigr)$ \EndIf
+  \EndFor
+  \State \textbf{Post-processing:} align each stored draw on a reference solution (Section~\ref{sec:align})
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+\section{Post-processing: label switching and signs}\label{sec:align}
+
+The posterior distribution is invariant under any permutation $\pi$ of the $H$ dimensions applied jointly to
+$\U$, $\V_1,\ldots,\V_K$ and $\Sigma_1,\ldots,\Sigma_K$, and under a joint change of sign of $\uu^{(h)}$ and
+$\vv_1^{(h)},\ldots,\vv_K^{(h)}$. Posterior summaries are therefore computed after aligning each draw on a reference
+$\U_{\mathrm{ref}}$ (in practice the OMCOA solution). For each draw, with $\mathbf C=\U_{\mathrm{ref}}^\intercal\U$,
+\[
+  \hat\pi=\argmax_{\pi\in\mathfrak S_H}\sum_{h=1}^H\bigl|C_{h,\pi(h)}\bigr|,\qquad
+  s_h=\operatorname{sign}\bigl(C_{h,\hat\pi(h)}\bigr),
+\]
+and the columns of $\U$ and $\V_k$ are reordered by $\hat\pi$ and multiplied by $s_h$, while the diagonal of
+$\Sigma_k$ is reordered by $\hat\pi$ (it stays positive). Posterior means and credible intervals of $\sigma_k^{(h)}$
+are then obtained from the empirical distribution of the aligned draws.
+
+\section{Link with OMCOA}
+
+\begin{remark}[OMCOA as iterated conditional modes]
+The modes of the full conditionals of Proposition~\ref{prop:cond} are
+\[
+  \U=\mathbf A\mathbf B^\intercal\ \text{with}\ \F_{\U}=\mathbf A\mathbf D\mathbf B^\intercal,\qquad
+  \V_k=\mathbf A_k\mathbf B_k^\intercal\ \text{with}\ \F_{\V_k}=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal,\qquad
+  \sigma_k^{(h)}=\frac{\tau_k}{\tau_k+\lambda}\,d_k^{(h)} .
+\]
+When $\lambda\to0$ and the precisions are equal ($\tau_1=\cdots=\tau_K$), these are exactly the OMCOA updates:
+Procrustes rotation of $\X\mathbf H^\intercal$ for $\U$ (with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$),
+Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$. OMCOA is therefore the
+iterated conditional modes (ICM) algorithm \cite{besag1986} associated with this posterior, and the Gibbs sampler is its
+stochastic counterpart.
+\end{remark}
+
+\begin{remark}[Block weighting]
+With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise
+precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion
+\eqref{eq:crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
+$\tau\mid\cdot\sim\Ga\bigl(a_0+\sum_k(N-1)p_k/2,\ b_0+\sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
+\end{remark}
+
+\begin{remark}[What the sampler adds]
+Besides point estimates close to the OMCOA solution, the sampler provides the posterior distribution of the block
+weights $\sigma_k^{(h)}$ and of the noise levels $\tau_k^{-1}$. Credible intervals on $\sigma_k^{(h)}$ can be used to assess
+whether a dimension is common to all blocks, shared by some of them, or specific to one block.
+\end{remark}
+
+\begin{remark}[Practical aspects]
+Starting from the OMCOA solution shortens the burn-in. The column-wise sweeps make successive draws of $\U$ and
+$\V_k$ correlated, so convergence should be checked on trace plots of the $\sigma_k^{(h)}$. Because the posterior is
+strongly concentrated when the noise is small, the chain rarely jumps between the $H!$ equivalent modes; the alignment step
+remains necessary nonetheless, in particular when several dimensions have close weights.
+\end{remark}
+
+\begin{thebibliography}{9}
+\bibitem{besag1986} J.~Besag (1986). On the statistical analysis of dirty pictures.
+  \emph{Journal of the Royal Statistical Society, Series B}, 48(3), 259--302.
+\bibitem{hoff2007} P.~D.~Hoff (2007). Model averaging and dimension selection for the singular value decomposition.
+  \emph{Journal of the American Statistical Association}, 102(478), 674--685.
+\bibitem{hoff2009} P.~D.~Hoff (2009). Simulation of the matrix Bingham--von Mises--Fisher distribution, with
+  applications to multivariate and relational data. \emph{Journal of Computational and Graphical Statistics}, 18(2), 438--456.
+\bibitem{wood1994} A.~T.~A.~Wood (1994). Simulation of the von Mises Fisher distribution.
+  \emph{Communications in Statistics -- Simulation and Computation}, 23(1), 157--164.
+\end{thebibliography}
+
+\end{document}

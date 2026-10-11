@@ -1,0 +1,404 @@
+\documentclass[11pt]{article}
+%
+%
+% Retirez le caractere "%" au debut de la ligne ci-dessous si votre
+% editeur de texte utilise des caracteres accentues
+% \usepackage[latin1]{inputenc}
+\setlength{\headheight}{14pt}
+%
+% Retirez le caractere "%" au debut des lignes ci-dessous si vous
+% utiisez les symboles et macros de l'AMS
+ \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{graphicx}
+\usepackage{color}
+
+%\usepackage{biblatex}
+%\addbibresource{Biblio.bib}
+
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\setlength{\parskip}{6pt}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+%\usepackage{caption}
+
+
+\usepackage{amsopn}             % pour \DeclareMathOperator
+\usepackage{amssymb}            % pour \leqslant
+
+\DeclareMathOperator{\cov}{cov}
+\DeclareMathOperator{\cor}{cor}
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\sumss}{SS}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator{\trace}{\mathrm{trace}}
+
+\newcommand{\X}{\textbf{X}}
+\newcommand{\U}{\textbf{U}}
+\newcommand{\V}{\textbf{V}}
+\renewcommand{\u}{\textbf{u}}
+\renewcommand{\v}{\textbf{v}}
+\newcommand{\HH}{\textbf{H}}
+\newcommand{\EE}{\textbf{E}}
+
+\begin{document}
+\renewcommand{\headrulewidth}{0pt}
+
+
+%--------------------------------------------------------------------------
+
+\begin{center}
+{\Large
+	{\sc Bayesian Framework for Canonical factorization of multiblock data}
+}
+\bigskip
+
+ %\underline{Jean-Michel Galharret}$^{1}$ \& Stephanie Bougeard $^{2}$ \& Katrijn Van Deun$^{3}$ \& Mohamed Hanafi$^{1}$
+\bigskip
+
+%{\it
+%$^{1}$ Oniris, INRAE, StatSC, Nantes, France. \\
+%$^{2}$ Epidemiology and Welfare, ANSES, Ploufragan, France. \\
+%$^{3}$ Department of Methodology and Statistics, Tilburg University, Tilburg, The Netherlands.
+%}
+\end{center}
+\bigskip
+
+--------------------------------------------------------------------------
+
+\section{Introduction}
+
+Data sets structured into blocks of variables measured on the same set of observations are frequently encountered in practice. These blocks may consist of quantitative variables originating from distinct measurement sources or correspond to thematic groupings defined by the user. For instance, in omics studies, blocks typically comprise variables derived from different analytical techniques (e.g., proteomics, metabolomics). In psychology, multiblock data structures commonly arise when multiple sets of variables are collected on the same individuals to capture different psychological domains. For example, distinct blocks may include self-report questionnaire scores assessing personality traits, behavioral task performance measures, and neurophysiological indicators such as electroencephalography  features.
+
+The four expected objectives of exploratory multiblock data analysis are: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.  An unified algebraic framework based on factorization strategies, denoted \textit{canonical factorisation}, was proposed by \cite{Bougeard024} for multiblock methods to achieve these objectives. In practice, canonical factorisation provides a structured framework for analysing data variability at multiple levels: differences between and within blocks, differences between observations by projecting them onto a common subspace. It also facilitates the harmonisation of outputs produced by different methods and supports a more objective criterion-based selection among competing approaches. 
+
+This framework is a compass among multiblock models:  Generalized Canonical Correlation Analysis (GCCA, \cite{Carroll68}) and its popular case MAXVAR \cite{Carroll68}, Hierarchical Principal Component Analysis (HPCA, \cite{Wold96,Westerhuis98}), Structuration de Tableaux A Tois Indices de la Statistique (Statis, \cite{Lavit94}), Multiple Factorial Analysis (MFA, \cite{escofier1994}), Common Components and Specific Weights Analysis (CCWSA, \cite{Qannari001}), Multiple CO-inertia Analysis (MCOA, \cite{Chessel96})  fall within this framework. A benchmark of these methods had been done in \cite{Bougeard024}.
+
+Initially, MCOA was proposed as an alternative to generalized canonical analysis, also known as MAXVAR \cite{Carroll68,Horst59}, for correlating multiple data tables. Compared with other generalisations of Hotelling's canonical correlation analysis \cite{Hotelling35}, such as those proposed by \cite{Kettenring71}, MCOA offers three main advantages. Firstly, it is computationally straightforward as it reduces to a singular value decomposition, the other approaches typically rely on iterative optimisation procedures. Secondly, MCOA is particularly effective at summarizing results across multiple datasets. Finally, MCOA provides sequential estimation of canonical factorisation under an orthogonality constraint.  In this work, we propose a new method, Optimal Multiple CO-inertia Analysis (OMCOA), which is a simultaneous version of MCOA. We compare this model with the previous one using simulated data whose structure is known.     
+
+\section{Canonical factorisation}
+\subsection*{Notations}
+
+\begin{itemize}
+	\item $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables on $N$ individuals.
+	\item  $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks.
+	\item $\textbf{U}^\intercal$ designates the transposed matrix of $\textbf{U}$. 
+	\item $\Sigma_k=diag(\sigma_k^{(1)},...,\sigma_k^{(R)})$ are diagonal matrices 
+	\item $\Vert . \Vert$ correspond to the Frobenius norm.
+\end{itemize}
+ 
+Consider $N$ individuals characterized by $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
+
+The $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  (see \cite{Bougeard024} for the demonstration) 
+\begin{align}
+  \left\{
+	\begin{array}{ll}
+		&\X   = \U \Sigma \V^\intercal   \\
+		&\X_k = \U \Sigma_k \V_k^\intercal \quad \textrm{for} \quad k=(1, \dots, K)   \label{Eqn_Facto} \\	
+		&\textrm{with the constraints} \quad \U^\intercal \U=\textbf{I}_R \quad \textrm{and} \quad \Vert\v_k^{(1)}\Vert=\ldots=\Vert\v_k^{(R)}\Vert=1 \quad \textrm{for} \quad k=(1, \dots, K), 
+	\end{array}
+	\right.
+\end{align}
+where
+\begin{itemize}
+	\item $\U\in \mathcal M_{N,H}(\mathbb R)$ is the standardized and orthogonal common components,
+	\item $\V \in \mathcal M_{P,H}(\mathbb R)$ is the standardized (not necessarily orthogonal) common loadings,
+	\item $\V_k \in \mathcal M_{p_k,H}(\mathbb R)$ the standardized block-loadings, $\Sigma_1\in \mathcal M_{R,R}(\mathbb R)$
+	\item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
+\end{itemize}
+
+\noindent This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{Bougeard024}). The benchmark in \cite{Bougeard024} showed that all the methods under study produced similar results. The decomposition of the concatenated block $\X$ is unique for all the multiblock methods, however, only the MCOA method guarantees uniqueness of the decomposition of each block $\X_k$ (thanks to the orthoganlity constraint), and the proportion of variance it explains can be lower than that of the other methods. To ensure uniqueness of the solution and to improve the robustness of MCOA, we propose a simultaneous version.
+ 
+For $H<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in (1) by minimizing an ordinary least square criterion. The models in section 1 (GCCA, SUMCOR, HPCA, Statis, CCWSA, MCOA) provide solution of this problem (see \cite{Bougeard024} for details on these methods). 
+
+
+
+\section{Bayesian framework for Canonical Factorisation}
+
+In the following, we assume that for all $k\in 1,\ldots,K$ the columns of $\V_k$ are orthogonal i.e. 
+$$\V_k^\intercal \V_k=\mathbf{I}_R.$$
+
+\subsection{Minimization problem}
+
+Providing a solution for canonical factorization means minimizing
+\begin{equation}
+	\sum_{k=1}^K\Vert \X_k - \U\Sigma_k \V_k^\intercal\Vert^2= \Vert \X- \U \Sigma \V^\intercal\Vert^2, \label{Crit}
+\end{equation}
+with $\U^\intercal.\U=I_R$, $\V_k^\intercal.\V_k=I_R$ for $k=1,\ldots,K$. Note that, with standardized and orthogonal block-loadings matrices $\V_1,\ldots,\V_K$, the solution of this problem is unique. 
+
+
+\noindent Consider $\textbf{H}_k=\Sigma_k.\V^\intercal_k\in \mathcal M_{R,p_k}(\mathbb R)$ and $\textbf{H}=[\textbf{H}_1|\ldots|\textbf{H}_K]\in \mathcal M_{R,P}(\mathbb R)$. An iterative algorithm for building the solution of \eqref{Crit} requires to update successively $\U,\V_k,\Sigma_k$ as follows:
+\begin{enumerate}
+	\item \underline{Updating of $\U$:}  For given $\textbf{X}\in \mathcal M_{N,P}(\mathbb R)$, $\textbf{H}\in \mathcal M_{R,P}(\mathbb R)$, update $\U$ by $\U=\textbf{A}.\textbf{B}^\intercal$ where $\textbf{A},\textbf{B}$ are respectively the matrices of the first $R$ left singular vectors and the matrix of the first $R$ right singular vectors from the svd of $\textbf{X}.\textbf{H}^\intercal$.
+	\item \underline{Updating of $\V_k$:} For given $\textbf{X}_k\in \mathcal M_{N,p_k}(\mathbb R)$, $\U\in \mathcal M_{R,N}(\mathbb R)$ with orthogonal columns, $\Sigma_k\in \mathcal M_{R,R}(\mathbb R)$, update $\V_k$ by: $\V_k=\textbf{A}\textbf{B}^\intercal$  where $\textbf{A},\textbf{B}$ are respectively the matrix of the first $R$ left singular vectors and the matrix of the first $R$ right singular vectors from the svd of $\textbf{X}^\intercal_k.\U$.
+	 \item \underline{Updating of $\Sigma_k$:}  For given $\textbf{X}_k\in \mathcal M_{N,p_k}(\mathbb R)$, $\U\in \mathcal M_{R,N}(\mathbb R)$ orthogonal, $\V_k\in \mathcal M_{R,p_k}(\mathbb R)$ with orthonormal columns, $\Sigma_k$ is given by 
+	 \[\Sigma_k=diag(\U^\intercal\textbf{X}_k\V_k).\] 
+\end{enumerate}
+
+\begin{proposition}
+The successive updates of $\U$, $\V_k$, and $\Sigma_k$ guarantee that the criterion defined in \eqref{Crit} decreases or remains constant at each step, ensuring convergence of the algorithm.
+\end{proposition}
+
+
+% \begin{lemma} \label{lemma1}
+% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R)$, the maximum of $\trace(\T^\intercal\X\h)$ with the constraint $\T^\intercal.\T=I_R$ is $\T=\textbf{U}.\textbf{V}^\intercal$ where the columns of $\textbf{U}$ (respectively $\textbf{V}$) are the $R$ first left (respectively right) singular vectors of $\X\h$. (see \cite{cliff66}) 
+% \end{lemma}
+
+% \begin{proof}
+% 	Consider the SVD of $\X.\h =\textbf{U}.\Sigma.\textbf{V}^t$. We have $\trace(\textbf{T}^t.\textbf{U}.\Sigma.\textbf{V}^t)=\trace(\Sigma.\textbf{V}^t.\textbf{T}^t.\textbf{U})$
+% 	($\trace(\textbf{A}.\textbf{B})=\trace(\textbf{B}.\textbf{A})$). The matrix $\textbf{W}=\textbf{V}^t.\textbf{T}^t.\textbf{U}$ is orthogonal. 
+% The problem of maximization remains to maximizing 
+% \[\trace(\Sigma.\textbf{W})=\sum_{h=1}^H\sigma^2_h.w_{hh}.\]
+% Since $\textbf{W}$ is orthogonal, $|w_{hh}| \leq 1$ for all $h$. The trace of $\Sigma.\textbf{W}$ is maximal for $w_{hh}=1$, that implies $\textbf{W}=I_H$ and $\textbf{T}=\textbf{U}.\textbf{V}^t$. Moreover, the maximum of the trace is  $\sum_{h=1}^H\sigma^2_h$. 
+
+% \end{proof}
+
+% \begin{lemma} \label{lemma2}
+% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R), \T \in \mathcal M_{N,R}(\mathbb R)$ we have 
+% 	\[\trace(\textbf{X}^\intercal.\textbf{T}.\textbf{H}^\intercal)=\trace(\textbf{T}^\intercal\textbf{X}\textbf{H}).\]
+% \end{lemma}
+
+%  \begin{proof}
+%  $\trace(\X^\intercal\T\h^\intercal)=\trace(\h^\intercal\X^\intercal\T)=\trace(\T^\intercal\X\h).$
+%  The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose.
+%  \end{proof}
+
+
+% \medskip
+% \noindent
+% \textbf{Remark.} This proof guarantees convergence of the values of the criterion, but not necessarily uniqueness of the limit point. Uniqueness of the solution is established separately, via the orthogonality of the columns of $\V_k$ for all $k$.
+
+\section{Comparison of MCOA and OMCOA}
+\subsection{Simulation study}
+MCOA and OMCOA are compared on simulated data. $K=3$ blocks $\X_1,\X_2,\X_3$ with respectively
+$p_1=10$, $p_2=15$, $p_3=20$ variables and $N=100$ observations are generated from
+\[
+\X_k=\U\Sigma_k\V_k^\intercal+\EE_k, \qquad k=1,2,3,
+\]
+where $\U\in\mathcal M_{N,R}(\mathbb R)$ (column-centered) and $\V_k\in\mathcal M_{p_k,R}(\mathbb R)$ have orthonormal
+columns, $R=3$, $\Sigma_k$ is diagonal and $\EE_k$ is a Gaussian noise term.
+We compare the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with MCOA and OMCOA.
+The diagonal matrices depend on a parameter $t\in[0,1]$:
+\[
+\Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
+\]
+where
+\begin{itemize}
+  \item for $t=0$, all the blocks share the same profile:
+  $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
+  \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
+  $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
+\end{itemize}
+In both cases $\sum_{r}(\sigma_k^{(r)})^2=0.83$ for each block. Moreover, the singular values of the
+noise-free concatenated matrix are $\bigl(\sum_k(\sigma_k^{(r)}(t))^2\bigr)^{1/2}$: they are well separated for $t=0$
+and all equal to $\sqrt{0.83}$ for $t=1$, since $\sum_k\Sigma_k^{(1)\,2}=0.83\,\textbf{I}_3$.
+The noise is scaled so that $\|\EE_k\|^2=\frac{0.10}{0.90}\,\|\U\Sigma_k\V_k^\intercal\|^2$, i.e.\ it accounts for about
+$10\%$ of the variance of each block. We use $t\in\{0,0.1,\ldots,1\}$ and $B=1000$ replications.
+
+At each replication, the estimated axes are reordered by the permutation
+\[
+\hat\pi=\arg\max_{\pi\in\mathfrak S_R}\sum_{r=1}^{R}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\pi(r))}\bigr)\bigr|,
+\]
+the absolute value accounting for the sign indeterminacy of the axes.
+The accuracy of the estimation of $\Sigma_1,\ldots,\Sigma_K$ is assessed by the mean absolute error
+over the $K$ blocks and the $R$ dimensions:
+\[
+\mathrm{MAE}=\frac{1}{KR}\sum_{k=1}^{K}\sum_{r=1}^{R}
+\bigl|\hat\sigma_k^{(\hat\pi(r))}-\sigma_k^{(r)}\bigr|.
+\]
+
+\subsection{Results}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\linewidth]{figs/plot_t0.png}
+  \caption{Common profile ($t=0$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
+  over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t0}}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\linewidth]{figs/plot_t1.png}
+  \caption{Permuted profiles ($t=1$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
+  over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t1}}
+\end{figure}
+
+Figures~\ref{fig_t0} and~\ref{fig_t1} show the estimates obtained with MCOA and OMCOA for $t=0$ and $t=1$
+respectively. As expected, both methods give very close estimates when the blocks share a common profile
+(Figure~\ref{fig_t0}). When the profiles are permuted, OMCOA outperforms MCOA in terms of both bias and
+precision (Figure~\ref{fig_t1}). In both scenarios, the OMCOA estimates show very low variability.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\linewidth]{figs/explained_var.png}
+  \caption{Distribution of the percentage of explained variance $V$ over the $B=1000$ replications.\label{var_expl}}
+\end{figure}
+
+Figure~\ref{var_expl} shows the empirical distribution of the percentage of variance of the concatenated
+matrix $\X$ explained by the $R$ dimensions,
+\[
+V=100\times\frac{\sum_{k,r}\bigl(\hat\sigma^{(r)}_k\bigr)^2}{\|\X\|^2},
+\qquad \|\X\|^2=\sum_{k=1}^{K}\|\X_k\|^2,
+\]
+to be compared with the percentage of variance due to the signal, which is about $90\%$ by construction.
+OMCOA slightly exceeds this value in all cases, since part of the noise is captured by the fitted
+dimensions, whereas MCOA clearly underestimates it when the profiles are permuted ($t=1$).
+
+Figure~\ref{comparison_t} shows the distribution of the MAE as a function of $t$. MCOA and OMCOA coincide as
+long as the singular values of $\X$ are well separated; MCOA breaks down when they get close ($t\geq 0.8$).
+Indeed, MCOA starts with the SVD of $\X$: when the singular values are close, $\u^{(1)}$ is an arbitrary
+direction of $\mathrm{span}(\U)$ driven by the noise, and this error propagates to the next dimensions through
+the deflation. OMCOA fits all the blocks simultaneously, so that the block-specific profiles identify $\U$.
+Figure~\ref{comparison_cos} illustrates the resulting misestimation of the axes $\u^{(1)},\ldots,\u^{(R)}$
+by MCOA for $t\geq 0.8$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.5\linewidth]{figs/comparaison_t.png}
+  \caption{Median and 10--90\% empirical quantiles of the MAE as a function of $t$ ($B=1000$ replications).\label{comparison_t}}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.5\linewidth]{figs/comparaison_cos.png}
+  \caption{Median and 10--90\% empirical quantiles of the worst axis recovery
+  $\displaystyle\min_{r}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\hat\pi(r))}\bigr)\bigr|$ as a function of $t$
+  ($B=1000$ replications).\label{comparison_cos}}
+\end{figure}
+
+\section*{Conclusion}
+\cite{Bougeard024} have compared estimations for the canonical factorisation problem. In this work, we propose on optimal version of Multiple COinertia Analysis that performs better on the simulated data. Constraining the matrices $(\V_1,\dots,\V_K)$ to be orthogonal ensures uniqueness of the solution. In particular, if $|\mathbf{E}_k|=0$, the OMCOA method recovers the exact canonical factorization while other methods do not guarantee this."    
+Furthermore, in practical applications the canonical factorisation is more readily interpreted under orthogonal configurations, as these yield a clearer decomposition of the effects.
+
+
+
+
+\bibliographystyle{apalike}
+\bibliography{Biblio}
+
+% \section*{Appendix: proof of the proposition}
+
+
+% \begin{proof}
+% 	The criterion to be minimized is:
+% \[
+%   \mathcal{L}(\U, \V_1, \ldots, \V_K, \Sigma_1, \ldots, \Sigma_K)
+%   = \sum_{k=1}^{K} \bigl\| \X_k - \U \Sigma_k \V_k^\top \bigr\|^2,
+% \]
+% subject to $\U^\intercal \U = I_R$ and $\V_k^\intercal \V_k = I_R$ for all $k = 1, \ldots, K$.
+
+% The algorithm is of the \emph{Alternating Least Squares} (ALS) type: at each iteration, the criterion is minimized successively with respect to each parameter, while the others are held fixed. It therefore suffices to show that each individual update decreases or maintains $\mathcal{L}$.
+
+% \paragraph{Update of $\U$} With $\V_k$ and $\Sigma_k$ fixed, let $\HH_k = \Sigma_k \V_k^\intercal \in \mathcal{M}_{R,p_k}(\mathbb{R})$ and
+% $\HH = [\HH_1 \mid \cdots \mid \HH_K] \in \mathcal{M}_{R,P}(\mathbb{R})$. Then:
+% \[
+%   \mathcal{L} = \sum_{k=1}^{K} \|\X_k - \U \HH_k\|^2 = \|\X - \U \HH^\intercal\|^2.
+% \]
+% Expanding:
+% $\|\X - \U \HH^\intercal\|^2
+%   = \|\X\|^2 - 2\,\operatorname{trace}(\X^\intercal \U \HH^\intercal) + \|\U \HH^\intercal\|^2.$
+
+% \noindent Since $\U^\intercal \U = I_R$: $\|\U \HH^\intercal\|^2
+%   = \operatorname{trace}(\HH \U^\intercal \U \HH^\intercal)
+%   = \operatorname{trace}(\HH \HH^\intercal)
+%   = \|\HH\|^2 \quad \text{(constant w.r.t.\ } \U\text{)}.$
+
+% \noindent Minimizing $\mathcal{L}$ with respect to $\U$ is therefore equivalent to
+% maximizing $$\trace(\X^\intercal\U\HH^\intercal)=\trace(\HH^\intercal\X^\intercal\U)=\trace(\U^\intercal\X\HH),$$
+% subject to $\U^\intercal \U = I_R$. The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose. By \cite{cliff66}, the maximum is attained at $\U^* = AB^\intercal$, where $A$ (resp.\ $B$) are the matrices of the $R$ leading left (resp.\ right) singular vectors of $\X\HH^T$.
+% This update is the global minimizer of $\mathcal{L}$ with respect to $\U$, hence:
+% \[
+%   \mathcal{L}(\U^*, \ldots) \leq \mathcal{L}(\U_{\mathrm{old}}, \ldots).
+% \]
+% \paragraph{Update of $\V_k$} With $\U$ and $\Sigma_k$ fixed, expanding the contribution of block $k$:
+% \[
+%   \|\X_k - \U \Sigma_k \V_k^\intercal\|^2
+%   = \|\X_k\|^2
+%     - 2\,\operatorname{trace}(\X_k^\intercal \U \Sigma_k \V_k^\intercal)
+%     + \|\U \Sigma_k \V_k^\intercal\|^2.
+% \]
+% Since $\U^\intercal \U = I_R$ and $\V_k^\intercal \V_k = I_R$:
+% \[
+%   \|\U \Sigma_k \V_k^\intercal\|^2
+%   = \operatorname{trace}(\V_k \Sigma_k^\intercal \U^\intercal \U \Sigma_k \V_k^\intercal)
+%   = \operatorname{trace}(\Sigma_k^2)
+%   \quad \text{(constant w.r.t.\ } \V_k\text{)}.
+% \]
+% Minimizing therefore reduces to maximizing
+% $\operatorname{trace}(\X_k^\intercal \U \Sigma_k \V_k^\intercal) = \operatorname{trace}(\V_k^\intercal\X_k^\intercal\U\Sigma_k)$
+% subject to $\V_k^\intercal \V_k = I_R$. Since the diagonal matrix $\Sigma_k > 0$ does not affect the singular vectors, the maximum is attained at $\V_k^* = \textbf{AB}^\intercal$ where $\textbf{A}$, $\textbf{B}$ are obtained from the SVD of $\X_k^\intercal\U$ \cite{cliff66} . Hence:
+% \[
+%   \mathcal{L}(\ldots, \V_k^*, \ldots) \leq \mathcal{L}(\ldots, \V_{k,\mathrm{old}}, \ldots).
+% \]
+
+% %---------------------------------------------------------------
+% \paragraph{Update of $\Sigma_k$} With $\U$ and $\V_k$ fixed (both having orthonormal columns), and $\Sigma_k = \operatorname{diag}(\sigma^{(1)}_k,
+% \ldots, \sigma^{(R)}_k)$, the contribution of block $k$ is:
+% \[
+%   \|\X_k - \U \Sigma_k \V_k^\intercal\|^2
+%   = \|\X_k\|^2
+%     - 2\,\operatorname{trace}(\V_k^\intercal \X_k^\intercal \U \Sigma_k)
+%     + \operatorname{trace}(\Sigma_k^2).
+% \]
+% Since $\Sigma_k$ is diagonal, it remains to minimazing:
+% \[
+%   \sum_{r=1}^{R} \Bigl[ ()\sigma^{(r)}_k)^2 - 2\,(\U^\intercal \X_k \V_k)_{rr} \cdot d_r \Bigr].
+% \]
+% Each term is a convex parabola in $\sigma^{(r)}_k$, minimized at: $(\sigma^{(r)}_k)^* = (\U^\intercal \X_k \V_k)_{rr},$ or, in matrix form:$\Sigma_k^* = \operatorname{diag}(\U^\intercal \X_k \V_k).$
+% This update is therefore the exact minimizer with respect to $\Sigma_k$, and:
+% \[
+%   \mathcal{L}(\ldots, \Sigma_k^*, \ldots) \leq \mathcal{L}(\ldots, \Sigma_{k,\mathrm{old}}, \ldots).
+% \]
+
+% %---------------------------------------------------------------
+% \paragraph{Global Convergence} At each complete iteration (update of $\U$, then all $\V_k$, then all $\Sigma_k$), the criterion $\mathcal{L}$ is monotonically decreasing and bounded below by zero. By the monotone convergence theorem, the sequence of values $(\mathcal{L}^{(t)})_{t \geq 0}$
+% converges:
+% \[
+%   \mathcal{L}^{(t+1)} \leq \mathcal{L}^{(t)}, \quad \mathcal{L}^{(t)} \geq 0
+%   \implies
+%   \mathcal{L}^{(t)} \xrightarrow[t \to \infty]{} \ell^* \geq 0.
+% \]
+% \end{proof}
+
+
+
+%\printbibliography
+
+% \subsection{Multiple CO-Inertia Analysis}
+% \cite{Chessel96} proposed Multiple Co-inertia Analysis as an alternative to MAXVAR \cite{Carroll68}. The rank-$H$ approximation is derived from successive rank-1 approximations of deflated versions of the blocks $\X_1,\ldots,\X_K$.
+
+% The rank-1 approximation criterion is based on minimising the sum of squared Frobenius norms
+% \begin{equation}
+%     \sum_{k=1}^K\Vert \X_k - \sigma_{k}\u\v_k^\intercal \Vert^2, \quad \Vert \u\Vert = \Vert \v_1\Vert = \ldots = \Vert \v_K\Vert = 1, \quad \sigma_k > 0. \label{mcoa_c}
+% \end{equation}
+
+% \noindent The solution to this minimisation problem is:
+% \begin{itemize}
+%   \item $\u$ is the first left singular vector of the concatenated block $\X$,
+%   \item $\v_k = \frac{\X_k^\intercal \u}{\Vert \X_k^\intercal \u \Vert}$,
+%   \item $\sigma_k = \Vert \X_k^\intercal \u \Vert$ for $k = 1, \ldots, K$.
+% \end{itemize}
+ 
+
+% The algorithm proposed by \cite{Chessel96} proceeds as follows: at each step $r = 1, \ldots, R$, the rank-1 approximation is applied to the deflated blocks $\X_k^{(r)} = \X_k(I_{p_k}-\sum_{i=1}^{r-1}\v_k^{(i)}{\v_k^{(i)}}^\intercal)$. Moreover, they proved that the resulting vectors $\u^{(1)}, \ldots, \u^{(R)}$ are mutually orthogonal. Note that, thanks to the deflation procedure,  $\v_k^{(1)}, \ldots, \v_k^{(R)}$ are mutually orthogonal for each $k$.
+% MCOA belongs to the class of sequential multiblock component methods. In the first stage, the global
+% component $\u^{(1)}$ and the block loadings $\v_1^{(1)},\ldots,\v_K^{(1)}$ are obtained as the solution of a least-squares criterion; the next dimensions are then computed in the same way from deflated versions of the original blocks. Although each stage is optimal in the least-squares sense given the previous ones, the sequential approach is sub-optimal: the resulting solution does not minimize the global criterion
+% \eqref{Crit} over the $H$ dimensions simultaneously. The present study proposes a simultaneous alternative to MCOA, which minimizes \eqref{Crit} under the same orthonormality constraints on $\V_1,\ldots,\V_K$.
+
+
+
+\end{document}
+
