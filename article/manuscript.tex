@@ -52,6 +52,8 @@
 \DeclareMathOperator{\trace}{\mathrm{trace}}
 \DeclareMathOperator{\vMF}{vMF}
 \DeclareMathOperator{\Ga}{Gamma}
+\DeclareMathOperator{\Bern}{Bernoulli}
+\DeclareMathOperator{\Be}{Beta}
 
 \newcommand{\X}{\mathbf{X}}
 \newcommand{\U}{\mathbf{U}}
@@ -80,7 +82,7 @@
 
 \begin{center}
 {\Large
-	{\sc Sparse Bayesian Model for Canonical factorization of multiblock data}
+	{\sc Bayesian Framework for Canonical factorization of multiblock data}
 }
 \bigskip
 
@@ -101,7 +103,7 @@
 
 Data sets structured into blocks of variables measured on the same set of observations are frequently encountered in practice. These blocks may consist of quantitative variables originating from distinct measurement sources or correspond to thematic groupings defined by the user. For instance, in omics studies, blocks typically comprise variables derived from different analytical techniques (e.g., proteomics, metabolomics). In psychology, multiblock data structures commonly arise when multiple sets of variables are collected on the same individuals to capture different psychological domains. For example, distinct blocks may include self-report questionnaire scores assessing personality traits, behavioral task performance measures, and neurophysiological indicators such as electroencephalography  features.
 
-The four expected objectives of exploratory multiblock data analysis are: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.  An unified algebraic framework based on factorization strategies, denoted \textit{canonical factorisation}, was proposed by \cite{Bougeard024} for multiblock methods to achieve these objectives. In practice, canonical factorisation provides a structured framework for analysing data variability at multiple levels: differences between and within blocks, differences between observations by projecting them onto a common subspace. It also facilitates the harmonisation of outputs produced by different methods and supports a more objective criterion-based selection among competing approaches. 
+The four expected objectives of exploratory multiblock data analysis are: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.  An unified algebraic framework based on factorization strategies, denoted \textit{canonical factorisation}, was proposed by \cite{bougeard2024} for multiblock methods to achieve these objectives. In practice, canonical factorisation provides a structured framework for analysing data variability at multiple levels: differences between and within blocks, differences between observations by projecting them onto a common subspace. It also facilitates the harmonisation of outputs produced by different methods and supports a more objective criterion-based selection among competing approaches. 
 
 %This framework is a compass among multiblock models:  Generalized Canonical Correlation Analysis (GCCA, \cite{Carroll68}) and its popular case MAXVAR \cite{Carroll68}, Hierarchical Principal Component Analysis (HPCA, \cite{Wold96,Westerhuis98}), Structuration de Tableaux A Tois Indices de la Statistique (Statis, \cite{Lavit94}), Multiple Factorial Analysis (MFA, \cite{escofier1994}), Common Components and Specific Weights Analysis (CCWSA, \cite{Qannari001}), Multiple CO-inertia Analysis (MCOA, \cite{Chessel96})  fall within this framework. A benchmark of these methods had been done in \cite{Bougeard024}.
 
@@ -120,15 +122,15 @@ The four expected objectives of exploratory multiblock data analysis are: (i) to
  
 Consider $N$ individuals characterized by $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
 
-The $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  (see \cite{Bougeard024} for the demonstration) 
+The $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  (see \cite{bougeard2024} for the demonstration) 
 \begin{align}
   \left\{
 	\begin{array}{ll}
 		&\X   = \U \Sigma \V^\intercal   \\
-		&\X_k = \U \Sigma_k \V_k^\intercal \quad \textrm{for} \quad k=(1, \dots, K)   \label{Cano_Facto} \\	
+		&\X_k = \U \Sigma_k \V_k^\intercal \quad \textrm{for} \quad k=(1, \dots, K)    \\	
 		&\textrm{with the constraints} \quad \U^\intercal \U=\textbf{I}_R \quad \textrm{and} \quad \Vert\vv_k^{(1)}\Vert=\ldots=\Vert\vv_k^{(R)}\Vert=1 \quad \textrm{for} \quad k=(1, \dots, K), 
 	\end{array}
-	\right.
+	\right. \label{Cano_Facto}
 \end{align}
 where
 \begin{itemize}
@@ -138,7 +140,7 @@ where
 	\item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
 \end{itemize}
 
-\noindent This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{Bougeard024}). The benchmark in \cite{Bougeard024} showed that all the methods under study produced similar results. The decomposition of the concatenated block $\X$ is unique for all the multiblock methods, however, only assuming $\V_k^\intercal\V_k=I_R$ guarantees uniqueness of the decomposition of each block $\X_k$.
+\noindent This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). The benchmark in \cite{bougeard2024} showed that all the methods under study produced similar results. The decomposition of the concatenated block $\X$ is unique for all the multiblock methods, however, only assuming $\V_k^\intercal\V_k=I_R$ guarantees uniqueness of the decomposition of each block $\X_k$.
  
 For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.  
 
@@ -232,10 +234,7 @@ Under model \eqref{eq:model} and the above priors:
 \end{enumerate}
 \end{proposition}
 
-
-
-
-\section{The Gibbs sampler}
+We can deduce the following algorithm:
 
 \begin{algorithm}[ht]
 \caption{Gibbs sampler for OMCOA}\label{alg:gibbs}
@@ -293,7 +292,7 @@ stochastic counterpart.
 \begin{remark}[Block weighting]
 With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise
 precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion
-\eqref{eq:crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
+\eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
 $\tau\mid\cdot\sim\Ga\bigl(a_0+\sum_k(N-1)p_k/2,\ b_0+\sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
 \end{remark}
 
@@ -310,9 +309,140 @@ strongly concentrated when the noise is small, the chain rarely jumps between th
 remains necessary nonetheless, in particular when several dimensions have close weights.
 \end{remark}
 
+\subsection{sparse version}
+In OMCOA, each block is approximated as $\X_k\approx\U\Sigma_k\V_k^\intercal$, where the diagonal matrix
+$\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each latent dimension $\uu^{(r)}$ contributes to
+block $k$. The structure of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension
+$r$ is
+\begin{itemize}
+  \item \emph{$U$-common} if $\sigma_k^{(r)}>0$ for all $k$;
+  \item \emph{partially $U$-common} if $\sigma_k^{(r)}>0$ for some blocks only;
+  \item \emph{$U$-specific} to block $k$ if $\sigma_k^{(r)}>0$ for this block only;
+  \item \emph{inactive} if $\sigma_k^{(r)}=0$ for all $k$.
+\end{itemize}
+OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose
+a Bayesian version of OMCOA in which a spike-and-slab prior on the weights $\sigma_k^{(r)}$ allows them to be exactly
+zero. The dimension $R$ is then a \emph{maximal} rank: inactive dimensions are switched off by the sampler, and the
+effective rank is inferred from the data.
 
+The sparsity of the model is based on the diagonal terms $\sigma_k^{(r)}$ as follows
+\begin{equation}
+  \sigma_k^{(r)}=\gamma_k^{(r)}\,s_k^{(r)},\qquad \gamma_k^{(r)}\in\{0,1\},\quad s_k^{(r)}>0 .
+  \label{eq:spike}
+\end{equation}
 
+\paragraph{Priors.}
+\begin{itemize}
+  \item spike-and-slab on the weights:
+        $\gamma_k^{(r)}\mid\theta_r\sim\Bern(\theta_r)$ and $s_k^{(r)}\sim\mathcal N^+(0,\lambda^{-1})$, i.e.\
+        \[
+          p\bigl(\sigma_k^{(r)}\mid\theta_r\bigr)=(1-\theta_r)\,\delta_0\bigl(\sigma_k^{(r)}\bigr)+\theta_r\,\mathcal N^+\bigl(\sigma_k^{(r)};0,\lambda^{-1}\bigr);
+        \]
+  \item $\theta_r\sim\Be(a_\theta,b_\theta)$, one inclusion probability per dimension, shared by the $K$ blocks.
+\end{itemize}
+Sharing $\theta_r$ across blocks borrows strength: a dimension that is active in several blocks is more likely
+to be active in another one, and a dimension that is inactive everywhere sees $\theta_r$ shrink towards zero.
 
+As in the non-sparse case, the orthonormality of $\U$ and $\V_k$ gives
+\begin{equation}
+  \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X_k\|^2-2\sum_{r=1}^R\sigma_k^{(r)}d_k^{(r)}+\sum_{r=1}^R\bigl(\sigma_k^{(r)}\bigr)^2,
+  \qquad d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)} .
+  \label{eq:expand2}
+\end{equation}
+
+\begin{proposition}[Full conditionals]\label{prop:cond2}
+Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\perp$ and write $\U=\Q\tilde\U$.
+\begin{enumerate}
+  \item \textbf{Common space:} $\tilde\U\mid\cdot\sim\vMF(\Q^\intercal\F_{\U})$ with $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$.
+  \item \textbf{Block loadings:} $\V_k\mid\cdot\sim\vMF(\F_{\V_k})$ with $\F_{\V_k}=\tau_k\X_k^\intercal\U\Sigma_k$.
+        When $\sigma_k^{(r)}=0$, the $r$-th column of $\F_{\V_k}$ is zero and $\vv_k^{(r)}$ is uniform on the orthogonal
+        complement of the other columns.
+  \item \textbf{Weights (joint update of $\gamma_k^{(r)}$ and $\sigma_k^{(r)}$).} Let
+        \[
+          \omega_k=\tau_k+\lambda,\qquad m_k^{(r)}=\frac{\tau_k\,d_k^{(r)}}{\omega_k}.
+        \]
+        Then, with $\sigma_k^{(r)}$ integrated out,
+        \[
+          P\bigl(\gamma_k^{(r)}=1\mid\cdot\bigr)=\frac{\theta_r B_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r},\qquad
+          B_k^{(r)}=2\sqrt{\frac{\lambda}{\omega_k}}\,
+          \exp\Bigl(\frac{\omega_k\bigl(m_k^{(r)}\bigr)^2}{2}\Bigr)\,\Phi\Bigl(m_k^{(r)}\sqrt{\omega_k}\Bigr),
+        \]
+        where $\Phi$ is the standard normal c.d.f.; and
+        \[
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\cdot\ \sim\ \mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr),\qquad
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=0,\cdot\ =\ 0 .
+        \]
+  \item \textbf{Inclusion probabilities:}
+        $\theta_r\mid\cdot\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$.
+  \item \textbf{Noise precisions:}
+        $\tau_k\mid\cdot\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}[Sketch of proof]
+Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
+conjugacy). For item 3, the terms of the log-posterior involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand},
+$\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is
+$0$. Under $\gamma_k^{(r)}=1$, integrating against the half-normal slab of density
+$2\sqrt{\lambda/(2\pi)}\exp(-\lambda s^2/2)$ on $(0,\infty)$ gives
+\[
+  2\sqrt{\frac{\lambda}{2\pi}}\int_0^{\infty}\exp\Bigl(-\frac{\omega_k}{2}s^2+\tau_kd_k^{(r)}s\Bigr)ds
+  =2\sqrt{\frac{\lambda}{\omega_k}}\exp\Bigl(\frac{\omega_k(m_k^{(r)})^2}{2}\Bigr)\Phi\bigl(m_k^{(r)}\sqrt{\omega_k}\bigr)=B_k^{(r)},
+\]
+which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The conditional of $\sigma_k^{(r)}$ given
+$\gamma_k^{(r)}=1$ is obtained by completing the square.
+\end{proof}
+
+Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
+drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$.
+In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow.
+
+\section{Algorithm}
+
+The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column
+being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, as in the non-sparse sampler.
+
+\begin{algorithm}[ht]
+\caption{Sparse Gibbs sampler for OMCOA}\label{alg:sparse}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R\leq\min_kp_k$; iterations $T$; burn-in $T_0$;
+           hyperparameters $a_0,b_0,\lambda,a_\theta,b_\theta$
+  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions; $\gamma_k^{(r)}\gets1$; $\theta_r\gets1/2$;
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State update $\tilde\U$ by one sweep of $\vMF\bigl(\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k\bigr)$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State update $\V_k$ by one sweep of $\vMF\bigl(\tau_k\X_k^\intercal\U\Sigma_k\bigr)$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$,\quad $\omega_k\gets\tau_k+\lambda$,\quad $m_k^{(r)}\gets\tau_kd_k^{(r)}/\omega_k$
+           \State draw $\gamma_k^{(r)}\sim\Bern\Bigl(\dfrac{\theta_rB_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r}\Bigr)$
+           \State \textbf{if} $\gamma_k^{(r)}=1$ \textbf{then} draw $\sigma_k^{(r)}\sim\mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr)$ \textbf{else} $\sigma_k^{(r)}\gets0$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \For{$r=1,\ldots,R$}
+        \State draw $\theta_r\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\Sigma_1,\ldots,\Sigma_K,\boldsymbol\gamma,\boldsymbol\theta,\boldsymbol\tau\bigr)$ \EndIf
+  \EndFor
+  \State align the stored draws (permutation and signs) on a reference $\U_{\mathrm{ref}}$
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+\section{Posterior summaries}
+
+After alignment of the $T-T_0$ stored draws (indexed by $t$) on a reference solution, as in the non-sparse sampler:
+\begin{itemize}
+  \item \textbf{Posterior inclusion probabilities.}
+        $\hat P_k^{(r)}=\frac{1}{T-T_0}\sum_t\gamma_k^{(r),t}$ estimates $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)$. The
+        $K\times R$ matrix $(\hat P_k^{(r)})$ summarizes the structure of the blocks; a dimension is declared active in
+        block $k$ when $\hat P_k^{(r)}>1/2$ (median probability model).
+  \item \textbf{Effective rank.} $R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\}$, whose posterior distribution is
+        estimated by its empirical distribution over the draws.
+  \item \textbf{Block weights.} Posterior means and credible intervals of $\sigma_k^{(r)}$; for active entries they are
+        computed conditionally on $\gamma_k^{(r)}=1$.
+\end{itemize}
 
 
 % \begin{lemma} \label{lemma1}
@@ -480,7 +610,7 @@ $\|\X - \U \HH^\intercal\|^2
 
 \noindent Minimizing $\mathcal{L}$ with respect to $\U$ is therefore equivalent to
 maximizing $$\trace(\X^\intercal\U\HH^\intercal)=\trace(\HH^\intercal\X^\intercal\U)=\trace(\U^\intercal\X\HH),$$
-subject to $\U^\intercal \U = I_R$. The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose. By \cite{cliff66}, the maximum is attained at $\U^* = AB^\intercal$, where $A$ (resp.\ $B$) are the matrices of the $R$ leading left (resp.\ right) singular vectors of $\X\HH^T$.
+subject to $\U^\intercal \U = I_R$. The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose. By \cite{cliff1966}, the maximum is attained at $\U^* = AB^\intercal$, where $A$ (resp.\ $B$) are the matrices of the $R$ leading left (resp.\ right) singular vectors of $\X\HH^T$.
 This update is the global minimizer of $\mathcal{L}$ with respect to $\U$, hence:
 \[
   \mathcal{L}(\U^*, \ldots) \leq \mathcal{L}(\U_{\mathrm{old}}, \ldots).
@@ -501,7 +631,7 @@ Since $\U^\intercal \U = I_R$ and $\V_k^\intercal \V_k = I_R$:
 \]
 Minimizing therefore reduces to maximizing
 $\operatorname{trace}(\X_k^\intercal \U \Sigma_k \V_k^\intercal) = \operatorname{trace}(\V_k^\intercal\X_k^\intercal\U\Sigma_k)$
-subject to $\V_k^\intercal \V_k = I_R$. Since the diagonal matrix $\Sigma_k > 0$ does not affect the singular vectors, the maximum is attained at $\V_k^* = \textbf{AB}^\intercal$ where $\textbf{A}$, $\textbf{B}$ are obtained from the SVD of $\X_k^\intercal\U$ \cite{cliff66} . Hence:
+subject to $\V_k^\intercal \V_k = I_R$. Since the diagonal matrix $\Sigma_k > 0$ does not affect the singular vectors, the maximum is attained at $\V_k^* = \textbf{AB}^\intercal$ where $\textbf{A}$, $\textbf{B}$ are obtained from the SVD of $\X_k^\intercal\U$ \cite{cliff1966} . Hence:
 \[
   \mathcal{L}(\ldots, \V_k^*, \ldots) \leq \mathcal{L}(\ldots, \V_{k,\mathrm{old}}, \ldots).
 \]
