@@ -11,6 +11,11 @@ Bougeard, S., Peltier, C., Jaillais, B., Boulet, J.-C., and Hanafi, M. (2024).
 \newblock Benchmarking multiblock methods with canonical factorization.
 \newblock {\em Chemometrics and Intelligent Laboratory Systems}, 254:105240.
 
+\bibitem[Chessel and Hanafi, 1996]{chessel1996}
+Chessel, D. and Hanafi, M. (1996).
+\newblock Analyses de la co-inertie de $ k $ nuages de points.
+\newblock {\em Revue de statistique appliqu{\'e}e}, 44(2):35--60.
+
 \bibitem[Cliff, 1966]{cliff1966}
 Cliff, N. (1966).
 \newblock Orthogonal rotation to congruence.

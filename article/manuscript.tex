@@ -113,57 +113,62 @@ The four expected objectives of exploratory multiblock data analysis are: (i) to
 \subsection*{Notations}
 
 \begin{itemize}
-	\item $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables on $N$ individuals.
-	\item  $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks.
-	\item $\textbf{U}^\intercal$ designates the transposed matrix of $\textbf{U}$. 
+	\item $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables on $N$ individuals,
+	\item  $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks,
+	\item $\textbf{U}^\intercal$ designates the transposed matrix of $\textbf{U}$, 
 	\item $\Sigma_k=diag(\sigma_k^{(1)},...,\sigma_k^{(R)})$ are diagonal matrices 
-	\item $\Vert . \Vert$ correspond to the Frobenius norm.
+	\item $\Vert . \Vert$ correspond to the Frobenius norm,
+	\item $\Stiefel{N}{R}=\{\W\in\mathcal M_{N,R}(\mathbb R):\W^\intercal\W=\I_R\}$
+denotes the Stiefel manifold.
 \end{itemize}
  
-Consider $N$ individuals characterized by $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
+Consider $K$ colmumn blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively in $\mathcal M_{N,p_1}(\mathbb R),...,\mathcal M_{N,p_K}(\mathbb R))$. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
 
-The $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  (see \cite{bougeard2024} for the demonstration) 
+\cite{bougeard2024} demonstrated that the $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  
 \begin{align}
   \left\{
 	\begin{array}{ll}
 		&\X   = \U \Sigma \V^\intercal   \\
 		&\X_k = \U \Sigma_k \V_k^\intercal \quad \textrm{for} \quad k=(1, \dots, K)    \\	
-		&\textrm{with the constraints} \quad \U^\intercal \U=\textbf{I}_R \quad \textrm{and} \quad \Vert\vv_k^{(1)}\Vert=\ldots=\Vert\vv_k^{(R)}\Vert=1 \quad \textrm{for} \quad k=(1, \dots, K), 
+		&\textrm{with the constraints} \quad \U\in \Stiefel{N}{R} \quad \textrm{and} \quad \Vert\vv_k^{(1)}\Vert=\ldots=\Vert\vv_k^{(R)}\Vert=1 \quad \textrm{for} \quad k=(1, \dots, K), 
 	\end{array}
 	\right. \label{Cano_Facto}
 \end{align}
 where
 \begin{itemize}
-	\item $\U\in \mathcal M_{N,R}(\mathbb R)$ is the standardized and orthogonal common components,
-	\item $\V \in \mathcal M_{P,R}(\mathbb R)$ is the standardized (not necessarily orthogonal) common loadings,
-	\item $\V_k \in \mathcal M_{p_k,R}(\mathbb R)$ the standardized block-loadings, $\Sigma_1\in \mathcal M_{R,R}(\mathbb R)$
-	\item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
+	\item $\U\in \Stiefel{N}{R}$ is the matrix of common components,
+	\item $\V_k \in \mathcal M_{p_k,R}(\mathbb R)$ are the standardized block-loadings, and $\V=[\V_1|...|\V_K] \in \mathcal M_{P,R}(\mathbb R)$,
+  \item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
 \end{itemize}
-
-\noindent This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). The benchmark in \cite{bougeard2024} showed that all the methods under study produced similar results. The decomposition of the concatenated block $\X$ is unique for all the multiblock methods, however, only assuming $\V_k^\intercal\V_k=I_R$ guarantees uniqueness of the decomposition of each block $\X_k$.
+Without loss of generality, we can assume $\sigma_k^{(r)}\geq 0$ for all $k,r$, since a joint sign change of $\sigma_k^{(r)}$ and $\vv_k^{(r)}$ leaves the model and the constraints unchanged. This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). For all the multiblock methods, once $\U$ is fixed, the decomposition $\X_k=\U\Sigma_k\V_k^\intercal$ of each block is unique (up to sign). The methods differ in how the axes $\uu^{(1)},\ldots,\uu^{(R)}$ themselves are determined. When the block loadings are only normalized ($\|\vv_k^{(r)}\|=1$), the optimal loadings are
+$\vv_k^{(r)}=\X_k^\intercal\uu^{(r)}/\|\X_k^\intercal\uu^{(r)}\|$ and the least-squares criterion reduces to
+\[
+  \sum_{k=1}^K\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X\|^2-\bigl\|\X^\intercal\U\bigr\|^2 ,
+\]
+which is invariant under any rotation $\U\mapsto\U\mathbf R$: only $\mathrm{span}(\U)$ is determined by the data, and the axes have to be fixed by an external convention, usually the SVD of $\X$. This convention becomes unstable when the singular values of $\X$ are close. When $\V_k\in\Stiefel{p_k}{R}$ for all $k$, the criterion is no longer rotation invariant, and the axes of $\U$ are identified (up to permutation and sign) by the block-specific profiles $\Sigma_1,\ldots,\Sigma_K$, as long as these profiles differ across blocks. 
  
-For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.  
+For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.    
 
-\subsection{Canonical Factorisation with orthogonal block-loadings}
+\subsection{Canonical Factorisation under orthogonal block-loadings constraint}
 
 Providing a solution for canonical factorization means minimizing
 \begin{equation}
 	\sum_{k=1}^K\Vert \X_k - \U\Sigma_k \V_k^\intercal\Vert^2= \Vert \X- \U \Sigma \V^\intercal\Vert^2, \label{Crit}
 \end{equation}
-with $\U^\intercal.\U=I_R$, $\V_k^\intercal.\V_k=I_R$ for $k=1,\ldots,K$. %Note that, with standardized and orthogonal block-loadings matrices $\V_1,\ldots,\V_K$, the solution of this problem is unique. 
-
-\noindent Consider $\textbf{H}_k=\Sigma_k.\V^\intercal_k\in \mathcal M_{R,p_k}(\mathbb R)$ and $\textbf{H}=[\textbf{H}_1|\ldots|\textbf{H}_K]\in \mathcal M_{R,P}(\mathbb R)$. An iterative algorithm for building the solution of \eqref{Crit} requires to update successively $\U,\V_k,\Sigma_k$ as follows:
-
-\begin{enumerate}
-	\item \underline{Updating of $\U$:}  For given $\textbf{X}\in \mathcal M_{N,P}(\mathbb R)$, $\textbf{H}\in \mathcal M_{R,P}(\mathbb R)$, update $\U$ by $\U=\textbf{A}.\textbf{B}^\intercal$ where $\textbf{A},\textbf{B}$ are respectively the matrices of the first $R$ left singular vectors and the matrix of the first $R$ right singular vectors from the svd of $\textbf{X}.\textbf{H}^\intercal$.
-	\item \underline{Updating of $\V_k$:} For given $\textbf{X}_k\in \mathcal M_{N,p_k}(\mathbb R)$, $\U\in \mathcal M_{R,N}(\mathbb R)$ with orthogonal columns, $\Sigma_k\in \mathcal M_{R,R}(\mathbb R)$, update $\V_k$ by: $\V_k=\textbf{A}\textbf{B}^\intercal$  where $\textbf{A},\textbf{B}$ are respectively the matrix of the first $R$ left singular vectors and the matrix of the first $R$ right singular vectors from the svd of $\textbf{X}^\intercal_k.\U$.
-	 \item \underline{Updating of $\Sigma_k$:}  For given $\textbf{X}_k\in \mathcal M_{N,p_k}(\mathbb R)$, $\U\in \mathcal M_{R,N}(\mathbb R)$ orthogonal, $\V_k\in \mathcal M_{R,p_k}(\mathbb R)$ with orthonormal columns, $\Sigma_k$ is given by 
-	 \[\Sigma_k=diag(\U^\intercal\textbf{X}_k\V_k).\] 
-\end{enumerate}
-
-\begin{proposition}
-The successive updates of $\U$, $\V_k$, and $\Sigma_k$ guarantee that the criterion defined in \eqref{Crit} decreases or remains constant at each step, ensuring convergence of the algorithm.
-\end{proposition}
+with $\U\in\Stiefel{N}{R}$, $\V_k\in\Stiefel{p_k}{N}$ for $k=1,\ldots,K$. 
+%Note that, with standardized and orthogonal block-loadings matrices $\V_1,\ldots,\V_K$, the solution of this problem is unique. 
+Chessel and Hanafi \cite{chessel1996} proposed a sequential solution, known as Multiple Co-Inertia Analysis (MCOA): the dimensions are computed one at a time, each from the blocks deflated with respect to the previous block loadings. This procedure yields orthonormal matrices $\U$ and $\V_1,\ldots,\V_K$, and each stage is optimal in the
+least-squares sense given the previous ones. The resulting solution is nevertheless suboptimal with respect to \eqref{Crit}, since each dimension is chosen without taking the next ones into account, so that the $R$ dimensions are not fitted simultaneously.
+Optimal Multiple COinertia Ananlysis (OMCOA) is proposed as a simultaneous solution of \eqref{Crit} under the constraints $\U\in \Stiefel{N}{R}$ and $\V_k\in \Stiefel{N}{R}$ ($k=1,\ldots,K$). It is computed by an alternating least squares (ALS) algorithm, in which each step minimizes \eqref{Crit} with respect to one set of parameters, the others being fixed:
+\begin{itemize}
+  \item \textbf{Update of $\U$:} $\U=\mathbf A\mathbf B^\intercal$, where $\X\mathbf H^\intercal=\mathbf A\mathbf D\mathbf B^\intercal$ is the SVD of
+        $\X\mathbf H^\intercal$, with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$ (orthogonal Procrustes problem);
+  \item \textbf{Update of $\V_k$:} $\V_k=\mathbf A_k\mathbf B_k^\intercal$, where $\X_k^\intercal\U\Sigma_k=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal$
+        is the SVD of $\X_k^\intercal\U\Sigma_k$, for $k=1,\ldots,K$;
+  \item \textbf{Update of $\Sigma_k$:} $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, for $k=1,\ldots,K$.
+\end{itemize}
+These steps are iterated until the decrease of \eqref{Crit} falls below a given tolerance. Since each step cannot increase the criterion, which is bounded below, the sequence of criterion values converges; the limit may however be a local minimum, so the algorithm is started from the MCOA solution and from several random initializations,
+and the solution with the lowest criterion is retained.
 
 
 \section{Bayesian framework for Canonical Factorisation}
@@ -174,9 +179,8 @@ A probabilistic counterpart of \eqref{Crit} is obtained by assuming a Gaussian n
   \EE_k\ \text{with i.i.d.\ entries}\ \mathcal N\bigl(0,\tau_k^{-1}\bigr),\qquad k=1,\ldots,K,
   \label{eq:model}
 \end{equation}
-where $\tau_k$ is the noise precision of block $k$. Let $\Stiefel{m}{H}=\{\W\in\mathcal M_{m,H}(\mathbb R):\W^\intercal\W=\I_H\}$
-denote the Stiefel manifold. Since the blocks are centered, the latent components are constrained to be
-centered as well: $\U\in\Stiefel{N}{H}$ with $\one_N^\intercal\U=0$.
+where $\tau_k$ is the noise precision of block $k$. Since the blocks are centered, the latent components are constrained to be
+centered as well: $\U\in\Stiefel{N}{R}$ with $\one_N^\intercal\U=0$.
 
 \paragraph{Priors.} We use the following independent priors:
 \begin{itemize}

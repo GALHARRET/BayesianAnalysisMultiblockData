@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex manuscript"] 1791967616.58204 "manuscript.aux" "manuscript.bbl" "manuscript" 1791967618.60613 0
-  "./Biblio.bib" 1791967588 2739 a53e248647bc9d1e7198fc031b39874e ""
+["bibtex manuscript"] 1791995783.29064 "manuscript.aux" "manuscript.bbl" "manuscript" 1791995942.42971 0
+  "./Biblio.bib" 1791993096 2986 4b30c9a2464f58ac7d3f4fd34805517d ""
   "C:/Program Files/MiKTeX/bibtex/bst/bibtex/apalike.bst" 1291972791 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "manuscript.aux" 1791967617 3343 dcc60613901f3c7bdda40e56ec747493 "pdflatex"
+  "manuscript.aux" 1791995941 3403 6daf5d1e530d903643047ce1ded6fe90 "pdflatex"
   (generated)
   "manuscript.bbl"
   "manuscript.blg"
   (rewritten before read)
-["pdflatex"] 1791967616.93382 "c:/Users/j.galharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1791967618.60688 0
+["pdflatex"] 1791995940.80187 "c:/Users/j.galharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1791995942.4305 0
   "C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
   "C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc" 1256929440 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc" 1256929440 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -128,10 +128,10 @@
   "C:/Users/j.galharret/AppData/Roaming/MiKTeX/tex/latex/float/float.sty" 1469023953 6916 16d2656a1984957e674b149555f1ea1d ""
   "C:/Users/j.galharret/AppData/Roaming/MiKTeX/tex/latex/geometry/geometry.cfg" 1578053545 1104 7ac475a4e3466b0b43e138e9356bda83 ""
   "C:/Users/j.galharret/AppData/Roaming/MiKTeX/tex/latex/geometry/geometry.sty" 1578053545 42759 9cf6c5257b1bc7af01a58859749dd37a ""
-  "c:/Users/j.galharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1791967612 46171 b2221aba139236f86789b3f77c5e68fd ""
-  "manuscript.aux" 1791967617 3343 dcc60613901f3c7bdda40e56ec747493 "pdflatex"
-  "manuscript.bbl" 1791967616 1186 9135007edfe1168f1d73c10f2d04e4aa "bibtex manuscript"
-  "manuscript.tex" 1791967612 46171 b2221aba139236f86789b3f77c5e68fd ""
+  "c:/Users/j.galharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1791995939 47297 24a0a90c154370874d04d02cacd64df7 ""
+  "manuscript.aux" 1791995941 3403 6daf5d1e530d903643047ce1ded6fe90 "pdflatex"
+  "manuscript.bbl" 1791995783 1404 865ec51f64898c01f4fd585b37cde64e "bibtex manuscript"
+  "manuscript.tex" 1791995939 47297 24a0a90c154370874d04d02cacd64df7 ""
   (generated)
   "manuscript.aux"
   "manuscript.log"
