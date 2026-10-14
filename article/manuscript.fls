@@ -153,9 +153,6 @@ INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbx8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr6.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbx6.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx10.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx8.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx6.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmro10.tfm
 OUTPUT manuscript.pdf
 INPUT C:\Users\j.galharret\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
@@ -163,6 +160,9 @@ INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-ec.enc
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-ts1.enc
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-mathit.enc
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-rm.enc
+INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx10.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx8.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx6.tfm
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-mathsy.enc
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-mathex.enc
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbxi10.tfm

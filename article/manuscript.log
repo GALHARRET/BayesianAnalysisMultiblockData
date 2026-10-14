@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2023.11.15)  14 OCT 2026 10:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2023.11.15)  14 OCT 2026 18:49
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -339,78 +339,83 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 116.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 118.
 (C:\Program Files\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 116.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 116.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 116.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 116.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 116.
+(Font)              <10.95> on input line 118.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 116.
+(Font)              <8> on input line 118.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 116.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 116.
+(Font)              <6> on input line 118.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 116.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 118.
  (C:\Program Files\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1{C:/Users/j.galharret/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}
 
-{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}] [2] [3]
-LaTeX Font Info:    Trying to load font information for U+euf on input line 270.
+{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}] [2{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Files/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
+Overfull \hbox (19.32083pt too wide) in paragraph at lines 166--168
+[]\T1/lmr/bx/n/10.95 Update of $\OT1/lmr/bx/n/10.95 U$\T1/lmr/bx/n/10.95 : $\OT1/lmr/bx/n/10.95 U \OT1/lmr/m/n/10.95 = \OT1/lmr/bx/n/10.95 AB[]$\T1/lmr/m/n/10.95 , where $\OT1/lmr/bx/n/10.95 XH[] \OT1/lmr/m/n/10.95 = \OT1/lmr/bx/n/10.95 ADB[]$ \T1/lmr/m/n/10.95 is the SVD of $\OT1/lmr/bx/n/10.95 XH[]$\T1/lmr/m/n/10.95 , with $\OT1/lmr/bx/n/10.95 H \OT1/lmr/m/n/10.95 = [^^F[]\OT1/lmr/bx/n/10.95 V[]\OMS/lmsy/m/n/10.95 j [] j\OT1/lmr/m/n/10.95 ^^F[]\OT1/lmr/bx/n/10.95 V[]\OT1/lmr/m/n/10.95 ]$
+ []
+
+[3]
+LaTeX Font Info:    Trying to load font information for U+euf on input line 277.
  (C:\Program Files\MiKTeX\tex/latex/amsfonts\ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
-) [4] [5] [6]
-Overfull \hbox (7.59448pt too wide) in paragraph at lines 437--441
+) [4] [5] [6] [7]
+Overfull \hbox (7.59448pt too wide) in paragraph at lines 445--449
 []\T1/lmr/bx/n/10.95 Posterior in-clu-sion prob-a-bil-i-ties. $[] \OT1/lmr/m/n/10.95 = [] [][] \OML/lmm/m/it/10.95 ^^M[]$ \T1/lmr/m/n/10.95 es-ti-mates $\OML/lmm/m/it/10.95 P\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 ^^M[] \OT1/lmr/m/n/10.95 = 1 \OMS/lmsy/m/n/10.95 j \OT1/lmr/bx/n/10.95 X[]\OML/lmm/m/it/10.95 ; [] ; \OT1/lmr/bx/n/10.95 X[]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/n/10.95 .
  []
 
-(manuscript.bbl [7]) [8]
-Overfull \hbox (25.61748pt too wide) in paragraph at lines 640--642
+(manuscript.bbl [8]) [9]
+Overfull \hbox (25.61748pt too wide) in paragraph at lines 650--652
  \T1/lmr/bx/n/10.95 Up-date of $\OT1/lmr/m/n/10.95 ^^F[]$[] \T1/lmr/m/n/10.95 With $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 and $\OT1/lmr/bx/n/10.95 V[]$ \T1/lmr/m/n/10.95 fixed (both hav-ing or-thonor-mal columns), and $\OT1/lmr/m/n/10.95 ^^F[] = [](\OML/lmm/m/it/10.95 ^^[[]; [] ; ^^[[]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/n/10.95 ,
  []
 
-[9]
-Overfull \hbox (51.8231pt too wide) in paragraph at lines 669--677
+
+Overfull \hbox (51.8231pt too wide) in paragraph at lines 679--687
 []\T1/lmr/m/n/10.95 (1)--(2): by [], the con-di-tional den-sity of $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 is pro-por-tional to $[]\OMS/lmsy/m/n/10.95 f[][] \OML/lmm/m/it/10.95 ^^\[] []\OT1/lmr/m/n/10.95 (^^F[]\OT1/lmr/bx/n/10.95 V[]X[]U\OT1/lmr/m/n/10.95 )\OMS/lmsy/m/n/10.95 g \OT1/lmr/m/n/10.95 =
  []
 
-[10] (manuscript.aux)
+[10] [11] (manuscript.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-08-29>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5746 strings out of 475248
- 89051 string characters out of 5767609
- 1942785 words of memory out of 5000000
- 27141 multiletter control sequences out of 15000+600000
+ 5747 strings out of 475248
+ 89064 string characters out of 5767609
+ 1945785 words of memory out of 5000000
+ 27142 multiletter control sequences out of 15000+600000
  638328 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,16n,65p,1082b,433s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,16n,65p,1082b,421s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/euler/eufm10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmbxi10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmro10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on manuscript.pdf (10 pages, 416706 bytes).
+Output written on manuscript.pdf (11 pages, 421740 bytes).
 PDF statistics:
- 155 PDF objects out of 1000 (max. 8388607)
+ 158 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
