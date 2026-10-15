@@ -1,0 +1,37 @@
+\begin{thebibliography}{}
+
+\bibitem[Besag, 1986]{besag1986}
+Besag, J. (1986).
+\newblock On the statistical analysis of dirty pictures.
+\newblock {\em Journal of the Royal Statistical Society: Series B
+  (Methodological)}, 48(3):259--279.
+
+\bibitem[Bougeard et~al., 2024]{bougeard2024}
+Bougeard, S., Peltier, C., Jaillais, B., Boulet, J.-C., and Hanafi, M. (2024).
+\newblock Benchmarking multiblock methods with canonical factorization.
+\newblock {\em Chemometrics and Intelligent Laboratory Systems}, 254:105240.
+
+\bibitem[Chessel and Hanafi, 1996]{chessel1996}
+Chessel, D. and Hanafi, M. (1996).
+\newblock Analyses de la co-inertie de $ k $ nuages de points.
+\newblock {\em Revue de statistique appliqu{\'e}e}, 44(2):35--60.
+
+\bibitem[Cliff, 1966]{cliff1966}
+Cliff, N. (1966).
+\newblock Orthogonal rotation to congruence.
+\newblock {\em Psychometrika}, 31(1):33--42.
+
+\bibitem[Hoff, 2009]{hoff2009}
+Hoff, P.~D. (2009).
+\newblock Simulation of the matrix bingham–von mises–fisher distribution,
+  with applications to multivariate and relational data.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  18(2):438--456.
+
+\bibitem[Wood, 1994]{wood1994}
+Wood, A.~T. (1994).
+\newblock Simulation of the von mises fisher distribution.
+\newblock {\em Communications in Statistics - Simulation and Computation},
+  23(1):157--164.
+
+\end{thebibliography}
