@@ -153,7 +153,6 @@ INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbx8.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr6.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbx6.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmro10.tfm
 OUTPUT manuscript.pdf
 INPUT C:\Users\j.galharret\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-ec.enc
@@ -166,15 +165,13 @@ INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\rm-lmbx6.tfm
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-mathsy.enc
 INPUT C:\Program Files\MiKTeX\fonts\enc\dvips\lm\lm-mathex.enc
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmbxi10.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr9.tfm
 INPUT C:\Program Files\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Program Files\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Program Files\MiKTeX\tex\latex\amsfonts\ueuf.fd
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\amsfonts\euler\eufm7.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmri8.tfm
-INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmri7.tfm
+INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\ec-lmr9.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\lmmib10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\lmmib10.tfm
 INPUT C:\Program Files\MiKTeX\fonts\tfm\public\lm\lmmib7.tfm
@@ -217,8 +214,6 @@ INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmr9.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmr9.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmri10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmri10.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmro10.pfb
-INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmro10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmsy10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmsy10.pfb
 INPUT C:\Program Files\MiKTeX\fonts\type1\public\lm\lmsy8.pfb

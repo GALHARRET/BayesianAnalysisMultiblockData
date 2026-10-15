@@ -17,6 +17,7 @@
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
+\fancyhead{}
 \usepackage{graphicx}
 \usepackage{color}
 
@@ -83,7 +84,6 @@
 \begin{center}
 {\Large
 	{\sc Bayesian Framework for Canonical factorization of multiblock data}
-	{\sc Bayesian Framework for Canonical factorization of multiblock data}
 }
 \bigskip
 
@@ -138,18 +138,20 @@ Consider $K$ colmumn blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively i
 \end{align}
 where
 \begin{itemize}
-	\item $\U\in \Stiefel{N}{R}$ is the matrix of common components,
-	\item $\V_k \in \mathcal M_{p_k,R}(\mathbb R)$ are the standardized block-loadings, and $\V=[\V_1|...|\V_K] \in \mathcal M_{P,R}(\mathbb R)$,
+	\item $\U\in \Stiefel{N}{R}$ is the block-common components,
+	\item $\V_k \in \mathcal M_{p_k,R}(\mathbb R)$ are the  block-loadings, and $\V=[\V_1|...|\V_K] \in \mathcal M_{P,R}(\mathbb R)$,
   \item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
 \end{itemize}
-Without loss of generality, we can assume $\sigma_k^{(r)}\geq 0$ for all $k,r$, since a joint sign change of $\sigma_k^{(r)}$ and $\vv_k^{(r)}$ leaves the model and the constraints unchanged. This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). For all the multiblock methods, once $\U$ is fixed, the decomposition $\X_k=\U\Sigma_k\V_k^\intercal$ of each block is unique (up to sign). The methods differ in how the axes $\uu^{(1)},\ldots,\uu^{(R)}$ themselves are determined. When the block loadings are only normalized ($\|\vv_k^{(r)}\|=1$), the optimal loadings are
+Without loss of generality, we can assume $\sigma_k^{(r)}\geq 0$ for all $k,r$, since a joint sign change of $\sigma_k^{(r)}$ and $\vv_k^{(r)}$ leaves the model and the constraints unchanged. Since the blocks $\X_1,...\X_K$ are column-centered, the block-common $\U\in\Stiefel{N}{R}$ is centered as-well:
+$$\U\in\Stiefel{N}{R}, \quad \mathbf{1}_N\U=0.$$
+This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). For all the multiblock methods, once $\U$ is fixed, the decomposition $\X_k=\U\Sigma_k\V_k^\intercal$ of each block is unique (up to sign). The methods differ in how the axes $\uu^{(1)},\ldots,\uu^{(R)}$ themselves are determined. When the block loadings are only normalized ($\|\vv_k^{(r)}\|=1$), the optimal loadings are
 $\vv_k^{(r)}=\X_k^\intercal\uu^{(r)}/\|\X_k^\intercal\uu^{(r)}\|$ and the least-squares criterion reduces to
 \[
   \sum_{k=1}^K\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X\|^2-\bigl\|\X^\intercal\U\bigr\|^2 ,
 \]
 which is invariant under any rotation $\U\mapsto\U\mathbf R$: only $\mathrm{span}(\U)$ is determined by the data, and the axes have to be fixed by an external convention, usually the SVD of $\X$. This convention becomes unstable when the singular values of $\X$ are close. When $\V_k\in\Stiefel{p_k}{R}$ for all $k$, the criterion is no longer rotation invariant, and the axes of $\U$ are identified (up to permutation and sign) by the block-specific profiles $\Sigma_1,\ldots,\Sigma_K$, as long as these profiles differ across blocks. 
  
-For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.    
+%For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.    
 
 \subsection{Canonical Factorisation under orthogonal block-loadings constraint}
 
@@ -169,8 +171,16 @@ Optimal Multiple COinertia Ananlysis (OMCOA) is proposed as a simultaneous solut
         is the SVD of $\X_k^\intercal\U\Sigma_k$, for $k=1,\ldots,K$;
   \item \textbf{Update of $\Sigma_k$:} $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, for $k=1,\ldots,K$.
 \end{itemize}
-These steps are iterated until the decrease of \eqref{Crit} falls below a given tolerance. Since each step cannot increase the criterion, which is bounded below, the sequence of criterion values converges; the limit may however be a local minimum, so the algorithm is started from the MCOA solution and from several random initializations,
-and the solution with the lowest criterion is retained.
+%These steps are iterated until the decrease of \eqref{Crit} falls below a given tolerance. Since each step cannot increase the criterion, which is bounded below, the sequence of criterion values converges; 
+
+\begin{proposition}
+  The successive updates of $\U,\V_k,\Sigma_k$ guarantee that the criterion defined in \eqref{Crit} decreases or remains constant at each step, ensuring convergence of the algorithm.  
+\end{proposition}
+The proof is given in the appendix.
+\begin{remark}
+Since the limit may however be a local minimum, the algorithm is started from the MCOA solution and from several random initializations, and the solution with the lowest criterion is retained.  
+\end{remark}
+
 
 
 \section{Bayesian framework for Canonical Factorisation}
@@ -178,18 +188,20 @@ and the solution with the lowest criterion is retained.
 A probabilistic counterpart of \eqref{Crit} is obtained by assuming a Gaussian noise:
 \begin{equation}
   \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad
-  \EE_k\ \text{with i.i.d.\ entries}\ \mathcal N\bigl(0,\tau_k^{-1}\bigr),\qquad k=1,\ldots,K,
+  \EE_k\ \sim \ \mathcal N\bigl(0,\tau_k^{-1}\bigr),\qquad k=1,\ldots,K,
   \label{eq:model}
 \end{equation}
-where $\tau_k$ is the noise precision of block $k$. Since the blocks are centered, the latent components are constrained to be
+where $\tau_k$ is the noise precision of block $k$. %Since the blocks are centered, the latent components are constrained to be
 centered as well: $\U\in\Stiefel{N}{R}$ with $\one_N^\intercal\U=0$.
 
 \paragraph{Priors.} We use the following independent priors:
 \begin{itemize}
-  \item $\U$ and $\V_1,\ldots,\V_K$ are uniformly distributed on their Stiefel manifolds (non-informative);
-  \item $\sigma_k^{(h)}\sim\mathcal N^+\bigl(0,\lambda^{-1}\bigr)$, a half-normal distribution with a small precision
-        $\lambda$ (e.g.\ $\lambda=10^{-2}$); the positivity constraint removes the sign indeterminacy between
-        $\sigma_k^{(h)}$ and $\vv_k^{(h)}$;
+  \item $\U$ and $\V_1,\ldots,\V_K$ are uniformly distributed on their Stiefel manifolds (non-informative von Mises--Fisher distribution). A random matrix $\W\in\Stiefel{m}{R}$ follows the matrix von Mises--Fisher distribution $\vMF(\F)$, with parameter $\F\in\mathcal M_{m,R}(\mathbb R)$, if its density with
+respect to the uniform measure on $\Stiefel{m}{R}$ is proportional to $\exp\{\trace(\F^\intercal\W)\}$
+\cite{hoff2009}. If $\F=\mathbf A\mathbf D\mathbf B^\intercal$ is the SVD of $\F$, the mode of $\vMF(\F)$ is the
+polar factor $\mathbf A\mathbf B^\intercal$, and the distribution concentrates around it as the singular values of $\F$ increase.
+  \item $\sigma_k^{(r)}\sim\mathcal N^+\bigl(0,\lambda^{-1}\bigr)$, a half-normal distribution with a small precision
+        $\lambda$ (e.g.\ $\lambda=10^{-2}$); 
   \item $\tau_k\sim\Ga(a_0,b_0)$ with small hyperparameters (e.g.\ $a_0=b_0=10^{-3}$).
 \end{itemize}
 
@@ -198,10 +210,10 @@ centered as well: $\U\in\Stiefel{N}{R}$ with $\one_N^\intercal\U=0$.
 \paragraph{Likelihood.} Because $\U$ and $\V_k$ have orthonormal columns and $\Sigma_k$ is diagonal,
 \begin{equation}
   \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2
-  =\|\X_k\|^2-2\trace\bigl(\Sigma_k\V_k^\intercal\X_k^\intercal\U\bigr)+\sum_{h=1}^H\bigl(\sigma_k^{(h)}\bigr)^2 .
+  =\|\X_k\|^2-2\trace\bigl(\Sigma_k\V_k^\intercal\X_k^\intercal\U\bigr)+\sum_{r=1}^R\bigl(\sigma_k^{(r)}\bigr)^2 .
   \label{eq:expand}
 \end{equation}
-Since the blocks are centered, each $\X_k$ carries $(N-1)p_k$ degrees of freedom, and the log-likelihood reads
+Since the blocks are centered, each $\X_k$ carries $(N-1)p_k$ degrees of freedom, and the log-likelihood is
 \[
   \log p(\X_1,\ldots,\X_K\mid\cdot)=\sum_{k=1}^K\Bigl[\tfrac{(N-1)p_k}{2}\log\tau_k
   -\tfrac{\tau_k}{2}\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2\Bigr]+\text{const}.
@@ -209,17 +221,13 @@ Since the blocks are centered, each $\X_k$ carries $(N-1)p_k$ degrees of freedom
 By \eqref{eq:expand}, $\U$ and $\V_k$ only appear in the linear term $\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)$.
 This is the key property: all the full conditionals belong to standard families.
 
-\paragraph{Matrix von Mises--Fisher distribution.} A random matrix $\W\in\Stiefel{m}{H}$ follows the matrix
-von Mises--Fisher distribution $\vMF(\F)$, with parameter $\F\in\mathcal M_{m,H}(\mathbb R)$, if its density with
-respect to the uniform measure on $\Stiefel{m}{H}$ is proportional to $\exp\{\trace(\F^\intercal\W)\}$
-\cite{hoff2009}. If $\F=\mathbf A\mathbf D\mathbf B^\intercal$ is the (thin) SVD of $\F$, the mode of $\vMF(\F)$ is the
-polar factor $\mathbf A\mathbf B^\intercal$, and the distribution concentrates around it as the singular values of $\F$ increase.
+
 
 \begin{proposition}[Full conditionals]\label{prop:cond}
 Under model \eqref{eq:model} and the above priors:
 \begin{enumerate}
   \item \textbf{Common space.} Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of
-        $\one_N^\perp$ and write $\U=\Q\tilde\U$ with $\tilde\U\in\Stiefel{N-1}{H}$. Then
+        $\one_N^\perp$ and write $\U=\Q\tilde\U$ with $\tilde\U\in\Stiefel{N-1}{R}$. Then
         \[
           \tilde\U\mid\cdot\ \sim\ \vMF\bigl(\Q^\intercal\F_{\U}\bigr),\qquad
           \F_{\U}=\sum_{k=1}^K\tau_k\,\X_k\V_k\Sigma_k .
@@ -228,9 +236,9 @@ Under model \eqref{eq:model} and the above priors:
         \[
           \V_k\mid\cdot\ \sim\ \vMF\bigl(\F_{\V_k}\bigr),\qquad \F_{\V_k}=\tau_k\,\X_k^\intercal\U\Sigma_k .
         \]
-  \item \textbf{Block weights.} For $k=1,\ldots,K$ and $h=1,\ldots,H$, let $d_k^{(h)}={\uu^{(h)}}^\intercal\X_k\vv_k^{(h)}$. Then
+  \item \textbf{Block weights.} For $k=1,\ldots,K$ and $h=1,\ldots,H$, let $d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$. Then
         \[
-          \sigma_k^{(h)}\mid\cdot\ \sim\ \mathcal N^+\Bigl(\frac{\tau_k\,d_k^{(h)}}{\tau_k+\lambda},\ \frac{1}{\tau_k+\lambda}\Bigr),
+          \sigma_k^{(r)}\mid\cdot\ \sim\ \mathcal N^+\Bigl(\frac{\tau_k\,d_k^{(r)}}{\tau_k+\lambda},\ \frac{1}{\tau_k+\lambda}\Bigr),
         \]
         a normal distribution truncated to $(0,+\infty)$.
   \item \textbf{Noise precisions.} For $k=1,\ldots,K$,
@@ -239,8 +247,33 @@ Under model \eqref{eq:model} and the above priors:
         \]
 \end{enumerate}
 \end{proposition}
+\noindent The modes of the full conditionals of Proposition~\ref{prop:cond} are
+\[
+  \U=\mathbf A\mathbf B^\intercal\ \text{with}\ \F_{\U}=\mathbf A\mathbf D\mathbf B^\intercal,\qquad
+  \V_k=\mathbf A_k\mathbf B_k^\intercal\ \text{with}\ \F_{\V_k}=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal,\qquad
+  \sigma_k^{(h)}=\frac{\tau_k}{\tau_k+\lambda}\,d_k^{(h)} .
+\]
+When $\lambda\to0$ and the precisions are equal ($\tau_1=\cdots=\tau_K$), these are exactly the OMCOA updates:
+Procrustes rotation of $\X\mathbf H^\intercal$ for $\U$ (with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$),
+Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$. OMCOA is therefore the iterated conditional modes (ICM) algorithm \cite{besag1986} associated with this posterior, and the Gibbs sampler is its
+stochastic counterpart. With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion \eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
+\eqref{Crit},
+$\tau\mid\cdot\sim\Ga\bigl(a_0+\sum_k(N-1)p_k/2,\ b_0+\sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
 
-We can deduce the following algorithm:
+\paragraph{Post-processing: label switching and signs}\label{sec:align}
+
+The posterior distribution is invariant under any permutation $\pi$ of the $R$ dimensions applied jointly to
+$\U$, $\V_1,\ldots,\V_K$ and $\Sigma_1,\ldots,\Sigma_K$, and under a joint change of sign of $\uu^{(r)}$ and
+$\vv_1^{(r)},\ldots,\vv_K^{(r)}$. Posterior summaries are therefore computed after aligning each draw on a reference
+$\U_{\mathrm{ref}}$ (in practice the OMCOA solution). For each draw, with $\mathbf C=\U_{\mathrm{ref}}^\intercal\U$,
+\[
+  \hat\pi=\argmax_{\pi\in\mathfrak S_R}\sum_{h=1}^R\bigl|C_{r,\pi(r)}\bigr|,\qquad
+  s_r=\operatorname{sign}\bigl(C_{r,\hat\pi(r)}\bigr),
+\]
+and the columns of $\U$ and $\V_k$ are reordered by $\hat\pi$ and multiplied by $s_r$, while the diagonal of
+$\Sigma_k$ is reordered by $\hat\pi$ (it stays positive). Posterior means and credible intervals of $\sigma_k^{(r)}$
+are then obtained from the empirical distribution of the aligned draws.
+
 We can deduce the following algorithm:
 
 \begin{algorithm}[ht]
@@ -267,57 +300,20 @@ We can deduce the following algorithm:
 \end{algorithmic}
 \end{algorithm}
 
-\paragraph{Post-processing: label switching and signs}\label{sec:align}
+% \begin{remark}[What the sampler adds]
+% Besides point estimates close to the OMCOA solution, the sampler provides the posterior distribution of the block
+% weights $\sigma_k^{(h)}$ and of the noise levels $\tau_k^{-1}$. Credible intervals on $\sigma_k^{(h)}$ can be used to assess
+% whether a dimension is common to all blocks, shared by some of them, or specific to one block.
+% \end{remark}
 
-The posterior distribution is invariant under any permutation $\pi$ of the $H$ dimensions applied jointly to
-$\U$, $\V_1,\ldots,\V_K$ and $\Sigma_1,\ldots,\Sigma_K$, and under a joint change of sign of $\uu^{(h)}$ and
-$\vv_1^{(h)},\ldots,\vv_K^{(h)}$. Posterior summaries are therefore computed after aligning each draw on a reference
-$\U_{\mathrm{ref}}$ (in practice the OMCOA solution). For each draw, with $\mathbf C=\U_{\mathrm{ref}}^\intercal\U$,
-\[
-  \hat\pi=\argmax_{\pi\in\mathfrak S_H}\sum_{h=1}^H\bigl|C_{h,\pi(h)}\bigr|,\qquad
-  s_h=\operatorname{sign}\bigl(C_{h,\hat\pi(h)}\bigr),
-\]
-and the columns of $\U$ and $\V_k$ are reordered by $\hat\pi$ and multiplied by $s_h$, while the diagonal of
-$\Sigma_k$ is reordered by $\hat\pi$ (it stays positive). Posterior means and credible intervals of $\sigma_k^{(h)}$
-are then obtained from the empirical distribution of the aligned draws.
+% \begin{remark}[Practical aspects]
+% Starting from the OMCOA solution shortens the burn-in. The column-wise sweeps make successive draws of $\U$ and
+% $\V_k$ correlated, so convergence should be checked on trace plots of the $\sigma_k^{(h)}$. Because the posterior is
+% strongly concentrated when the noise is small, the chain rarely jumps between the $H!$ equivalent modes; the alignment step
+% remains necessary nonetheless, in particular when several dimensions have close weights.
+% \end{remark}
 
-
-\begin{remark}[OMCOA as iterated conditional modes]
-The modes of the full conditionals of Proposition~\ref{prop:cond} are
-\[
-  \U=\mathbf A\mathbf B^\intercal\ \text{with}\ \F_{\U}=\mathbf A\mathbf D\mathbf B^\intercal,\qquad
-  \V_k=\mathbf A_k\mathbf B_k^\intercal\ \text{with}\ \F_{\V_k}=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal,\qquad
-  \sigma_k^{(h)}=\frac{\tau_k}{\tau_k+\lambda}\,d_k^{(h)} .
-\]
-When $\lambda\to0$ and the precisions are equal ($\tau_1=\cdots=\tau_K$), these are exactly the OMCOA updates:
-Procrustes rotation of $\X\mathbf H^\intercal$ for $\U$ (with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$),
-Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$. OMCOA is therefore the
-iterated conditional modes (ICM) algorithm \cite{besag1986} associated with this posterior, and the Gibbs sampler is its
-stochastic counterpart.
-\end{remark}
-
-\begin{remark}[Block weighting]
-With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise
-precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion
-\eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
-\eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with
-$\tau\mid\cdot\sim\Ga\bigl(a_0+\sum_k(N-1)p_k/2,\ b_0+\sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
-\end{remark}
-
-\begin{remark}[What the sampler adds]
-Besides point estimates close to the OMCOA solution, the sampler provides the posterior distribution of the block
-weights $\sigma_k^{(h)}$ and of the noise levels $\tau_k^{-1}$. Credible intervals on $\sigma_k^{(h)}$ can be used to assess
-whether a dimension is common to all blocks, shared by some of them, or specific to one block.
-\end{remark}
-
-\begin{remark}[Practical aspects]
-Starting from the OMCOA solution shortens the burn-in. The column-wise sweeps make successive draws of $\U$ and
-$\V_k$ correlated, so convergence should be checked on trace plots of the $\sigma_k^{(h)}$. Because the posterior is
-strongly concentrated when the noise is small, the chain rarely jumps between the $H!$ equivalent modes; the alignment step
-remains necessary nonetheless, in particular when several dimensions have close weights.
-\end{remark}
-
-\subsection{sparse version}
+\section{Sparse Bayesian Framework for canonical factorisation}
 In OMCOA, each block is approximated as $\X_k\approx\U\Sigma_k\V_k^\intercal$, where the diagonal matrix
 $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each latent dimension $\uu^{(r)}$ contributes to
 block $k$. The structure of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension
@@ -339,7 +335,7 @@ The sparsity of the model is based on the diagonal terms $\sigma_k^{(r)}$ as fol
   \label{eq:spike}
 \end{equation}
 
-\paragraph{Priors.}
+\paragraph{Priors.} The difference between the two sets of prior distributions lies in the prior distributions of the diagonal terms: 
 \begin{itemize}
   \item spike-and-slab on the weights:
         $\gamma_k^{(r)}\mid\theta_r\sim\Bern(\theta_r)$ and $s_k^{(r)}\sim\mathcal N^+(0,\lambda^{-1})$, i.e.\
@@ -387,28 +383,15 @@ Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\per
 \end{enumerate}
 \end{proposition}
 
-\begin{proof}[Sketch of proof]
-Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
-conjugacy). For item 3, the terms of the log-posterior involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand},
-$\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is
-$0$. Under $\gamma_k^{(r)}=1$, integrating against the half-normal slab of density
-$2\sqrt{\lambda/(2\pi)}\exp(-\lambda s^2/2)$ on $(0,\infty)$ gives
-\[
-  2\sqrt{\frac{\lambda}{2\pi}}\int_0^{\infty}\exp\Bigl(-\frac{\omega_k}{2}s^2+\tau_kd_k^{(r)}s\Bigr)ds
-  =2\sqrt{\frac{\lambda}{\omega_k}}\exp\Bigl(\frac{\omega_k(m_k^{(r)})^2}{2}\Bigr)\Phi\bigl(m_k^{(r)}\sqrt{\omega_k}\bigr)=B_k^{(r)},
-\]
-which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The conditional of $\sigma_k^{(r)}$ given
-$\gamma_k^{(r)}=1$ is obtained by completing the square.
-\end{proof}
 
 Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
 drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$.
 In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow.
 
-\section{Algorithm}
 
-The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column
-being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, as in the non-sparse sampler.
+%The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, as in the non-sparse sampler.
+
+We can deduce the following algorithm:
 
 \begin{algorithm}[ht]
 \caption{Sparse Gibbs sampler for OMCOA}\label{alg:sparse}
@@ -438,19 +421,13 @@ being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, 
 \end{algorithmic}
 \end{algorithm}
 
-\section{Posterior summaries}
+From the posterior distributions of the parameter $\gamma_k^{(r)}$ a decision rule for the representation of the block $\X_k$ on the component $u^{(r)}$: 
+\begin{quote} 
+  the component $\uu^{(r)}$ is active for the block $k$ if and only if $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$. 
+\end{quote}
+\noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. $R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\}$, whose posterior distribution is estimated by its empirical distribution over the draws. 
 
-After alignment of the $T-T_0$ stored draws (indexed by $t$) on a reference solution, as in the non-sparse sampler:
-\begin{itemize}
-  \item \textbf{Posterior inclusion probabilities.}
-        $\hat P_k^{(r)}=\frac{1}{T-T_0}\sum_t\gamma_k^{(r),t}$ estimates $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)$. The
-        $K\times R$ matrix $(\hat P_k^{(r)})$ summarizes the structure of the blocks; a dimension is declared active in
-        block $k$ when $\hat P_k^{(r)}>1/2$ (median probability model).
-  \item \textbf{Effective rank.} $R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\}$, whose posterior distribution is
-        estimated by its empirical distribution over the draws.
-  \item \textbf{Block weights.} Posterior means and credible intervals of $\sigma_k^{(r)}$; for active entries they are
-        computed conditionally on $\gamma_k^{(r)}=1$.
-\end{itemize}
+
 
 
 % \begin{lemma} \label{lemma1}
@@ -717,7 +694,27 @@ proportional to $\exp(\f^\intercal\z)$ on $\mathbb S^{m-1}$, is sampled with the
 \noindent The expression of $b$ used in Algorithm~\ref{alg:wood} is algebraically equivalent to Wood's original one,
 $b=\bigl(-2\kappa+\sqrt{4\kappa^2+(m-1)^2}\bigr)/(m-1)$, but avoids a numerical cancellation when $\kappa$ is large,
 which is the typical situation here since $\kappa$ scales with the noise precisions $\tau_k$.
+
+\begin{proof}[Sketch of proof]
+Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
+conjugacy). For item 3, the terms of the log-posterior involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand},
+$\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is
+$0$. Under $\gamma_k^{(r)}=1$, integrating against the half-normal slab of density
+$2\sqrt{\lambda/(2\pi)}\exp(-\lambda s^2/2)$ on $(0,\infty)$ gives
+\[
+  2\sqrt{\frac{\lambda}{2\pi}}\int_0^{\infty}\exp\Bigl(-\frac{\omega_k}{2}s^2+\tau_kd_k^{(r)}s\Bigr)ds
+  =2\sqrt{\frac{\lambda}{\omega_k}}\exp\Bigl(\frac{\omega_k(m_k^{(r)})^2}{2}\Bigr)\Phi\bigl(m_k^{(r)}\sqrt{\omega_k}\bigr)=B_k^{(r)},
+\]
+which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The conditional of $\sigma_k^{(r)}$ given
+$\gamma_k^{(r)}=1$ is obtained by completing the square.
+\end{proof}
+
+
+
 %\printbibliography
+
+
+
 
 % \subsection{Multiple CO-Inertia Analysis}
 % \cite{Chessel96} proposed Multiple Co-inertia Analysis as an alternative to MAXVAR \cite{Carroll68}. The rank-$H$ approximation is derived from successive rank-1 approximations of deflated versions of the blocks $\X_1,\ldots,\X_K$.
