@@ -307,7 +307,7 @@ resF<-list(resSlSl,resHS)
 #save(resF,file="C:/Users/j.galharret/Documents/bayesianCanonicalFactorization/RCodes/res0.RData")
 
 
-load("C:/Users/j.galharret/Documents/bayesianCanonicalFactorization/RCodes/res0.RData")
+load("RCodes/res0.RData")
 ## Graphiques
 
 res<-resF[[1]]
@@ -338,11 +338,18 @@ tab$true<- c(c(.7,.5,.0,.0),     # bloc 1
              c(.6,.4,.0,.0),     # bloc 2
              c(.5,.0,.6,.0))     # bloc 3
 
+tab$block<-as.factor(tab$block)
+tab$dim<-as.factor(tab$dim)
 
-ggplot(tab,aes(x=as.factor(block),y=M,fill=as.factor(dim)))+
-  geom_bar(stat="identity",position="dodge")+
-  theme_bw()+
-  geom_errorbar(aes(ymin=Q5,ymax=Q95),width=.1)
+ggplot(tab, aes(x = block, y = M, fill = dim)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+  
+  geom_errorbar(
+    aes(ymin = Q5, ymax = Q95), 
+    width = 0.1, 
+    position = position_dodge(width = 0.9) # Aligne les barres d'erreurs
+  ) +
+  theme_bw()
 
 
   #res$truth <- cbind(sig_true, 0)[cbind(res$block, res$dim)]
