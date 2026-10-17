@@ -1,14 +1,26 @@
 # Fdb version 4
+<<<<<<< Updated upstream
 ["bibtex manuscript"] 1792262113.51653 "manuscript.aux" "manuscript.bbl" "manuscript" 1792262286.33139 0
   "./Biblio.bib" 1792260942.89299 3887 b1590e8e92ac780fc7692365e6ae75a3 ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
   "manuscript.aux" 1792262286.05121 4063 e509262a1f1f4c8be496f0073d6e1e73 "pdflatex"
+=======
+["bibtex manuscript"] 1792093167.26662 "manuscript.aux" "manuscript.bbl" "manuscript" 1792093167.93292 0
+  "./Biblio.bib" 1792093105.4214 2883 4b30c9a2464f58ac7d3f4fd34805517d ""
+  "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
+  "manuscript.aux" 1792093167.71751 3348 a38d0c9566e8c51cc3d67052514095f0 "pdflatex"
+>>>>>>> Stashed changes
   (generated)
   "manuscript.bbl"
   "manuscript.blg"
   (rewritten before read)
+<<<<<<< Updated upstream
 ["pdflatex"] 1792262285.52488 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1792262286.33152 0
   "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1792262285.32469 51556 9ea9fae7746bb282a76872feb9cf4db3 ""
+=======
+["pdflatex"] 1792093167.36194 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1792093167.93303 0
+  "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1792093105.42896 49822 e44896142093b3f392e0f1b7efa3a763 ""
+>>>>>>> Stashed changes
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -126,9 +138,15 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1747203790 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1747203749 3345733 e5360f354b310b62ce5167b14af0c915 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
+<<<<<<< Updated upstream
   "manuscript.aux" 1792262286.05121 4063 e509262a1f1f4c8be496f0073d6e1e73 "pdflatex"
   "manuscript.bbl" 1792262113.61881 2766 304c53f22437c233b408c36615d1394a "bibtex manuscript"
   "manuscript.tex" 1792262285.32469 51556 9ea9fae7746bb282a76872feb9cf4db3 ""
+=======
+  "manuscript.aux" 1792093167.71751 3348 a38d0c9566e8c51cc3d67052514095f0 "pdflatex"
+  "manuscript.bbl" 1792093167.35975 1359 c968f2840c380742a16dfd85edbe8085 "bibtex manuscript"
+  "manuscript.tex" 1792093105.42896 49822 e44896142093b3f392e0f1b7efa3a763 ""
+>>>>>>> Stashed changes
   (generated)
   "manuscript.aux"
   "manuscript.log"
