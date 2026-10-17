@@ -102,10 +102,18 @@
 
 \section{Introduction}
 
-Data sets structured into blocks of variables measured on the same set of observations are frequently encountered in practice. These blocks may consist of quantitative variables originating from distinct measurement sources or correspond to thematic groupings defined by the user. For instance, in omics studies, blocks typically comprise variables derived from different analytical techniques (e.g., proteomics, metabolomics). In psychology, multiblock data structures commonly arise when multiple sets of variables are collected on the same individuals to capture different psychological domains. For example, distinct blocks may include self-report questionnaire scores assessing personality traits, behavioral task performance measures, and neurophysiological indicators such as electroencephalography  features.
+Data sets structured into blocks of variables measured on the same set of observations are frequently encountered in practice. These blocks may consist of quantitative variables originating from distinct measurement sources or correspond to thematic groupings defined by the user. For instance, in omics studies, blocks typically comprise variables derived from different analytical techniques (e.g., proteomics, metabolomics). In psychology, multiblock data commonly arise when several sets of variables are collected on the same individuals to capture different psychological domains, such as
+self-report questionnaire scores assessing personality traits, behavioral task performance measures, and neurophysiological indicators such as electroencephalography features.
 
-The four expected objectives of exploratory multiblock data analysis are: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.  An unified algebraic framework based on factorization strategies, denoted \textit{canonical factorisation}, was proposed by \cite{bougeard2024} for multiblock methods to achieve these objectives. In practice, canonical factorisation provides a structured framework for analysing data variability at multiple levels: differences between and within blocks, differences between observations by projecting them onto a common subspace. It also facilitates the harmonisation of outputs produced by different methods and supports a more objective criterion-based selection among competing approaches. 
-The four expected objectives of exploratory multiblock data analysis are: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.  An unified algebraic framework based on factorization strategies, denoted \textit{canonical factorisation}, was proposed by \cite{bougeard2024} for multiblock methods to achieve these objectives. In practice, canonical factorisation provides a structured framework for analysing data variability at multiple levels: differences between and within blocks, differences between observations by projecting them onto a common subspace. It also facilitates the harmonisation of outputs produced by different methods and supports a more objective criterion-based selection among competing approaches. 
+Exploratory multiblock data analysis has four main objectives: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.
+A unified algebraic framework based on factorization strategies, called \textit{canonical factorization}, was proposed by \cite{bougeard2024} for multiblock methods to achieve these objectives. In practice, canonical factorization provides a structured framework for analyzing data variability at multiple levels: differences between and within blocks, and
+differences between observations through their projection onto a common subspace. It also facilitates the harmonization of the outputs of different methods and supports a criterion-based selection among competing approaches.
+
+The canonical factorization is exact when the dimension of the common subspace equals the rank of the concatenated matrix, which can be large. Determining a reduced dimension, and identifying which dimensions are common to all blocks, shared by some of them or specific to one block, is therefore a major issue. Bayesian approaches address the first question for a single matrix: \cite{hoff2007} proposed a Bayesian singular value decomposition (SVD) that quantifies the uncertainty on the rank, and competing approaches were obtained with other priors on the singular values, such as the
+double exponential distribution \cite{zhai2023}, the repulsed normal distribution \cite{yuchi2023} and the horseshoe prior \cite{wang2026}, which shrinks small singular values towards zero.
+
+Following this line of work, we propose a Bayesian framework for the canonical factorization of multiblock data. The model imposes orthonormality constraints on both the common components and the block loadings, which makes the axes of the common subspace identifiable and leads to matrix von Mises--Fisher full conditional distributions. We derive an efficient Gibbs sampler and show that its conditional modes coincide with the updates of Optimal Multiple Co-Inertia Analysis (OMCOA), the simultaneous alternative to Multiple Co-Inertia Analysis \cite{chessel1996}. We then propose a sparse
+version based on a spike-and-slab prior \cite{mitchell1988,george1993} on the block weights. Unlike continuous shrinkage priors, this prior yields exact zeros and posterior inclusion probabilities, which directly reveal common, partially common and specific structures and provide an estimate of the dimension of the common subspace.  
 
 %This framework is a compass among multiblock models:  Generalized Canonical Correlation Analysis (GCCA, \cite{Carroll68}) and its popular case MAXVAR \cite{Carroll68}, Hierarchical Principal Component Analysis (HPCA, \cite{Wold96,Westerhuis98}), Structuration de Tableaux A Tois Indices de la Statistique (Statis, \cite{Lavit94}), Multiple Factorial Analysis (MFA, \cite{escofier1994}), Common Components and Specific Weights Analysis (CCWSA, \cite{Qannari001}), Multiple CO-inertia Analysis (MCOA, \cite{Chessel96})  fall within this framework. A benchmark of these methods had been done in \cite{Bougeard024}.
 
@@ -124,7 +132,7 @@ The four expected objectives of exploratory multiblock data analysis are: (i) to
 denotes the Stiefel manifold.
 \end{itemize}
  
-Consider $K$ colmumn blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively in $\mathcal M_{N,p_1}(\mathbb R),...,\mathcal M_{N,p_K}(\mathbb R))$. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
+Consider $K$ colmumn blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively in $\mathcal M_{N,p_1}(\mathbb R),...,\mathcal M_{N,p_K}(\mathbb R)$. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
 
 \cite{bougeard2024} demonstrated that the $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=rank(\textbf{X})$ as follows  
 \begin{align}
@@ -429,9 +437,40 @@ From the posterior distributions of the parameter $\gamma_k^{(r)}$ a decision ru
 
 \section{Empirical Performance via Simulation}
 
-\subsection{Scenario}
+\subsection{Simulation model}
+$K=3$ blocks $\X_1,\X_2,\X_3$ with respectively $p_1=5$, $p_2=15$, $p_3=20$ variables and $N=100$ observations are generated from
+ \[
+ \X_k=\U\Sigma_k\V_k^\intercal+\EE_k, \qquad k=1,2,3,
+ \]
+ where $\U\in\Stiefel{N}{R}$ (column-centered) and $\V_k\in\Stiefel{p_k}{R}$, $R=3$, $\Sigma_k$ is diagonal and $\EE_k$ is a Gaussian noise term.
+
+Two cases are considered 
+
+\begin{itemize}
+  \item $\Sigma_1=\diag(.7,.5,0), \Sigma_2=\diag(.6,.4,0), \Sigma_3=\diag(.5,0,.6),$
+  \item $\Sigma_1=\diag(.7,.1,0), \Sigma_2=\diag(.6,.1,0), \Sigma_3=\diag(.5,0,.1),$
+\end{itemize}
+
+In both cases, the first component is active for all the three blocks, the second component is active only for the first and the second blocks and the last component is active only for the third block. In the second set of values for $\Sigma_k$ the weigths of the blocks associated with the second and the third components are small.   
+In all simulations, the noise represent 10 percent of the variance of the structure of the blocks.
 
 \subsection{Results}
+
+
+
+% We compare\item $\Sigma_1=\diag(.7,.5,0), \Sigma_1=\diag(.6,.4,0), \Sigma_1=\diag(.5,0,0),$ the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with.6MCOA and OMCOA.
+% The diagonal matrices depend on a parameter $t\in[0,1]$:
+% \[
+% \Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
+% \]
+% where
+% \begin{itemize}
+%   \item for $t=0$, all the blocks share the same profile:
+%   $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
+%   \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
+%   $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
+% \end{itemize}
+
 
 % \begin{lemma} \label{lemma1}
 % 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R)$, the maximum of $\trace(\T^\intercal\X\h)$ with the constraint $\T^\intercal.\T=I_R$ is $\T=\textbf{U}.\textbf{V}^\intercal$ where the columns of $\textbf{U}$ (respectively $\textbf{V}$) are the $R$ first left (respectively right) singular vectors of $\X\h$. (see \cite{cliff66}) 
