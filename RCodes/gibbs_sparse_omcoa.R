@@ -264,27 +264,114 @@ for(b in 1:length(res)){
 RES<-rbind(RES,res[[b]])
 }
 
+RES
 
+B<-1000
 library(ggplot2)
 ggplot(RES,aes(x=as.factor(dim),y=pip))+
   geom_boxplot()+
   facet_grid(~block)+
   theme_bw()
 
-RES$true<-rep(c(1,1,0,0,1,1,0,0,1,0,1,0),1000)
+RES$true<-rep(c(1,1,0,0,0,1,1,0,0,0,1,0,1,0,0),B)
+RES$sig_true<- rep(c(.7,.5,.0,.0,.0,
+                     .6,.4,.0,.0,.0,
+                     .5,.0,.6,.0,.0),B)    
 
 RES$Pred<-as.numeric(RES$pip>0.5)
-table(RES$Pred,RES$true)
 
+library(dplyr)
+tab<-RES |> 
+  group_by(block,dim)|>
+  summarise(
+    sig_true=mean(sig_true),
+    sig_est=mean(mean),
+    sig_sd=sd(mean),
+    Active=sum(true)/1000,
+    Predict_Active=sum(Pred)/1000)
+
+library(xtable)
+xtable(tab)
+
+
+
+
+load("RCodes/res1.RData")
+## Graphiques
+
+res<-resF[[1]]
+RES<-NULL
+for(b in 1:length(res)){
+RES<-rbind(RES,res[[b]])
+}
+
+RES
+
+
+RES$true<-rep(c(1,1,0,0,0,1,1,0,0,0,1,0,1,0,0),1000)
+RES$sig_true<- rep(c(.7,.1,.0,.0,.0,
+                     .6,.1,.0,.0,.0,
+                     .5,.0,.1,.0,.0),1000)    
+
+RES$Pred<-as.numeric(RES$pip>0.5)
+
+library(dplyr)
+tab<-RES |> 
+  group_by(block,dim)|>
+  summarise(
+    sig_true=mean(sig_true),
+    sig_est=mean(mean),
+    sig_sd=sd(mean),
+    Active=sum(true)/1000,
+    Predict_Active=sum(Pred)/10)
+
+tab$Active<-factor(tab$Active,labels=c("No","Yes"))
+library(xtable)
+xtable(tab)
+
+
+load("RCodes/res0.RData")
+effective_rank<-matrix(NA,nrow=2*B,ncol=3)
+colnames(effective_rank)<-c("3","4","5")
+for(b in 1:B){
+  effective_rank[b,names(resF[[2]][[b]])]<-unlist(resF[[2]][[b]])
+}
+
+load("RCodes/res1.RData")
+for(b in 1:B){
+  effective_rank[b+B,names(resF[[2]][[b]])]<-unlist(resF[[2]][[b]])
+}
+
+data<-data.frame(effective_rank,case=c(rep("case=1",B),rep("case=2",B)))
+
+colnames(data)[1:3]<-c("R=3","R=4","R=5")
+library(tidyr)
+long_data <- pivot_longer(
+  data = data,
+  cols = c("R=3", "R=4", "R=5"),     # Colonnes à transformer
+  names_to = 'Eff_rank',     # Nom de la nouvelle colonne pour les variables
+  values_to = 'probability'       # Nom de la nouvelle colonne pour les valeurs
+)
+
+
+ggplot(long_data,aes(x=probability))+
+  geom_histogram()+
+  theme_bw()+
+  facet_grid(Eff_rank~case)
+
+dim(effective_rank)
+table(apply(effective_rank[1:B,],1,which.max))
+
+table(apply(effective_rank[(B+1):(2*B),],1,which.max))
 library(dplyr)
 
 tab<-RES |>
   group_by(block,dim) |>
   summarise(M=mean(mean),Q5=quantile(mean,probs=.025),Q95=quantile(mean,probs=.975))
 
-tab$true<- c(c(.7,.5,.0,.0),     # bloc 1
-             c(.6,.4,.0,.0),     # bloc 2
-             c(.5,.0,.6,.0))     # bloc 3
+tab$true<- c(c(.7,.5,.0,.0,.0),     # bloc 1
+             c(.6,.4,.0,.0,.0),     # bloc 2
+             c(.5,.0,.6,.0,.0))     # bloc 3
 
 tab$block<-as.factor(tab$block)
 tab$dim<-as.factor(tab$dim)

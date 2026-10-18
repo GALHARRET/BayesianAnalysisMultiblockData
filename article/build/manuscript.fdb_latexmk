@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex manuscript"] 1792262113.50211 "manuscript.aux" "manuscript.bbl" "manuscript" 1792262286.30633 0
+["bibtex manuscript"] 1792329387.63244 "manuscript.aux" "manuscript.bbl" "manuscript" 1792329389.05943 0
   "./Biblio.bib" 1792260942.89299 3887 b1590e8e92ac780fc7692365e6ae75a3 ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "manuscript.aux" 1792262286.05121 4063 e509262a1f1f4c8be496f0073d6e1e73 ""
+  "manuscript.aux" 1792329388.18942 4283 95a8f797e7648038c3c5f8fb0c97d2e8 ""
   (generated)
   "manuscript.bbl"
   "manuscript.blg"
   (rewritten before read)
-["pdflatex"] 1792262285.41966 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "build/manuscript.pdf" "manuscript" 1792262286.30648 0
-  "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1792262285.32469 51556 9ea9fae7746bb282a76872feb9cf4db3 ""
+["pdflatex"] 1792329388.39068 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "build/manuscript.pdf" "manuscript" 1792329389.05948 0
+  "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1792329386.11919 53599 d292e0f223c2b4ba81323dafa264cff0 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -122,13 +122,15 @@
   "/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ot1lmr.fd" 1616454256 1882 28c08db1407ebff35a658fd141753d16 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/lm/t1lmr.fd" 1616454256 1867 996fe743d88a01aca041ed22cc10e1bb ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ts1lmr.fd" 1616454256 1914 884882d7ebb0fd65cea93fca77ff6f5a ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty" 1731446765 6696 886c9f3087d0b973ed2c19aa79cb3023 ""
   "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1739380943 42148 61becc7c670cd061bb319c643c27fdd4 ""
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1747203790 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1747203749 3345733 e5360f354b310b62ce5167b14af0c915 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "build/manuscript.aux" 1792262286.00009 4063 e509262a1f1f4c8be496f0073d6e1e73 "pdflatex"
-  "manuscript.bbl" 1792262113.61881 2766 304c53f22437c233b408c36615d1394a "bibtex manuscript"
-  "manuscript.tex" 1792262285.32469 51556 9ea9fae7746bb282a76872feb9cf4db3 ""
+  "build/manuscript.aux" 1792329388.82788 4283 95a8f797e7648038c3c5f8fb0c97d2e8 "pdflatex"
+  "manuscript.bbl" 1792329387.76258 2564 71cbb14c4f183fb33da8b521412a8998 "bibtex manuscript"
+  "manuscript.tex" 1792329386.11919 53599 d292e0f223c2b4ba81323dafa264cff0 ""
+  "plot.png" 1792325403.46437 19379 c616eedc88e465dec43d09b28c654c08 ""
   (generated)
   "build/manuscript.aux"
   "build/manuscript.log"

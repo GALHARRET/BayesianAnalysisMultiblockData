@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.5.14)  17 OCT 2026 20:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.5.14)  18 OCT 2026 15:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -119,23 +119,30 @@ Package: amsthm 2020/05/29 v2.20.6
 \c@proposition=\count283
 \c@remark=\count284
 
+(/usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
+\multirow@colwidth=\skip57
+\multirow@cntb=\count285
+\multirow@dima=\skip58
+\bigstrutjot=\dimen151
+)
 (/usr/local/texlive/2025/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 
-\f@nch@headwidth=\skip57
-\f@nch@offset@elh=\skip58
-\f@nch@offset@erh=\skip59
-\f@nch@offset@olh=\skip60
-\f@nch@offset@orh=\skip61
-\f@nch@offset@elf=\skip62
-\f@nch@offset@erf=\skip63
-\f@nch@offset@olf=\skip64
-\f@nch@offset@orf=\skip65
-\f@nch@height=\skip66
-\f@nch@footalignment=\skip67
-\f@nch@widthL=\skip68
-\f@nch@widthC=\skip69
-\f@nch@widthR=\skip70
+\f@nch@headwidth=\skip59
+\f@nch@offset@elh=\skip60
+\f@nch@offset@erh=\skip61
+\f@nch@offset@olh=\skip62
+\f@nch@offset@orh=\skip63
+\f@nch@offset@elf=\skip64
+\f@nch@offset@erf=\skip65
+\f@nch@offset@olf=\skip66
+\f@nch@offset@orf=\skip67
+\f@nch@height=\skip68
+\f@nch@footalignment=\skip69
+\f@nch@widthL=\skip70
+\f@nch@widthC=\skip71
+\f@nch@widthR=\skip72
 \@temptokenb=\toks28
 )
 (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
@@ -159,8 +166,8 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2024/04/13 v1.2c Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen151
-\Gin@req@width=\dimen152
+\Gin@req@height=\dimen152
+\Gin@req@width=\dimen153
 )
 (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2024/06/23 v1.3e Standard LaTeX Color (DPC)
@@ -180,17 +187,17 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 (/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 ))
-\Gm@cnth=\count285
-\Gm@cntv=\count286
-\c@Gm@tempcnt=\count287
-\Gm@bindingoffset=\dimen153
-\Gm@wd@mp=\dimen154
-\Gm@odd@mp=\dimen155
-\Gm@even@mp=\dimen156
-\Gm@layoutwidth=\dimen157
-\Gm@layoutheight=\dimen158
-\Gm@layouthoffset=\dimen159
-\Gm@layoutvoffset=\dimen160
+\Gm@cnth=\count286
+\Gm@cntv=\count287
+\c@Gm@tempcnt=\count288
+\Gm@bindingoffset=\dimen154
+\Gm@wd@mp=\dimen155
+\Gm@odd@mp=\dimen156
+\Gm@even@mp=\dimen157
+\Gm@layoutwidth=\dimen158
+\Gm@layoutheight=\dimen159
+\Gm@layouthoffset=\dimen160
+\Gm@layoutvoffset=\dimen161
 \Gm@dimlist=\toks30
 )
 (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/lmodern.sty
@@ -244,13 +251,13 @@ Package: inputenc 2024/02/08 v1.3d Input encoding file
 (/usr/local/texlive/2025/texmf-dist/tex/generic/babel/babel.sty
 Package: babel 2025/02/14 v25.4 The multilingual framework for pdfLaTeX, LuaLaT
 eX and XeLaTeX
-\babel@savecnt=\count288
-\U@D=\dimen161
+\babel@savecnt=\count289
+\U@D=\dimen162
 \l@unhyphenated=\language90
 
 (/usr/local/texlive/2025/texmf-dist/tex/generic/babel/txtbabel.def)
 \bbl@readstream=\read2
-\bbl@dirlevel=\count289
+\bbl@dirlevel=\count290
 
 (/usr/local/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf
 Language: english 2017/06/06 v3.3r English support from the babel system
@@ -275,30 +282,30 @@ Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count290
-\c@ALG@rem=\count291
-\c@ALG@nested=\count292
-\ALG@tlm=\skip71
-\ALG@thistlm=\skip72
-\c@ALG@Lnr=\count293
-\c@ALG@blocknr=\count294
-\c@ALG@storecount=\count295
-\c@ALG@tmpcounter=\count296
-\ALG@tmplength=\skip73
+\c@ALG@line=\count291
+\c@ALG@rem=\count292
+\c@ALG@nested=\count293
+\ALG@tlm=\skip73
+\ALG@thistlm=\skip74
+\c@ALG@Lnr=\count294
+\c@ALG@blocknr=\count295
+\c@ALG@storecount=\count296
+\c@ALG@tmpcounter=\count297
+\ALG@tmplength=\skip75
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count297
+\c@float@type=\count298
 \float@exts=\toks33
 \float@box=\box54
 \@float@everytoks=\toks34
 \@floatcapt=\box55
 )
 \@float@every@algorithm=\toks35
-\c@algorithm=\count298
+\c@algorithm=\count299
 )
 (/usr/local/texlive/2025/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
 Package: algpseudocode 
@@ -306,7 +313,7 @@ Package: algpseudocode
 Document Style - pseudocode environments for use with the `algorithmicx' style
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count299
+\l__color_backend_stack_int=\count300
 \l__pdf_internal_box=\box56
 ) (build/manuscript.aux)
 \openout1 = `manuscript.aux'.
@@ -328,16 +335,16 @@ LaTeX Font Info:    ... okay on input line 78.
 
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count300
-\scratchdimen=\dimen162
+\scratchcounter=\count301
+\scratchdimen=\dimen163
 \scratchbox=\box57
-\nofMPsegments=\count301
-\nofMParguments=\count302
+\nofMPsegments=\count302
+\nofMParguments=\count303
 \everyMPshowfont=\toks36
-\MPscratchCnt=\count303
-\MPscratchDim=\dimen163
-\MPnumerator=\count304
-\makeMPintoPDFobject=\count305
+\MPscratchCnt=\count304
+\MPscratchDim=\dimen164
+\MPnumerator=\count305
+\makeMPintoPDFobject=\count306
 \everyMPtoPDFconversion=\toks37
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -465,12 +472,24 @@ File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 
 [6]
 
-[7] (./manuscript.bbl
+[7]
 
-[8])
+[8]
+<plot.png, id=51, 416.30531pt x 257.46187pt>
+File: plot.png Graphic file (type png)
+<use plot.png>
+Package pdftex.def Info: plot.png  used on input line 508.
+(pdftex.def)             Requested size: 472.03123pt x 291.93814pt.
+
 
 [9]
-Overfull \hbox (25.61748pt too wide) in paragraph at lines 669--671
+
+[10 <./plot.png>] (./manuscript.bbl)
+
+[11
+
+]
+Overfull \hbox (25.61748pt too wide) in paragraph at lines 721--723
  \T1/lmr/bx/n/10.95 Up-date of $\OT1/lmr/m/n/10.95 ^^F[]$[] \T1/lmr/m/n/10.95 W
 ith $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 and $\OT1/lmr/bx/n/10.95 V[]$ \T1
 /lmr/m/n/10.95 fixed (both hav-ing or-thonor-mal columns), and $\OT1/lmr/m/n/10
@@ -480,8 +499,8 @@ r/m/n/10.95 ,
 
 
 
-[10]
-Overfull \hbox (51.8231pt too wide) in paragraph at lines 698--706
+[12]
+Overfull \hbox (44.6998pt too wide) in paragraph at lines 750--758
 []\T1/lmr/m/n/10.95 (1)--(2): by [], the con-di-tional den-sity of $\OT1/lmr/bx
 /n/10.95 U$ \T1/lmr/m/n/10.95 is pro-por-tional to $[]\OMS/lmsy/m/n/10.95 f[][]
  \OML/lmm/m/it/10.95 ^^\[] []\OT1/lmr/m/n/10.95 (^^F[]\OT1/lmr/bx/n/10.95 V[]X[
@@ -490,19 +509,17 @@ Overfull \hbox (51.8231pt too wide) in paragraph at lines 698--706
 
 
 
-[11]
-
-[12] (build/manuscript.aux)
+[13] (build/manuscript.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5928 strings out of 473190
- 93486 string characters out of 5715800
- 511682 words of memory out of 5000000
- 29061 multiletter control sequences out of 15000+600000
+ 6007 strings out of 473190
+ 94923 string characters out of 5715800
+ 517300 words of memory out of 5000000
+ 29136 multiletter control sequences out of 15000+600000
  627539 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,16n,65p,1042b,454s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -524,10 +541,10 @@ ic/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10
 /local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texl
 ive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on build/manuscript.pdf (12 pages, 363033 bytes).
+Output written on build/manuscript.pdf (13 pages, 374947 bytes).
 PDF statistics:
- 158 PDF objects out of 1000 (max. 8388607)
- 100 compressed objects within 1 object stream
+ 164 PDF objects out of 1000 (max. 8388607)
+ 103 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

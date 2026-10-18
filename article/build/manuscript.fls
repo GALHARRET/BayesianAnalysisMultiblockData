@@ -25,6 +25,8 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amscls/amsthm.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amscls/amsthm.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
@@ -175,6 +177,11 @@ INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/lm/lmmib7.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/lm/lmbsy10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/lm/lmbsy10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/lm/lmbsy7.tfm
+INPUT ./plot.png
+INPUT ./plot.png
+INPUT ./plot.png
+INPUT ./plot.png
+INPUT ./plot.png
 INPUT ./manuscript.bbl
 INPUT ./manuscript.bbl
 INPUT manuscript.bbl
