@@ -324,12 +324,11 @@ We can deduce the following algorithm:
 \section{Sparse Bayesian Framework for canonical factorisation}
 In OMCOA, each block is approximated as $\X_k\approx\U\Sigma_k\V_k^\intercal$, where the diagonal matrix
 $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each latent dimension $\uu^{(r)}$ contributes to
-block $k$. The structure of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension
-$r$ is
+block $k$. The variance of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension $r$ explains
 \begin{itemize}
-  \item \emph{$U$-common} if $\sigma_k^{(r)}>0$ for all $k$;
-  \item \emph{partially $U$-common} if $\sigma_k^{(r)}>0$ for some blocks only;
-  \item \emph{$U$-specific} to block $k$ if $\sigma_k^{(r)}>0$ for this block only;
+  \item variance of all the blocks if $\sigma_k^{(r)}>0$ for all $k$;
+  \item variance of a subset of the blocks, if $\sigma_k^{(r)}>0$ for these blocks only;
+  \item variance of the block $k$ if $\sigma_k^{(r)}>0$ for this block only;
   \item \emph{inactive} if $\sigma_k^{(r)}=0$ for all $k$.
 \end{itemize}
 OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose
