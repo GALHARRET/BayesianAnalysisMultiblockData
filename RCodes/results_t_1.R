@@ -3,7 +3,7 @@ B<-1000
 library(dplyr)
 true_value<-c(c(.7, .5, .3,0,0), c(.5, .3, .7,0,0), c(.3, .7, .5,0,0))
 ESTIM<-NULL
-for(k in c(1,4)){
+for(k in c(1,2)){
 load(paste("RCodes/res",k,".RData",sep=""))
 mcoa<-NULL
 #mcoa2<-NULL
@@ -101,3 +101,46 @@ ggplot(ESTIM2, aes(x = sigma, y = estim, color = method)) +
   geom_hline(data = TRUE_DF, aes(yintercept = true_value), linetype = "dashed") +
   theme_bw() +
   facet_grid(block ~ dim)
+
+
+PIP<-NULL
+for(k in c(1,4)){
+load(paste("RCodes/res",k,".RData",sep=""))
+for(b in 1:B){
+PIP<-rbind(PIP,cbind(res$gsomcoa1[[b]]$summary[,c("block","dim","pip")],lambda=1,sigma=k/10))
+PIP<-rbind(PIP,cbind(res$gsomcoa2[[b]]$summary[,c("block","dim","pip")],lambda=0.1,sigma=k/10))
+PIP<-rbind(PIP,cbind(res$gsomcoa3[[b]]$summary[,c("block","dim","pip")],lambda=10,sigma=k/10))
+}  
+}
+PIP$lambda<-factor(PIP$lambda)
+PIP$sigma<-factor(PIP$sigma)
+PIP$block<-factor(PIP$block,labels=paste("block",1:K))
+PIP$dim<-factor(PIP$dim,labels=paste("dim",1:H))
+ggplot(PIP,aes(x=sigma,y=pip,color=lambda))+
+geom_boxplot()+
+  facet_grid(block~dim)+
+  theme_bw()
+
+PIP |> group_by(block,dim,lambda) |> summarise(mean(pip),sd(pip))
+
+RANK<-NULL
+for(k in c(1,4)){
+load(paste("RCodes/res",k,".RData",sep=""))
+names(res$gsomcoa1[[1]]$rank)
+for(b in 1:B){
+RANK<-rbind(RANK,data.frame(res$gsomcoa1[[b]]$rank,lambda=1,sigma=k/10))
+RANK<-rbind(RANK,data.frame(res$gsomcoa2[[b]]$rank,lambda=0.1,sigma=k/10))
+RANK<-rbind(RANK,data.frame(res$gsomcoa3[[b]]$rank,lambda=10,sigma=k/10))
+}  
+}
+RANK$lambda<-factor(RANK$lambda)
+RANK$sigma<-factor(RANK$sigma)
+
+colnames(RANK)[1:2]<-c("rank","proba")
+
+ggplot(RANK,aes(x=sigma,y=proba,color=rank))+
+geom_boxplot()+
+  theme_bw()+
+  facet_grid(~lambda)
+
+RANK |> group_by(lambda,sigma,rank) |> summarise(mean(proba),sd(proba))
