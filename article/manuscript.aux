@@ -36,15 +36,21 @@
 \@writefile{toc}{\contentsline {paragraph}{Priors.}{6}{}\protected@file@percent }
 \newlabel{eq:expand2}{{6}{6}{}{}{}}
 \newlabel{prop:cond2}{{3}{6}{}{}{}}
+\newlabel{dec_rule}{{4}{7}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Empirical performance via simulation}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Simulation design}{7}{}\protected@file@percent }
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Sparse Gibbs sampler for OMCOA}}{8}{}\protected@file@percent }
 \newlabel{alg:sparse}{{2}{8}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Results}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Estimation of the block weights over $B=1000$ replications: true value, mean and standard deviation of the posterior mean, and percentage of replications in which the weight is selected ($\hat  P(\gamma _k^{(r)}=1\mid \mathbf  {X}_1,\ldots  ,\mathbf  {X}_K)>1/2$). }}{9}{}\protected@file@percent }
-\newlabel{table}{{1}{9}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Distribution of the Bayes estimator of the probability of effective rank to be equal to 3, 4, 5 in both case.}}{10}{}\protected@file@percent }
-\newlabel{fig}{{1}{10}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Estimated block weights (and their empirical 95\%-CI) of the three actives dimensions using the sequential approach (mcoa in red), the simultaneaous approach (omcoa in green), the gibbs sampler for omcoa (gibbs omcoa in lightblue) and the sparse version (gibbs sparse omcoa in purple) as function of the proportion $\sigma $ associated to the residual error ($\|\mathbf  {E}_k\|^2=\sigma \,\|X_k\|^2$). For the Bayesian models the estimate is equal to the posterior mean. For the sparse version $\lambda =1$. }}{9}{}\protected@file@percent }
+\newlabel{fig1}{{1}{9}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Estimated block weights (and their empirical 95\%-CI) of the two non actives dimensions (dimension 4 and 5) using the sequential approach (mcoa in red), the simultaneaous approach (omcoa in green), the gibbs sampler for omcoa (gibbs omcoa in lightblue) and the sparse version (gibbs sparse omcoa in purple) as function of the proportion $\sigma $ associated to the residual error ($\|\mathbf  {E}_k\|^2=\sigma \,\|X_k\|^2$). For the Bayesian models the estimate is equal to the posterior mean. For the sparse version $\lambda =1$.}}{10}{}\protected@file@percent }
+\newlabel{fig2}{{2}{10}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Analysis of sensitivity to $\lambda $:}{10}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Empirical specificity of the decision rule as function of the proportion $\sigma $ associated to the residual error ($\|\mathbf  {E}_k\|^2=\sigma \,\|X_k\|^2$) and of the parameter $\lambda $. }}{11}{}\protected@file@percent }
+\newlabel{fig3}{{3}{11}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Proportion of the number of dimension chosen as function of the residual parameter $\sigma $ and of the parameter $\lambda $. }}{12}{}\protected@file@percent }
+\newlabel{fig4}{{4}{12}{}{}{}}
 \bibstyle{apalike}
 \bibdata{Biblio}
 \bibcite{besag1986}{Besag, 1986}
@@ -62,8 +68,8 @@
 \citation{cliff1966}
 \citation{cliff1966}
 \citation{cliff1966}
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{13}{}\protected@file@percent }
-\gdef \@abspage@last{13}
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{15}{}\protected@file@percent }
+\gdef \@abspage@last{15}

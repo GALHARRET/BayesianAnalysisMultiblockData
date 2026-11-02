@@ -398,7 +398,7 @@ Frobenius norm, as is usual in multiblock analysis.
 
 From the posterior distributions of the parameter $\gamma_k^{(r)}$ a decision rule for the representation of the block $\X_k$ on the component $u^{(r)}$: 
 \begin{quote} 
-  the component $\uu^{(r)}$ is active for the block $k$ if and only if $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$. 
+  the component $\uu^{(r)}$ is active for the block $k$ if and only if $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$. \label{dec_rule}
 \end{quote}
 \noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. $$R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},$$ whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
 $a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
@@ -446,66 +446,36 @@ where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sig
 All the models are fitted with the maximal rank $R_{\max}=5$, i.e. the largest value allowed by $R_{\max}\leq\min_kp_k$. The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. For the sparse version, the parameter $\lambda$ varied in $\{0.1,1,10\}$ and $a_\theta=b_\theta=1$. All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case.
 
 \subsection{Results}
-Table~\ref{table} reports, for each weight, the mean over the $B$ replications of the posterior mean $\hat\sigma_k^{(r)}$, its
-standard deviation across replications, and the percentage of replications in which dimension $r$ is selected in block $k$, i.e.\ $\hat P\bigl(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K\bigr)>1/2$.
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure1.eps}
+  \caption{Estimated block weights (and their empirical 95\%-CI) of the three actives dimensions using the sequential approach (mcoa in red), the simultaneaous approach (omcoa in green), the gibbs sampler for omcoa (gibbs omcoa in lightblue) and the sparse version (gibbs sparse omcoa in purple) as function of the proportion $\sigma$ associated to the residual error  ($\|\EE_k\|^2=\sigma\,\|X_k\|^2$). For the Bayesian models the estimate is equal to the posterior mean. For the sparse version $\lambda=1$. \label{fig1}}
+\end{figure}
 
-The weights are accurately estimated in both cases, with no visible bias except a slight underestimation of the smallest weight (mean estimate $0.09$ for a true value of $0.10$ in case 2, dimension 3, block 3), as expected from a
-shrinkage prior. The selection rule has a very high empirical sensitivity (proportion of active weights that are selected): $100\%$ in case 1 and $99.1\%$ in case 2. Its empirical specificity (proportion of null weights that are not
-selected) is also very high: $99.6\%$ in case 1 and $99.1\%$ in case 2. In the most difficult configuration (case 2, dimension 3, block 3), the specific dimension is selected in $94.9\%$ of the replications; in most of the remaining
-ones, the signal is captured by the fourth dimension ($4.7\%$), which suggests a labelling issue in the alignment rather than a failure of detection.
-
-Figure~\ref{fig} shows the distribution over the replications of the posterior probabilities $\hat P(R_{\mathrm{eff}}=r\mid\X_1,\ldots,\X_K)$, $r=3,4,5$. The posterior mode of $R_{\mathrm{eff}}$ equals the true value $3$ in $98\%$ of the replications in both cases.
-
-
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{c|ccccccc}
-  \hline
- case&  block ($k$) & dim ($r$) & $\sigma_k^{(r)}$ & $\hat \sigma_k^{(r)}$ & Std. Dev & Dim $r$ active on block $k$ & Selected (\%) \\ 
-  \hline
-\multirow{15}{*}{case=1} & 1 &   1 & 0.70 & 0.70 & 0.01 & Yes & 100.0 \\ 
- & 1 &   2 & 0.50 & 0.50 & 0.01 & Yes & 100.0 \\ 
- & 1 &   3 & 0.00 & 0.00 & 0.00 & No & 0.2 \\ 
- & 1 &   4 & 0.00 & 0.00 & 0.00 & No & 0.0 \\ 
- & 1 &   5 & 0.00 & 0.00 & 0.00 & No & 0.0 \\ 
- & 2 &   1 & 0.60 & 0.60 & 0.01 & Yes & 100.0 \\ 
- & 2 &   2 & 0.40 & 0.40 & 0.01 & Yes & 100.0 \\ 
- & 2 &   3 & 0.00 & 0.00 & 0.00 & No & 1.2 \\ 
- & 2 &   4 & 0.00 & 0.00 & 0.01 & No & 1.7 \\ 
- & 2 &   5 & 0.00 & 0.00 & 0.00 & No & 0.0 \\ 
- & 3 &   1 & 0.50 & 0.50 & 0.01 & Yes & 100.0 \\ 
- & 3 &   2 & 0.00 & 0.00 & 0.00 & No & 0.4 \\ 
- & 3 &   3 & 0.60 & 0.60 & 0.01 & Yes & 100.0 \\ 
- & 3 &   4 & 0.00 & 0.00 & 0.00 & No & 0.0 \\ 
- & 3 &   5 & 0.00 & 0.00 & 0.00 & No & 0.2 \\ 
-   \hline
-\multirow{15}{*}{case=2} & 1 &   1 & 0.70 & 0.70 & 0.01 & Yes & 100.00 \\ 
- & 1 &   2 & 0.10 & 0.10 & 0.01 & Yes & 99.70 \\ 
- & 1 &   3 & 0.00 & 0.00 & 0.00 & No & 0.10 \\ 
- & 1 &   4 & 0.00 & 0.00 & 0.00 & No & 0.20 \\ 
- & 1 &   5 & 0.00 & 0.00 & 0.00 & No & 0.10 \\ 
- & 2 &   1 & 0.60 & 0.60 & 0.01 & Yes & 100.00 \\ 
- & 2 &   2 & 0.10 & 0.10 & 0.01 & Yes & 99.90 \\ 
- & 2 &   3 & 0.00 & 0.00 & 0.00 & No & 1.50 \\ 
- & 2 &   4 & 0.00 & 0.00 & 0.01 & No & 1.00 \\ 
- & 2 &   5 & 0.00 & 0.00 & 0.00 & No & 0.00 \\ 
- & 3 &   1 & 0.50 & 0.50 & 0.00 & Yes & 100.00 \\ 
- & 3 &   2 & 0.00 & 0.00 & 0.00 & No & 0.10 \\ 
- & 3 &   3 & 0.10 & 0.09 & 0.02 & Yes & 94.90 \\ 
- & 3 &   4 & 0.00 & 0.00 & 0.02 & No & 4.70 \\ 
- & 3 &   5 & 0.00 & 0.00 & 0.01 & No & 0.40 \\ 
-   \hline
-\end{tabular}
-\caption{Estimation of the block weights over $B=1000$ replications: true value, mean and standard deviation of the posterior mean, and percentage of replications in which the weight is selected ($\hat P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$). \label{table}}
-\end{table}
+Figure~\ref{fig1} provides the estimated block weights and their 95\%-CI of the active dimensions (dimension 1 to 3) as function of the proportion $\sigma$ associated to the residual error . When the weigths were non null, they were accurately estimated using both bayesian frameworks and the omcoa algorithm for all values of $\sigma$.The bias estimation of these weights with the sequential approach (mcoa) can be increased with $\sigma$ (for example the variance of the block 2 explained by dimension 1). When the weights were null, as expected, the bias of the sparse version remained near from 0 for all $\sigma$, whereas the bias of the others increased with $\sigma$. We can note that estimates obtained using the Gibbs sampler degrade less than those obtained using mcoa and omcoa methods.
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{plot.png}
-  \caption{Distribution of the Bayes estimator of the probability of effective rank to be equal to 3, 4, 5 in both case.\label{fig}}
+  \includegraphics[width=\linewidth]{figs/figure2.eps}
+  \caption{Estimated block weights (and their empirical 95\%-CI) of the two non actives dimensions (dimension 4 and 5) using the sequential approach (mcoa in red), the simultaneaous approach (omcoa in green), the gibbs sampler for omcoa (gibbs omcoa in lightblue) and the sparse version (gibbs sparse omcoa in purple) as function of the proportion $\sigma$ associated to the residual error  ($\|\EE_k\|^2=\sigma\,\|X_k\|^2$). For the Bayesian models the estimate is equal to the posterior mean. For the sparse version $\lambda=1$.\label{fig2}}
+\end{figure}
+Figure~\ref{fig2} provides the estimated block weights and their 95\%-CI of the inactive dimensions (dimension 4 and 5) as function of the proportion $\sigma$ associated to the residual error . The bias of estimate of the sequential approach (mcoa, omcoa) and the gibbs sampler increased with $\sigma$. For the sparse version, the bias remained to 0 in all cases.
+
+\paragraph{Analysis of sensitivity to $\lambda$:} We compare the performances in terms of sensitivity (the proportion of active dimensions that are selected) and of specificity (proportion of inactive dimensions that are not selected) of the decision rule defined in (\ref{dec_rule}).     
+The selection rule had a very high empirical sensitivity : $100\%$ for all $\sigma$. Its empirical specificity  decreased as a function of $\sigma$ but remainded very high: exceeding $99.4\%$ for $\lambda=0.1$, above $98.3\%$ for $\lambda=1$ and above $92.7\%$ for $\lambda=10$. Figure~\ref{fig3} shows the empirical specificity at block and dimension levels. The specificity for  block 2 with dimensions 4 and 5 can be linked to the estimated values obtained for the block weights (Figure~\ref{fig2}). Figure~\ref{fig4} displays the proportion of dimensions chosen.
+The posterior mode of $R_{\mathrm{eff}}$ equals the true value of $3$ in $95.4\%$ of cases on average for $\sigma$ with $\lambda=0.1$ and in $85.7\%$ of cases on average for $\sigma$ with $\lambda=1$. For $\lambda=10$, this proportion is only $0.404$, the choice $R_{\mathrm{eff}}=4$ is the majoritory choice.
+
+
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure3.eps}
+  \caption{Empirical specificity of the decision rule as function of the proportion $\sigma$ associated to the residual error  ($\|\EE_k\|^2=\sigma\,\|X_k\|^2$) and of the parameter $\lambda$. \label{fig3}}
 \end{figure}
 
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure4.eps}
+  \caption{Proportion of the number of dimension chosen as function of the residual parameter $\sigma$ and of the parameter $\lambda$. \label{fig4}}
+\end{figure}
 
 % We compare\item $\Sigma_1=\diag(.7,.5,0), \Sigma_1=\diag(.6,.4,0), \Sigma_1=\diag(.5,0,0),$ the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with.6MCOA and OMCOA.
 % The diagonal matrices depend on a parameter $t\in[0,1]$:

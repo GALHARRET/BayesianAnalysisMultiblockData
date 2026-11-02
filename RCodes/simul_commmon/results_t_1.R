@@ -104,7 +104,7 @@ TRUE_DF2<-TRUE_DF|>
   filter(dim %in% c("dim 1","dim 2","dim 3"))|>
   mutate(dim=droplevels(dim))
 
-ggplot(ESTIM3,aes(x = sigma, y = estim, color = method)) +
+p<-ggplot(ESTIM3,aes(x = sigma, y = estim, color = method)) +
   geom_point(position = pd) +
   geom_errorbar(aes(ymin = estim - 2*sd, ymax = estim + 2*sd),
                 width = 0.05, position = pd) +
@@ -112,6 +112,26 @@ ggplot(ESTIM3,aes(x = sigma, y = estim, color = method)) +
   theme_bw() +
   facet_grid(block ~ dim)+ 
   theme(legend.position = "bottom")
+
+ggsave(filename = "figure1.eps", plot = p, width = 6, height = 4, units = "in")
+
+ESTIM3<-ESTIM2 |>
+  filter(dim %in% c("dim 4","dim 5"))|>
+  mutate(dim=droplevels(dim))
+TRUE_DF2<-TRUE_DF|>
+  filter(dim %in% c("dim 4","dim 5"))|>
+  mutate(dim=droplevels(dim))
+
+p<-ggplot(ESTIM3,aes(x = sigma, y = estim, color = method)) +
+  geom_point(position = pd) +
+  geom_errorbar(aes(ymin = estim - 2*sd, ymax = estim + 2*sd),
+                width = 0.05, position = pd) +
+  geom_hline(data = TRUE_DF2, aes(yintercept = true_value), linetype = "dashed") +
+  theme_bw() +
+  facet_grid(block ~ dim)+ 
+  theme(legend.position = "bottom")
+
+ggsave(filename = "article/figs/figure2.eps", plot = p, width = 6, height = 4, units = "in")
 
 
 
@@ -124,17 +144,46 @@ PIP<-rbind(PIP,cbind(res$gsomcoa2[[b]]$summary[,c("block","dim","pip")],lambda=0
 PIP<-rbind(PIP,cbind(res$gsomcoa3[[b]]$summary[,c("block","dim","pip")],lambda=10,sigma=k/10))
 }  
 }
+PIP$statut<-rep(factor(true_value>0,labels=c("inactive","active")),3*500*7)
+PIP$statut_id<-factor(PIP$pip>=0.5,labels=c("inactive","active"))
+
 PIP$lambda<-factor(PIP$lambda)
 PIP$sigma<-factor(PIP$sigma)
 PIP$block<-factor(PIP$block,labels=paste("block",1:K))
 PIP$dim<-factor(PIP$dim,labels=paste("dim",1:H))
-ggplot(PIP,aes(x=sigma,y=pip,color=lambda))+
-geom_boxplot()+
+
+l="10"
+resF<-NULL
+for(l in levels(PIP$lambda)){
+  res1<-PIP |> 
+  filter(statut_id=="active",statut=="active",lambda==l) |>
+  group_by(sigma,block,dim) |>
+  count()
+
+res1$proba<-res1$n/500
+res1$lambda=l
+res1$index<-"sensitivity"
+
+res2<-PIP |> 
+  filter(statut_id=="inactive",statut=="inactive",lambda==l) |>
+  group_by(sigma,block,dim) |>
+  count()
+
+res2$proba<-res2$n/500
+res2$lambda<-l
+res2$index<-"specificity"
+resF<-rbind(resF,res1,res2)
+}
+
+p<-ggplot(resF |> filter(index=="specificity"),aes(x=sigma,y=proba,group=lambda,color=lambda))+
+  geom_point()+
+  geom_line()+
   facet_grid(block~dim)+
   theme_bw()
 
-PIP |> group_by(block,dim,lambda) |> summarise(mean(pip),sd(pip))
+ggsave(filename = "article/figs/figure3.eps", plot = p, width = 6, height = 4, units = "in")
 
+b=1
 RANK<-NULL
 for(k in 1:7){
 load(paste("RCodes/simul_commmon/res",k,".RData",sep=""))
@@ -155,6 +204,56 @@ geom_boxplot()+
   theme_bw()+
   facet_grid(~lambda)
 
-RANK |> group_by(lambda,sigma,rank) |> summarise(mean(proba),sd(proba))
+RK2<-RANK |> group_by(lambda,sigma,rank) |> summarise(m=median(proba),
+q1=quantile(proba,probs=0.025),q2=quantile(proba,probs=0.975))
 
 
+  
+
+pd <- position_dodge(width = 0.4)
+RK2$lambda<-factor(RK2$lambda,labels=c("lambda=0.1","lambda=1","lambda=10"))
+p<-ggplot(RK2,aes(x=sigma,y=m,color=rank,group=rank))+
+  geom_point() +
+  geom_line()+
+  #geom_errorbar(aes(ymin = q1, ymax = q2),
+  #              width = 0.05, position = pd) +
+  theme_bw() +
+  facet_grid( ~ lambda)+ 
+  theme(legend.position = "bottom")
+
+ggsave(filename = "figure4.eps", plot = p, width = 6, height = 4, units = "in")
+
+RANK3<-NULL
+for(k in 1:7){
+load(paste("RCodes/simul_commmon/res",k,".RData",sep=""))
+for(b in 1:B){
+RANK3<-rbind(RANK3,data.frame(choice=names(which.max(res$gsomcoa1[[b]]$rank)),lambda=1,sigma=k/10))
+RANK3<-rbind(RANK3,data.frame(choice=names(which.max(res$gsomcoa2[[b]]$rank)),lambda=0.1,sigma=k/10))
+RANK3<-rbind(RANK3,data.frame(choice=names(which.max(res$gsomcoa3[[b]]$rank)),lambda=10,sigma=k/10))
+}  
+}
+
+rank4<-RANK3 |>
+  group_by(lambda,sigma,choice) |>
+  count()
+rank4$prop<-rank4$n/500
+rank4$lambda<-factor(rank4$lambda,labels=c("lamb=0.1","lamb=1","lamb=10"))
+p<-ggplot(rank4,aes(x=sigma,y=prop,color=choice,group=choice))+
+  geom_point() +
+  geom_line()+
+  #geom_errorbar(aes(ymin = q1, ymax = q2),
+  #              width = 0.05, position = pd) +
+  theme_bw() +
+  facet_grid( ~ lambda)+ 
+  theme(legend.position = "bottom")
+
+ggsave(filename = "article/figs/figure4.eps", plot = p, width = 6, height = 4, units = "in")
+
+x<-RANK3 |>
+  group_by(lambda,sigma,choice) |>
+  count()
+
+x$prop<-x$n/sum(x$n[1:3])
+
+library(xtable)
+xtable(x[,-3])
