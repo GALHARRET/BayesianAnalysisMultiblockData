@@ -391,13 +391,17 @@ Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\per
 \end{proposition}
 The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column being drawn from a vector von Mises--Fisher distribution with Wood's algorithm, as in the non-sparse sampler. Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
 drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$.
-In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow.
+In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow. Moreover, $B_k^{(r)}$ contains the factor $\sqrt{\lambda/\omega_k}$: a very diffuse slab ($\lambda\to0$) always favours
+the spike (Lindley's paradox). The slab precision must therefore be chosen on the scale of the data, e.g.\ $\lambda=1$
+when the blocks are scaled so that $\|\X_k\|^2$ is of order one, which is the case when each block is divided by its
+Frobenius norm, as is usual in multiblock analysis.
 
 From the posterior distributions of the parameter $\gamma_k^{(r)}$ a decision rule for the representation of the block $\X_k$ on the component $u^{(r)}$: 
 \begin{quote} 
   the component $\uu^{(r)}$ is active for the block $k$ if and only if $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$. 
 \end{quote}
-\noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. $R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\}$, whose posterior distribution is estimated by its empirical distribution over the draws. 
+\noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. $$R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},$$ whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
+$a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
 
 
 
@@ -434,18 +438,12 @@ We can deduce Sparse Gibbs sampler algorithm for OMCOA (algorithm \ref{alg:spars
 \section{Empirical performance via simulation}
 
 \subsection{Simulation design}
-$K=3$ blocks with $p_1=5$, $p_2=15$, $p_3=20$ variables and $N=100$ observations are generated from
+We consider $K=3$ blocks with $p_1=5$, $p_2=15$, $p_3=20$ variables and $N=100$ observations generated from
 \[
   \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad k=1,2,3,
 \]
-where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sigma_k$ is the diagonal matrix of the block weights and $\EE_k$ is a Gaussian noise term; the true effective rank is $R_{\mathrm{eff}}=3$. Two cases are considered:
-\begin{itemize}
-  \item case 1: $\Sigma_1=\diag(0.7,0.5,0)$, $\Sigma_2=\diag(0.6,0.4,0)$, $\Sigma_3=\diag(0.5,0,0.6)$;
-  \item case 2: $\Sigma_1=\diag(0.7,0.1,0)$, $\Sigma_2=\diag(0.6,0.1,0)$, $\Sigma_3=\diag(0.5,0,0.1)$.
-\end{itemize}
-In both cases, the first dimension is common to the three blocks, the second one is shared by blocks 1 and 2, and the third one is specific to block 3. In case 2, the weights of the second and third dimensions are small: for instance, the third dimension explains about $3.5\%$ of the variance of block 3, less than the noise. In all simulations, the noise is scaled so that $\|\EE_k\|^2=0.1\,\|X_k\|^2$.
-The sparse model is fitted with a maximal rank $R_{\max}=5$, i.e. the largest value allowed by $R_{\max}\leq\min_kp_k$, with
-$T=6000$ iterations, a burn-in of $T_0=1000$, $\lambda=1$ and $a_\theta=b_\theta=1$; the draws are aligned on the true $\U$ (permutation and signs of the dimensions) before computing posterior summaries. $B=1000$ data sets are simulated in each case.
+where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sigma_k$ is the diagonal matrix of the block weights and $\EE_k$ is a Gaussian noise term. The true effective rank is $R_{\mathrm{eff}}=3$. The diagonal matrices are set to $\Sigma_1=\diag(0.7,0.5,0)$, $\Sigma_2=\diag(0.5,0.7,0)$, $\Sigma_3=\diag(0.3,0,0.5)$. The first dimension explains variances of the three blocks, the second one explains variances of blocks 1 and 2, and the third one explains variance of block 3. In all simulations, the noise is scaled so that $\|\EE_k\|^2=\sigma\,\|X_k\|^2$ where $\sigma$ ranged from 0.1 to 0.7.
+All the models are fitted with the maximal rank $R_{\max}=5$, i.e. the largest value allowed by $R_{\max}\leq\min_kp_k$. The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. For the sparse version, the parameter $\lambda$ varied in $\{0.1,1,10\}$ and $a_\theta=b_\theta=1$. All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case.
 
 \subsection{Results}
 Table~\ref{table} reports, for each weight, the mean over the $B$ replications of the posterior mean $\hat\sigma_k^{(r)}$, its
