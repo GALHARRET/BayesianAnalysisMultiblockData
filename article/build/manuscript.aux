@@ -7,8 +7,7 @@
 \citation{yuchi2023}
 \citation{wang2026}
 \citation{chessel1996}
-\citation{mitchell1988}
-\citation{george1993}
+\citation{mitchell1988,george1993}
 \babel@aux{english}{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{}\protected@file@percent }
 \citation{bougeard2024}
@@ -36,34 +35,44 @@
 \@writefile{toc}{\contentsline {paragraph}{Priors.}{6}{}\protected@file@percent }
 \newlabel{eq:expand2}{{6}{6}{}{equation.6}{}}
 \newlabel{prop:cond2}{{3}{6}{}{proposition.3}{}}
+\citation{benaychgeorges2012}
+\newlabel{dec_rule}{{4}{7}{}{enumi.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Empirical performance via simulation}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Simulation design}{7}{}\protected@file@percent }
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Sparse Gibbs sampler for OMCOA}}{8}{}\protected@file@percent }
 \newlabel{alg:sparse}{{2}{8}{}{algorithm.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Results}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Estimation of the block weights over $B=1000$ replications: true value, mean and standard deviation of the posterior mean, and percentage of replications in which the weight is selected ($\hat  P(\gamma _k^{(r)}=1\mid \mathbf  {X}_1,\ldots  ,\mathbf  {X}_K)>1/2$). }}{9}{}\protected@file@percent }
-\newlabel{table}{{1}{9}{}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Distribution of the Bayes estimator of the probability of effective rank to be equal to 3, 4, 5 in both case.}}{10}{}\protected@file@percent }
-\newlabel{fig}{{1}{10}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Grid for noise variance:}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Thresholds for the standard deviation of noise that make the weight of the dimension on the block undetectable.}}{8}{}\protected@file@percent }
+\newlabel{tab:thres}{{1}{8}{}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Estimated weights of the blocks (and their 95\% empirical confidence intervals) for the three active dimensions (dimensions 1 to 3) using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue), and the sparse version (Gibbs Sparse OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean. }}{9}{}\protected@file@percent }
+\newlabel{fig1}{{1}{9}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Slab parameter $\lambda $:}{9}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the parameter $\lambda $. }}{10}{}\protected@file@percent }
+\newlabel{fig2}{{2}{10}{}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Results}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Analysis of sensitivity to $\lambda $:}{10}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda $. }}{11}{}\protected@file@percent }
+\newlabel{fig3}{{3}{11}{}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Proportion of the number of dimension chosen as function of the residual parameter $\sigma $ and of the parameter $\lambda $. }}{12}{}\protected@file@percent }
+\newlabel{fig4}{{4}{12}{}{figure.4}{}}
 \bibstyle{apalike}
 \bibdata{Biblio}
-\bibcite{besag1986}{Besag, 1986}
-\bibcite{bougeard2024}{Bougeard et~al., 2024}
-\bibcite{chessel1996}{Chessel and Hanafi, 1996}
-\bibcite{cliff1966}{Cliff, 1966}
-\bibcite{george1993}{George and McCulloch, 1993}
-\bibcite{hoff2007}{Hoff, 2007}
-\bibcite{hoff2009}{Hoff, 2009}
-\bibcite{mitchell1988}{Mitchell and Beauchamp, 1988}
-\bibcite{wang2026}{Wang et~al., 2026}
-\bibcite{yuchi2023}{Yuchi et~al., 2023}
-\bibcite{zhai2023}{Zhai and Gutman, 2023}
+\bibcite{benaychgeorges2012}{{1}{2012}{{Benaych-Georges and Nadakuditi}}{{}}}
+\bibcite{besag1986}{{2}{1986}{{Besag}}{{}}}
+\bibcite{bougeard2024}{{3}{2024}{{Bougeard et~al.}}{{}}}
+\bibcite{chessel1996}{{4}{1996}{{Chessel and Hanafi}}{{}}}
+\bibcite{cliff1966}{{5}{1966}{{Cliff}}{{}}}
+\bibcite{george1993}{{6}{1993}{{George and McCulloch}}{{}}}
+\bibcite{hoff2007}{{7}{2007}{{Hoff}}{{}}}
+\bibcite{hoff2009}{{8}{2009}{{Hoff}}{{}}}
+\bibcite{mitchell1988}{{9}{1988}{{Mitchell and Beauchamp}}{{}}}
+\bibcite{wang2026}{{10}{2026}{{Wang et~al.}}{{}}}
+\bibcite{yuchi2023}{{11}{2023}{{Yuchi et~al.}}{{}}}
+\bibcite{zhai2023}{{12}{2023}{{Zhai and Gutman}}{{}}}
 \citation{cliff1966}
 \citation{cliff1966}
-\citation{cliff1966}
-\citation{cliff1966}
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{12}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{13}{}\protected@file@percent }
-\gdef \@abspage@last{13}
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{14}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{15}{}\protected@file@percent }
+\gdef \@abspage@last{15}

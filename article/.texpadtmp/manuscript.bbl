@@ -1,0 +1,63 @@
+\begin{thebibliography}{}
+
+\bibitem[Benaych-Georges and Nadakuditi, 2012]{benaychgeorges2012}
+Benaych-Georges, F. and Nadakuditi, R.~R. (2012).
+\newblock The singular values and vectors of low rank perturbations of large rectangular random matrices.
+\newblock {\em Journal of Multivariate Analysis}, 111:120--135.
+
+\bibitem[Besag, 1986]{besag1986}
+Besag, J. (1986).
+\newblock On the statistical analysis of dirty pictures.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Methodological)}, 48(3):259--279.
+
+\bibitem[Bougeard et~al., 2024]{bougeard2024}
+Bougeard, S., Peltier, C., Jaillais, B., Boulet, J.-C., and Hanafi, M. (2024).
+\newblock Benchmarking multiblock methods with canonical factorization.
+\newblock {\em Chemometrics and Intelligent Laboratory Systems}, 254:105240.
+
+\bibitem[Chessel and Hanafi, 1996]{chessel1996}
+Chessel, D. and Hanafi, M. (1996).
+\newblock Analyses de la co-inertie de $ k $ nuages de points.
+\newblock {\em Revue de statistique appliqu{\'e}e}, 44(2):35--60.
+
+\bibitem[Cliff, 1966]{cliff1966}
+Cliff, N. (1966).
+\newblock Orthogonal rotation to congruence.
+\newblock {\em Psychometrika}, 31(1):33--42.
+
+\bibitem[George and McCulloch, 1993]{george1993}
+George, E.~I. and McCulloch, R.~E. (1993).
+\newblock Variable selection via gibbs sampling.
+\newblock {\em Journal of the American Statistical Association}, 88(423):881--889.
+
+\bibitem[Hoff, 2007]{hoff2007}
+Hoff, P.~D. (2007).
+\newblock Model averaging and dimension selection for the singular value decomposition.
+\newblock {\em Journal of the American Statistical Association}, 102(478):674--685.
+
+\bibitem[Hoff, 2009]{hoff2009}
+Hoff, P.~D. (2009).
+\newblock Simulation of the matrix bingham–von mises–fisher distribution, with applications to multivariate and relational data.
+\newblock {\em Journal of Computational and Graphical Statistics}, 18(2):438--456.
+
+\bibitem[Mitchell and Beauchamp, 1988]{mitchell1988}
+Mitchell, T.~J. and Beauchamp, J.~J. (1988).
+\newblock Bayesian variable selection in linear regression.
+\newblock {\em Journal of the American Statistical Association}, 83(404):1023--1032.
+
+\bibitem[Wang et~al., 2026]{wang2026}
+Wang, J., Gong, Y., Lin, H., Zhang, R., and Zhao, W. (2026).
+\newblock Bayesian singular value decomposition procedure based on the horseshoe prior.
+\newblock {\em Journal of Applied Statistics}, 53(11):2162--2182.
+
+\bibitem[Yuchi et~al., 2023]{yuchi2023}
+Yuchi, H.~S., Mak, S., and Xie, Y. (2023).
+\newblock Bayesian uncertainty quantification for low-rank matrix completion.
+\newblock {\em Bayesian Analysis}, 18(2):491--518.
+
+\bibitem[Zhai and Gutman, 2023]{zhai2023}
+Zhai, R. and Gutman, R. (2023).
+\newblock A bayesian singular value decomposition procedure for missing data imputation.
+\newblock {\em Journal of Computational and Graphical Statistics}, 32(2):470--482.
+
+\end{thebibliography}
