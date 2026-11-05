@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.5.14)  4 NOV 2026 12:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.5.14)  5 NOV 2026 13:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -483,85 +483,101 @@ File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 
 [8]
 Package epstopdf Info: Source file: <figs/figure1.eps>
-(epstopdf)                    date: 2026-11-04 11:39:01
-(epstopdf)                    size: 71756 bytes
+(epstopdf)                    date: 2026-11-05 13:07:29
+(epstopdf)                    size: 34400 bytes
 (epstopdf)             Output file: <figs/figure1-eps-converted-to.pdf>
-(epstopdf)                    date: 2026-11-04 11:39:03
-(epstopdf)                    size: 36781 bytes
+(epstopdf)                    date: 2026-11-05 13:07:30
+(epstopdf)                    size: 26242 bytes
 (epstopdf)             Command: <repstopdf --outfile=figs/figure1-eps-converted
 -to.pdf figs/figure1.eps>
 (epstopdf)             \includegraphics on input line 473.
 Package epstopdf Info: Output file is already uptodate.
-<figs/figure1-eps-converted-to.pdf, id=51, 433.62pt x 289.08pt>
+<figs/figure1-eps-converted-to.pdf, id=51, 722.7pt x 361.35pt>
 File: figs/figure1-eps-converted-to.pdf Graphic file (type pdf)
 <use figs/figure1-eps-converted-to.pdf>
 Package pdftex.def Info: figs/figure1-eps-converted-to.pdf  used on input line 
 473.
-(pdftex.def)             Requested size: 472.03123pt x 314.70277pt.
-
-
-[9 <./figs/figure1-eps-converted-to.pdf>]
+(pdftex.def)             Requested size: 472.03123pt x 236.01607pt.
 Package epstopdf Info: Source file: <figs/figure2.eps>
-(epstopdf)                    date: 2026-11-04 11:39:10
-(epstopdf)                    size: 42593 bytes
+(epstopdf)                    date: 2026-11-05 12:42:40
+(epstopdf)                    size: 72010 bytes
 (epstopdf)             Output file: <figs/figure2-eps-converted-to.pdf>
-(epstopdf)                    date: 2026-11-04 11:39:12
-(epstopdf)                    size: 24036 bytes
+(epstopdf)                    date: 2026-11-05 12:43:22
+(epstopdf)                    size: 36797 bytes
 (epstopdf)             Command: <repstopdf --outfile=figs/figure2-eps-converted
 -to.pdf figs/figure2.eps>
-(epstopdf)             \includegraphics on input line 481.
+(epstopdf)             \includegraphics on input line 483.
 Package epstopdf Info: Output file is already uptodate.
-<figs/figure2-eps-converted-to.pdf, id=64, 433.62pt x 289.08pt>
+<figs/figure2-eps-converted-to.pdf, id=52, 722.7pt x 361.35pt>
 File: figs/figure2-eps-converted-to.pdf Graphic file (type pdf)
 <use figs/figure2-eps-converted-to.pdf>
 Package pdftex.def Info: figs/figure2-eps-converted-to.pdf  used on input line 
-481.
-(pdftex.def)             Requested size: 472.03123pt x 314.70277pt.
+483.
+(pdftex.def)             Requested size: 472.03123pt x 236.01607pt.
 
 
-[10 <./figs/figure2-eps-converted-to.pdf>]
+[9 <./figs/figure1-eps-converted-to.pdf>]
 Package epstopdf Info: Source file: <figs/figure3.eps>
-(epstopdf)                    date: 2026-11-04 11:39:40
-(epstopdf)                    size: 55423 bytes
+(epstopdf)                    date: 2026-11-05 12:41:10
+(epstopdf)                    size: 42787 bytes
 (epstopdf)             Output file: <figs/figure3-eps-converted-to.pdf>
-(epstopdf)                    date: 2026-11-04 11:48:17
-(epstopdf)                    size: 29214 bytes
+(epstopdf)                    date: 2026-11-05 12:41:12
+(epstopdf)                    size: 23980 bytes
 (epstopdf)             Command: <repstopdf --outfile=figs/figure3-eps-converted
 -to.pdf figs/figure3.eps>
-(epstopdf)             \includegraphics on input line 493.
+(epstopdf)             \includegraphics on input line 495.
 Package epstopdf Info: Output file is already uptodate.
-<figs/figure3-eps-converted-to.pdf, id=77, 867.24pt x 433.62pt>
+<figs/figure3-eps-converted-to.pdf, id=64, 722.7pt x 361.35pt>
 File: figs/figure3-eps-converted-to.pdf Graphic file (type pdf)
 <use figs/figure3-eps-converted-to.pdf>
 Package pdftex.def Info: figs/figure3-eps-converted-to.pdf  used on input line 
-493.
-(pdftex.def)             Requested size: 472.03123pt x 236.01717pt.
+495.
+(pdftex.def)             Requested size: 472.03123pt x 236.01607pt.
 Package epstopdf Info: Source file: <figs/figure4.eps>
-(epstopdf)                    date: 2026-11-04 08:14:52
-(epstopdf)                    size: 24199 bytes
+(epstopdf)                    date: 2026-11-05 12:43:21
+(epstopdf)                    size: 55423 bytes
 (epstopdf)             Output file: <figs/figure4-eps-converted-to.pdf>
-(epstopdf)                    date: 2026-11-04 08:14:53
-(epstopdf)                    size: 18773 bytes
+(epstopdf)                    date: 2026-11-05 12:43:23
+(epstopdf)                    size: 29214 bytes
 (epstopdf)             Command: <repstopdf --outfile=figs/figure4-eps-converted
 -to.pdf figs/figure4.eps>
-(epstopdf)             \includegraphics on input line 499.
+(epstopdf)             \includegraphics on input line 501.
 Package epstopdf Info: Output file is already uptodate.
-<figs/figure4-eps-converted-to.pdf, id=78, 1084.05pt x 578.16pt>
+<figs/figure4-eps-converted-to.pdf, id=65, 867.24pt x 433.62pt>
 File: figs/figure4-eps-converted-to.pdf Graphic file (type pdf)
 <use figs/figure4-eps-converted-to.pdf>
 Package pdftex.def Info: figs/figure4-eps-converted-to.pdf  used on input line 
-499.
-(pdftex.def)             Requested size: 472.03123pt x 251.7534pt.
+501.
+(pdftex.def)             Requested size: 472.03123pt x 236.01717pt.
+Package epstopdf Info: Source file: <figs/figure6.eps>
+(epstopdf)                    date: 2026-11-05 13:02:05
+(epstopdf)                    size: 22682 bytes
+(epstopdf)             Output file: <figs/figure6-eps-converted-to.pdf>
+(epstopdf)                    date: 2026-11-05 13:02:07
+(epstopdf)                    size: 18087 bytes
+(epstopdf)             Command: <repstopdf --outfile=figs/figure6-eps-converted
+-to.pdf figs/figure6.eps>
+(epstopdf)             \includegraphics on input line 506.
+Package epstopdf Info: Output file is already uptodate.
+<figs/figure6-eps-converted-to.pdf, id=66, 722.7pt x 361.35pt>
+File: figs/figure6-eps-converted-to.pdf Graphic file (type pdf)
+<use figs/figure6-eps-converted-to.pdf>
+Package pdftex.def Info: figs/figure6-eps-converted-to.pdf  used on input line 
+506.
+(pdftex.def)             Requested size: 472.03123pt x 236.01607pt.
 
 
-[11 <./figs/figure3-eps-converted-to.pdf>]
+[10 <./figs/figure2-eps-converted-to.pdf>]
 
-[12 <./figs/figure4-eps-converted-to.pdf>] (./manuscript.bbl)
+[11 <./figs/figure3-eps-converted-to.pdf> <./figs/figure4-eps-converted-to.pdf>
+]
+
+[12 <./figs/figure6-eps-converted-to.pdf>] (./manuscript.bbl)
 
 [13
 
 ]
-Overfull \hbox (25.61748pt too wide) in paragraph at lines 709--711
+Overfull \hbox (25.61748pt too wide) in paragraph at lines 718--720
  \T1/lmr/bx/n/10.95 Up-date of $\OT1/lmr/m/n/10.95 ^^F[]$[] \T1/lmr/m/n/10.95 W
 ith $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 and $\OT1/lmr/bx/n/10.95 V[]$ \T1
 /lmr/m/n/10.95 fixed (both hav-ing or-thonor-mal columns), and $\OT1/lmr/m/n/10
@@ -572,7 +588,7 @@ r/m/n/10.95 ,
 
 
 [14]
-Overfull \hbox (44.6998pt too wide) in paragraph at lines 738--746
+Overfull \hbox (44.6998pt too wide) in paragraph at lines 747--755
 []\T1/lmr/m/n/10.95 (1)--(2): by [], the con-di-tional den-sity of $\OT1/lmr/bx
 /n/10.95 U$ \T1/lmr/m/n/10.95 is pro-por-tional to $[]\OMS/lmsy/m/n/10.95 f[][]
  \OML/lmm/m/it/10.95 ^^\[] []\OT1/lmr/m/n/10.95 (^^F[]\OT1/lmr/bx/n/10.95 V[]X[
@@ -588,10 +604,10 @@ L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 6399 strings out of 473190
- 100654 string characters out of 5715800
- 515441 words of memory out of 5000000
- 29524 multiletter control sequences out of 15000+600000
+ 6407 strings out of 473190
+ 100912 string characters out of 5715800
+ 515464 words of memory out of 5000000
+ 29532 multiletter control sequences out of 15000+600000
  627539 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,16n,65p,1042b,448s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -613,10 +629,10 @@ ic/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10
 /local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texl
 ive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on build/manuscript.pdf (15 pages, 464600 bytes).
+Output written on build/manuscript.pdf (15 pages, 488144 bytes).
 PDF statistics:
- 208 PDF objects out of 1000 (max. 8388607)
- 130 compressed objects within 2 object streams
+ 217 PDF objects out of 1000 (max. 8388607)
+ 135 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

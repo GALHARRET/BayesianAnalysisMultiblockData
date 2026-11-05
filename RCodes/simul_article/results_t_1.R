@@ -103,7 +103,8 @@ cov_percent<-resSIG |>
   group_by(block,dim,model,sigma) |>
   summarise(P=sum(isInCI)/500)
 cov_percent$model<-factor(cov_percent$model,levels=c("gomcoa","gsomcoa1","gsomcoa2","gsomcoa3"),labels=c("gibbs_omcoa","gibbs_sparse_omcoa(l=1)","gibbs_sparse_omcoa(l=.1)","gibbs_sparse_omcoa(l=10)"))
-
+cov_percent$dim<-factor(cov_percent$dim,labels=paste("dim",1:3))
+cov_percent$block<-factor(cov_percent$block,labels=paste("block",1:3))
 p<-ggplot(cov_percent,aes(x=sigma,y=P,color=model,group=model))+
   geom_point()+
   geom_line()+
@@ -112,7 +113,7 @@ p<-ggplot(cov_percent,aes(x=sigma,y=P,color=model,group=model))+
   theme_bw()+
   theme(legend.position = "bottom")
 
-ggsave(filename = "article/figs/figure5.eps", plot = p, width = 6, height = 4, units = "in")
+ggsave(filename = "article/figs/figure1.eps", plot = p, width = 10, height = 5, units = "in")
 
 ESTIM$true_value<-rep(true_value,630/length(true_value))
 
@@ -142,7 +143,7 @@ p<-ggplot(ESTIM3,aes(x = sigma, y = estim, color = model)) +
   facet_grid(block ~ dim)+ 
   theme(legend.position = "bottom")
 
-ggsave(filename = "article/figs/figure1.eps", plot = p, width = 6, height = 4, units = "in")
+ggsave(filename = "article/figs/figure2.eps", plot = p, width = 10, height = 5, units = "in")
 
 ESTIM2 =ESTIM|>filter(model %in% c("gsomcoa1","gsomcoa2","gsomcoa3"))
 ESTIM2$model<-factor(ESTIM2$model,labels=c("l=1","l=0.1","l=10"))
@@ -168,7 +169,7 @@ p<-ggplot(ESTIM3,aes(x = sigma, y = estim, color = model)) +
   facet_grid(block ~ dim)+ 
   theme(legend.position = "bottom")
 
-ggsave(filename = "article/figs/figure2.eps", plot = p, width = 6, height = 4, units = "in")
+ggsave(filename = "article/figs/figure3.eps", plot = p, width = 10, height = 5, units = "in")
 
 
 
@@ -210,7 +211,7 @@ p<-ggplot(res1|>filter(statut_id=="active"),aes(x=sigma,y=proba,group=lambda,col
   theme_bw()+ 
   theme(legend.position = "bottom")
 
-ggsave(filename = "article/figs/figure3.eps", plot = p, width = 12, height = 6, units = "in")
+ggsave(filename = "article/figs/figure4.eps", plot = p, width = 12, height = 6, units = "in")
 
 
 #### RANK STUDY ####
@@ -243,7 +244,7 @@ p<-ggplot(RK2,aes(x=sigma,y=m,color=rank,group=rank))+
   facet_grid( ~ lambda)+ 
   theme(legend.position = "bottom")
 
-ggsave(filename = "figure4.eps", plot = p, width = 6, height = 4, units = "in")
+ggsave(filename = "figure5.eps", plot = p, width = 10, height = 5, units = "in")
 
 RANK3<-NULL
 B<-500
@@ -260,11 +261,10 @@ rank4<-RANK3 |>
   group_by(lambda,sigma,choice) |>
   count()
 rank4$prop<-rank4$n/B
-rank4$model<-"SGOMCOA_l=1"
+rank4$model<-"gibbs_sparse_omcoa(l=1)"
 rank4$effective_rank<-factor(rank4$choice,labels=c(paste("Reff=",0:5,sep="")))
-rank4$sigma<-factor(rank4$sigma)
-dim(rank4)
-print(n=33,rank4)
+#rank4$sigma<-factor(rank4$sigma)
+
 load("RCodes/simul_article/resGD.RData")
 rank5<-resGD |>
   as.data.frame()|>
@@ -272,14 +272,14 @@ rank5<-resGD |>
   count()
 B<-1000
 rank5$prop<-rank5$n/B
-rank5$sigma<-factor(rank5$sigma)
+#rank5$sigma<-factor(rank5$sigma)
 rank5$effective_rank<-factor(rank5$effective_rank,levels=0:5,labels=paste("Reff=",0:5,sep=""))
 rank5$model<-"Gavish–Donoho"
 
 load("RCodes/simul_article/resHoff.RData")
 
-resH<-NULL
-for(b in 1:dim(resHoff)[1]) resH<-rbind(resH,c(names(which.max(resHoff[b,1:6])),resHoff[b,7]))
+resH<-data.frame(matrix(NA,nrow=dim(resHoff)[1],ncol=2))
+for(b in 1:dim(resHoff)[1]) resH[b,]<-c(names(which.max(resHoff[b,1:6])),as.numeric(resHoff[b,7]))
 colnames(resH)<-c("effective_rank","sigma")
 
 rank6<-resH |>
@@ -288,14 +288,15 @@ rank6<-resH |>
   count()
 B<-300
 rank6$prop<-rank6$n/B
-rank6$sigma<-factor(rank6$sigma)
+#rank6$sigma<-factor(rank6$sigma)
 rank6$effective_rank<-factor(rank6$effective_rank,levels=0:5,labels=paste("Reff=",0:5,sep=""))
 rank6$model<-"Hoff"
+rank6$sigma<-as.numeric(rank6$sigma)
 print(rank6)
 
 rank<-rbind(rank4[,c("sigma","effective_rank","prop","model")],rank5[,c("sigma","effective_rank","prop","model")],rank6[,c("sigma","effective_rank","prop","model")])
 table(rank$model)
-p<-ggplot(rank|>filter(model %in% c("SGOMCOA_l=1","Gavish–Donoho","Hoff")),aes(x=sigma,y=prop,color=model,group=model))+
+p<-ggplot(rank|>filter(model %in% c("gibbs_sparse_omcoa(l=1)","Gavish–Donoho","Hoff")),aes(x=sigma,y=prop,color=model,group=model))+
   geom_point() +
   geom_line()+
   #geom_errorbar(aes(ymin = q1, ymax = q2),
@@ -307,7 +308,7 @@ p<-ggplot(rank|>filter(model %in% c("SGOMCOA_l=1","Gavish–Donoho","Hoff")),aes
 
 p
 
-ggsave(filename = "article/figs/figure6.eps", plot = p, width = 15, height = 8, units = "in")
+ggsave(filename = "article/figs/figure6.eps", plot = p, width = 10, height = 5, units = "in")
 
 x<-RANK3 |>
   group_by(lambda,sigma,choice) |>

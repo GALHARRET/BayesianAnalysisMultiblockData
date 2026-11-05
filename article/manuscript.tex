@@ -448,7 +448,7 @@ All the models are fitted with the maximal rank $R_{\max}=5$, i.e. the largest v
 \centering
 \begin{tabular}{ccrr}
   \hline
-dimension & block & weight & threshold \\ 
+dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\ 
   \hline
 1 & 3 & 0.30 & 0.05 \\ 
   3 & 3 & 0.50 & 0.08 \\ 
@@ -471,15 +471,17 @@ The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. F
 \subsection{Results}
 \begin{figure}
   \includegraphics[width=\linewidth]{figs/figure1.eps}
-  \caption{Estimated weights of the blocks (and their 95\% empirical confidence intervals) for the three active dimensions (dimensions 1 to 3) using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue), and the sparse version (Gibbs Sparse OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean. \label{fig1}}
+  \caption{Empirical coverage probability for gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda=1$, blue for $\lambda=.1$ and purple for $\lambda=10$) as a function of the noise parameter $\sigma$. \label{fig1}}
 \end{figure}
 
 Figure~\ref{fig1} provides the estimated block weights and their 95\%-CI of the active dimensions (dimension 1 to 3) as function of the proportion $\sigma$ associated to the residual error . When the weigths were non null, they were accurately estimated using both bayesian frameworks and the omcoa algorithm for all values of $\sigma$.The bias estimation of these weights with the sequential approach (mcoa) can be increased with $\sigma$ (for example the variance of the block 2 explained by dimension 1). When the weights were null, as expected, the bias of the sparse version remained near from 0 for all $\sigma$, whereas the bias of the others increased with $\sigma$. We can note that estimates obtained using the Gibbs sampler degrade less than those obtained using mcoa and omcoa methods.
 
+
+
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figs/figure2.eps}
-  \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the parameter $\lambda$. \label{fig2}}
+  \caption{Estimated block weights and their 95\% empirical confidence intervals for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
 \end{figure}
 Figure~\ref{fig2} provides the estimated block weights and their 95\%-CI of the inactive dimensions (dimension 4 and 5) as function of the proportion $\sigma$ associated to the residual error . The bias of estimate of the sequential approach (mcoa, omcoa) and the gibbs sampler increased with $\sigma$. For the sparse version, the bias remained to 0 in all cases.
 
@@ -491,14 +493,21 @@ The posterior mode of $R_{\mathrm{eff}}$ equals the true value of $3$ in $95.4\%
 
 \begin{figure}
   \includegraphics[width=\linewidth]{figs/figure3.eps}
-  \caption{Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda$. \label{fig3}}
+  \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda$.  \label{fig3}}
 \end{figure}
 
 
 \begin{figure}
   \includegraphics[width=\linewidth]{figs/figure4.eps}
-  \caption{Proportion of the number of dimension chosen as function of the residual parameter $\sigma$ and of the parameter $\lambda$. \label{fig4}}
+  \caption{Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda$. \label{fig4}}
 \end{figure}
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure6.eps}
+  \caption{Proportion of the number of dimension chosen as function of the residual parameter $\sigma$ and of the parameter $\lambda$. \label{fig6}}
+\end{figure}
+
+
 
 % We compare\item $\Sigma_1=\diag(.7,.5,0), \Sigma_1=\diag(.6,.4,0), \Sigma_1=\diag(.5,0,0),$ the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with.6MCOA and OMCOA.
 % The diagonal matrices depend on a parameter $t\in[0,1]$:
