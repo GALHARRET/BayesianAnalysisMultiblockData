@@ -192,42 +192,23 @@ Since the limit may however be a local minimum, the algorithm is started from th
 \begin{proposition}[Noiseless identifiability]\label{prop:identif}
 Let $\X_k=\U\Sigma_k\V_k^\intercal$, $k=1,\ldots,K$, with $\U\in\Stiefel{N}{R}$,
 $\V_k\in\Stiefel{p_k}{R}$, $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$,
-$\sigma_k^{(r)}\geq 0$, and assume that every dimension is present in at least
-one block: for each $r$ there is a $k$ with $\sigma_k^{(r)}>0$. Denote by
+$\sigma_k^{(r)}\geq 0$, and assume that for each $r$ there is a $k$ with $\sigma_k^{(r)}>0$. Denote
 $\mathbf s^{(r)}=(\sigma_1^{(r)},\ldots,\sigma_K^{(r)})$ the profile of dimension
-$r$ across the blocks and, for block weights $w_1,\ldots,w_K>0$, by
-\[
-  \lambda_r(\mathbf w)=\sum_{k=1}^K w_k\bigl(\sigma_k^{(r)}\bigr)^2
-\]
-the squared singular values of the weighted concatenated matrix
-$[\sqrt{w_1}\X_1|\cdots|\sqrt{w_K}\X_K]$.
-\begin{enumerate}
-  \item[(a)] \textbf{OMCOA.} If the profiles are pairwise distinct,
-  $\mathbf s^{(r)}\neq\mathbf s^{(r')}$ for $r\neq r'$, then every minimiser of
-  criterion~\eqref{Crit} in dimension $R$, weighted or not, is equal to
-  $(\U,\V_k,\Sigma_k)$ up to a common permutation of the dimensions and to
-  the joint change of sign $(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})\mapsto
-  -(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})$; the columns $\vv_k^{(r)}$ with
-  $\sigma_k^{(r)}=0$ are not determined.
-  \item[(b)] \textbf{MCOA.} If the values $\lambda_1(\mathbf w),\ldots,
-  \lambda_R(\mathbf w)$ are pairwise distinct, MCOA applied to the weighted
-  blocks $\sqrt{w_k}\X_k$ recovers $(\U,\V_k)$ up to the order and the signs of
-  the dimensions, and the weights $\sqrt{w_k}\,\sigma_k^{(r)}$. Its solution
-  then coincides with the OMCOA solution. %(once the MCOA weights are divided by $\sqrt{w_k}$).
-  \item[(c)] If $\lambda_r(\mathbf w)=\lambda_{r'}(\mathbf w)$ for some
-  $r\neq r'$, the MCOA solution is not determined by the data: at the first
-  step where the largest remaining value is tied, any unit vector of the
-  corresponding eigenspace is a solution, and the computed solution differs
-  in general from $(\U,\V_k)$, even when the profiles are distinct.
-\end{enumerate}
+$r$ across the blocks and, 
+$\lambda_r(\mathbf w)=\sum_{k=1}^K w_k\bigl(\sigma_k^{(r)}\bigr)^2$  for block weights $w_1,\ldots,w_K>0$ . Note that $\lambda_r(\mathbf w)$ are the squared singular values of the weighted concatenated matrix $[\tilde\X_1|\cdots|\tilde\X_K]$ where $\tilde \X_k=\sqrt{w_k}\X_k$.
+  
+  If $\mathbf s^{(r)}\neq\mathbf s^{(r')}$ (respectively $\lambda_r(\mathbf w)\not=\lambda_{r'}(\mathbf w)$) for all $r\neq r'$  then the omcoa  (respectively the mcoa applied to the weighted blocks $\tilde \X_k$) solution of dimension $R$ recovers $(\U,\V_k,\Sigma_k)$ (respectively with $\Sigma_k=[\sqrt{w_k}\sigma_k^{(1)},\cdots,\sqrt{w_k}\sigma_k^{(R)}]$)  up to a common permutation of the dimensions and to a joint change of sign. 
 \end{proposition}
 The proof is given is the appendix.
 
+\begin{remark}
 Since equal profiles give equal values $\lambda_r(\mathbf w)$ for every
-$\mathbf w$, the condition of (b) implies that of (a), whatever the weights.
+$\mathbf w$, the omcoa and mcoa solutions are equals when $\lambda_r(\mathbf w)\not=\lambda_{r'}(\mathbf w)$ for $r\not=r'$ whatever the weights.
 Conversely, for any weights there are designs with distinct profiles and tied
-values $\lambda_r(\mathbf w)$: OMCOA identifies strictly more configurations
-than MCOA, and its identifiability does not depend on the block weighting.
+values $\lambda_r(\mathbf w)$: omcoa identifies strictly more configurations
+than mcoa.
+\end{remark}
+
 
 
 
@@ -553,7 +534,7 @@ Figure~\ref{fig1} provides the estimated block weights and their 95\%-CI of the 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figs/figure2.eps}
-  \caption{Estimated block weights and their 95\% empirical confidence intervals for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
+  \caption{Estimated block weights and their 95\% empirical confidence intervals from the $B=1000$ simulated data for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
 \end{figure}
 Figure~\ref{fig2} provides the estimated block weights and their 95\%-CI of the inactive dimensions (dimension 4 and 5) as function of the proportion $\sigma$ associated to the residual error . The bias of estimate of the sequential approach (mcoa, omcoa) and the gibbs sampler increased with $\sigma$. For the sparse version, the bias remained to 0 in all cases.
 
@@ -818,7 +799,7 @@ converges:
 \end{proof}
 
 \begin{proof}[Proposition 2]
-\emph{(a)} The true parameters give the value $0$ to criterion~\eqref{Crit}, so
+\emph{(omcoa)} The true parameters give the value $0$ to criterion~\eqref{Crit}, so
 every minimiser $(\U',\V_k',\Sigma_k')$ satisfies
 $\X_k=\U'\Sigma_k'\V_k'^\intercal$ for all $k$; this does not depend on the
 weights given to the blocks. Since every dimension is present in some block,
@@ -870,15 +851,15 @@ MCOA has recovered $\U$ and the $\V_k$ (columns with a positive weight) up to
 order and signs, and gives a zero value to criterion~\eqref{Crit} for the
 weighted blocks: by (a), it coincides with the OMCOA solution.
 
-\emph{(c)} Let $t$ be the first step where
-$\max_{r\in\mathcal R_t}\lambda_r(\mathbf w)$ is attained by several dimensions
-$r\in\mathcal T\subset\mathcal R_t$. Up to step $t-1$, the argument of (b)
-applies, and the leading eigenvalue of $\X^{(t)}\X^{(t)\intercal}$ has the
-eigenspace $\mathrm{span}\{\uu^{(r)},r\in\mathcal T\}$, of dimension
-$|\mathcal T|\geq2$. Every unit vector of this space maximises the MCOA
-criterion at step $t$; a vector other than $\pm\uu^{(r)}$, $r\in\mathcal T$,
-gives a common component that is not a column of $\U$ up to sign, hence, by
-(a), a solution different from the OMCOA one.
+%\emph{(c)} Let $t$ be the first step where
+%$\max_{r\in\mathcal R_t}\lambda_r(\mathbf w)$ is attained by several dimensions
+%$r\in\mathcal T\subset\mathcal R_t$. Up to step $t-1$, the argument of (b)
+%applies, and the leading eigenvalue of $\X^{(t)}\X^{(t)\intercal}$ has the
+%eigenspace $\mathrm{span}\{\uu^{(r)},r\in\mathcal T\}$, of dimension
+%$|\mathcal T|\geq2$. Every unit vector of this space maximises the MCOA
+%criterion at step $t$; a vector other than $\pm\uu^{(r)}$, $r\in\mathcal T$,
+%gives a common component that is not a column of $\U$ up to sign, hence, by
+%(a), a solution different from the OMCOA one.
 \end{proof}
 
 
