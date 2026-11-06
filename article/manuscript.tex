@@ -83,7 +83,7 @@
 
 \begin{center}
 {\Large
-	{\sc Bayesian Framework for Canonical factorization of multiblock data}
+	{\textsc Bayesian Framework for Canonical factorization of multiblock data}
 }
 \bigskip
 
@@ -151,7 +151,7 @@ where
   \item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
 \end{itemize}
 Without loss of generality, we can assume $\sigma_k^{(r)}\geq 0$ for all $k,r$, since a joint sign change of $\sigma_k^{(r)}$ and $\vv_k^{(r)}$ leaves the model and the constraints unchanged. Since the blocks $\X_1,...\X_K$ are column-centered, the block-common $\U\in\Stiefel{N}{R}$ is centered as-well:
-$$\U\in\Stiefel{N}{R}, \quad \mathbf{1}_N\U=0.$$
+\[\U\in\Stiefel{N}{R}, \quad \mathbf{1}_N\U=0.\]
 This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). For all the multiblock methods, once $\U$ is fixed, the decomposition $\X_k=\U\Sigma_k\V_k^\intercal$ of each block is unique (up to sign). The methods differ in how the axes $\uu^{(1)},\ldots,\uu^{(R)}$ themselves are determined. When the block loadings are only normalized ($\|\vv_k^{(r)}\|=1$), the optimal loadings are
 $\vv_k^{(r)}=\X_k^\intercal\uu^{(r)}/\|\X_k^\intercal\uu^{(r)}\|$ and the least-squares criterion reduces to
 \[
@@ -188,6 +188,76 @@ The proof is given in the appendix.
 \begin{remark}
 Since the limit may however be a local minimum, the algorithm is started from the MCOA solution and from several random initializations, and the solution with the lowest criterion is retained.  
 \end{remark}
+
+\begin{proposition}[Noiseless identifiability]\label{prop:identif}
+Let $\X_k=\U\Sigma_k\V_k^\intercal$, $k=1,\ldots,K$, with $\U\in\Stiefel{N}{R}$,
+$\V_k\in\Stiefel{p_k}{R}$, $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$,
+$\sigma_k^{(r)}\geq 0$, and assume that every dimension is present in at least
+one block: for each $r$ there is a $k$ with $\sigma_k^{(r)}>0$. Denote by
+$\mathbf s^{(r)}=(\sigma_1^{(r)},\ldots,\sigma_K^{(r)})$ the profile of dimension
+$r$ across the blocks and, for block weights $w_1,\ldots,w_K>0$, by
+\[
+  \lambda_r(\mathbf w)=\sum_{k=1}^K w_k\bigl(\sigma_k^{(r)}\bigr)^2
+\]
+the squared singular values of the weighted concatenated matrix
+$[\sqrt{w_1}\X_1|\cdots|\sqrt{w_K}\X_K]$.
+\begin{enumerate}
+  \item[(a)] \textbf{OMCOA.} If the profiles are pairwise distinct,
+  $\mathbf s^{(r)}\neq\mathbf s^{(r')}$ for $r\neq r'$, then every minimiser of
+  criterion~\eqref{Crit} in dimension $R$, weighted or not, is equal to
+  $(\U,\V_k,\Sigma_k)$ up to a common permutation of the dimensions and to
+  the joint change of sign $(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})\mapsto
+  -(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})$; the columns $\vv_k^{(r)}$ with
+  $\sigma_k^{(r)}=0$ are not determined.
+  \item[(b)] \textbf{MCOA.} If the values $\lambda_1(\mathbf w),\ldots,
+  \lambda_R(\mathbf w)$ are pairwise distinct, MCOA applied to the weighted
+  blocks $\sqrt{w_k}\X_k$ recovers $(\U,\V_k)$ up to the order and the signs of
+  the dimensions, and the weights $\sqrt{w_k}\,\sigma_k^{(r)}$. Its solution
+  then coincides with the OMCOA solution. %(once the MCOA weights are divided by $\sqrt{w_k}$).
+  \item[(c)] If $\lambda_r(\mathbf w)=\lambda_{r'}(\mathbf w)$ for some
+  $r\neq r'$, the MCOA solution is not determined by the data: at the first
+  step where the largest remaining value is tied, any unit vector of the
+  corresponding eigenspace is a solution, and the computed solution differs
+  in general from $(\U,\V_k)$, even when the profiles are distinct.
+\end{enumerate}
+\end{proposition}
+The proof is given is the appendix.
+
+Since equal profiles give equal values $\lambda_r(\mathbf w)$ for every
+$\mathbf w$, the condition of (b) implies that of (a), whatever the weights.
+Conversely, for any weights there are designs with distinct profiles and tied
+values $\lambda_r(\mathbf w)$: OMCOA identifies strictly more configurations
+than MCOA, and its identifiability does not depend on the block weighting.
+
+
+
+%\begin{remark}
+%In \texttt{ade4}, the weight $w_k$ combines the column weights of the
+%\texttt{ktab} object (by default $1/p_k$ for each column of block $k$ with
+%\texttt{ktab.list.df}) and the block weighting of \texttt{mcoa}: $1$ for
+%\texttt{option="uniform"}, the inverse of the total inertia for
+%\texttt{"inertia"}, the inverse of the first eigenvalue for \texttt{"lambda1"}.
+%The condition of (b) therefore depends on these choices: for instance, with
+%blocks of different sizes, the default column weights $1/p_k$ can break a tie
+%of the unweighted values $\sum_k(\sigma_k^{(r)})^2$, and conversely.
+%Standardising the columns of the blocks (\texttt{dudi.pca(scale=TRUE)}) is not
+%a block weighting: it multiplies $\X_k$ on the right by a diagonal matrix
+%$\mathbf D_k^{-1}$, and $\X_k\mathbf D_k^{-1}$ is no longer of the form
+%$\U\Sigma_k\V_k^\intercal$ with orthonormal $\V_k$, unless all the columns of
+%block $k$ have the same variance.
+%\end{remark}
+
+%\begin{remark}
+%With noise, exact ties become near ties. When two values $\lambda_r(\mathbf w)$
+%are close, the corresponding MCOA axes are only determined up to a rotation
+%within their plane: by the Davis--Kahan theorem \cite{davis1970}, the angle
+%between estimated and true axes is bounded by the noise level divided by the
+%gap between the two values, and this bound is attained in the worst case.
+%OMCOA does not rely on this gap, but on the separation of the profiles. The
+%simulation with the parameter $t$, which moves continuously from distinct to
+%tied values of $\lambda_r(\mathbf w)$ with distinct profiles, illustrates the
+%difference.
+%\end{remark}
 
 
 
@@ -297,7 +367,7 @@ We can deduce the following algorithm:
         \State $\F_{\V_k}\gets\tau_k\,\X_k^\intercal\U\Sigma_k$;\quad update $\V_k$ by one column-wise sweep of $\vMF(\F_{\V_k})$
         \For{$h=1,\ldots,H$}
            \State $d_k^{(h)}\gets{\uu^{(h)}}^\intercal\X_k\vv_k^{(h)}$;\quad draw
-                  $\sigma_k^{(h)}\sim\mathcal N^+\bigl(\tau_kd_k^{(h)}/(\tau_k+\lambda),\,1/(\tau_k+\lambda)\bigr)$
+                  $\sigma_k^{(h)}\sim\mathcal N^+\bigl(\tau_k d_k^{(h)}/(\tau_k+\lambda),\,1/(\tau_k+\lambda)\bigr)$
         \EndFor
         \State draw $\tau_k\sim\Ga\bigl(a_0+(N-1)p_k/2,\ b_0+\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
      \EndFor
@@ -397,7 +467,9 @@ From the posterior distributions of the parameter $\gamma_k^{(r)}$ a decision ru
 \begin{quote} 
   the component $\uu^{(r)}$ is active for the block $k$ if and only if $P(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K)>1/2$. \label{dec_rule}
 \end{quote}
-\noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. $$R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},$$ whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
+\noindent Moreover, this model makes it possible to estimate the rank of the blocks $(\X_1,...,\X_K)$ i.e. 
+\[R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},\]
+ whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
 $a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
 
 
@@ -440,7 +512,7 @@ We consider $K=3$ blocks with $p_1=10$, $p_2=5$, $p_3=15$ variables and $N=100$ 
   \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad k=1,2,3,
 \]
 where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sigma_k$ is the diagonal matrix of the block weights and $\EE_k$ is a noise term. The true effective rank is $R_{\mathrm{eff}}=3$. The diagonal matrices are set to 
-$$\Sigma_1=\diag(0.7,0.5,0), \quad \Sigma_2=\diag(0.5,0.7,0), \quad \Sigma_3=\diag(0.3,0,0.5).$$ 
+\[\Sigma_1=\diag(0.7,0.5,0), \quad \Sigma_2=\diag(0.5,0.7,0), \quad \Sigma_3=\diag(0.3,0,0.5).\] 
 All the models are fitted with the maximal rank $R_{\max}=5$, i.e. the largest value allowed by $R_{\max}\leq\min_kp_k$. 
 \paragraph{Grid for noise variance:} We assume that the terms $e_{\bullet\bullet}$ of the noise $\EE_k$ are distributed from $\mathcal{N}(0,s^2)$. For a spectral method applied in a single block and for any sufficiently large $N$, an active weight $w$ is indetectable when the noise parameter $s$ exceeds $w/(Np_k)^{1/4}$ \cite[see][for details]{benaychgeorges2012}. Table~\ref{tab:thres} provides these thresholds as a function of the dimensional weights of the blocks. We set $s$ within the interval from 0.02 to 0.18. Note that, for example, the first column of $\U$ remains probably well estimated even if $s>0.05$ since it depends on the three blocks. On the other side, the third column of $\U$ depends only on block 3 so it will not be well estimated for $s>0.08$.    
 
@@ -466,7 +538,7 @@ dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\
 ($\|\mathbf X_k\|=1$), the weights are bounded, $\sigma_k^{(r)}\le 1$, and $(\sigma_k^{(r)})^2$ is the proportion of the variance of block $k$ explained by dimension $r$. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable
 values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions.
 
-The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. For the sparse version, the parameter $\lambda$ varied in $\{0.1,1,10\}$ and $a_\theta=b_\theta=1$. All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case.
+The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. For the sparse version, the parameter $\lambda$ varied in $\{0.1,1,10\}$ and $a_\theta=b_\theta=1$. All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayasian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
 
 \subsection{Results}
 \begin{figure}
@@ -662,6 +734,8 @@ The posterior mode of $R_{\mathrm{eff}}$ equals the true value of $3$ in $95.4\%
 \section*{Appendix: proof of the proposition}
 
 
+
+
 \begin{proof}[Proposition 1]
 	The criterion to be minimized is:
 \[
@@ -744,6 +818,72 @@ converges:
 \end{proof}
 
 \begin{proof}[Proposition 2]
+\emph{(a)} The true parameters give the value $0$ to criterion~\eqref{Crit}, so
+every minimiser $(\U',\V_k',\Sigma_k')$ satisfies
+$\X_k=\U'\Sigma_k'\V_k'^\intercal$ for all $k$; this does not depend on the
+weights given to the blocks. Since every dimension is present in some block,
+the column space of $\X=[\X_1|\cdots|\X_K]$ is the span of $\U$, of dimension
+$R$. It is contained in the span of $\U'$, which also has dimension $R$; hence
+$\U'=\U\mathbf O$ with $\mathbf O$ orthogonal. From
+$\X_k\X_k^\intercal=\U\Sigma_k^2\U^\intercal=\U'\Sigma_k'^2\U'^\intercal$ we get
+\[
+  \mathbf O^\intercal\Sigma_k^2\,\mathbf O=\Sigma_k'^2,\qquad k=1,\ldots,K .
+\]
+For $\mathbf c\in\mathbb R^K$, the diagonal matrix
+$\mathbf A(\mathbf c)=\sum_k c_k\Sigma_k^2$ has entries
+$a_r=\sum_k c_k(\sigma_k^{(r)})^2$, and $\mathbf O^\intercal\mathbf A(\mathbf c)\mathbf O$
+is diagonal. Since the profiles are distinct and nonnegative, the squared
+profiles are distinct, and $\mathbf c$ can be chosen outside the finite union
+of hyperplanes $\{a_r=a_{r'}\}$, so that the entries of $\mathbf A(\mathbf c)$
+are pairwise distinct. An orthogonal matrix that diagonalises a diagonal
+matrix with distinct entries is a signed permutation matrix:
+$\mathbf O=\mathbf P\mathbf D$, with $\mathbf P$ a permutation matrix and
+$\mathbf D=\diag(\pm1)$. Hence $\U'=\U\mathbf P\mathbf D$ and
+$\Sigma_k'^2=\mathbf P^\intercal\Sigma_k^2\mathbf P$, that is
+$\Sigma_k'=\mathbf P^\intercal\Sigma_k\mathbf P$ since the weights are
+nonnegative. Finally, $\U'^\intercal\X_k=\Sigma_k'\V_k'^\intercal$ gives, for
+every $(k,r)$ with $\sigma_k'^{(r)}>0$,
+$\vv_k'^{(r)}=\X_k^\intercal\uu'^{(r)}/\sigma_k'^{(r)}$, which is the matching
+column of $\V_k$ with the sign of $\uu'^{(r)}$; the columns with
+$\sigma_k'^{(r)}=0$ are only constrained by $\V_k'\in\Stiefel{p_k}{R}$.
+
+\emph{(b)} Write $\mathcal R_t$ for the set of dimensions not yet extracted at
+step $t$ of MCOA ($\mathcal R_1=\{1,\ldots,R\}$), and assume that the deflated
+blocks are
+$\X_k^{(t)}=\sqrt{w_k}\sum_{r\in\mathcal R_t}\sigma_k^{(r)}\uu^{(r)}\vv_k^{(r)\intercal}$,
+which holds for $t=1$. Then
+\[
+  \X^{(t)}\X^{(t)\intercal}=\sum_{k}\X_k^{(t)}\X_k^{(t)\intercal}
+  =\sum_{r\in\mathcal R_t}\lambda_r(\mathbf w)\,\uu^{(r)}\uu^{(r)\intercal},
+\]
+because the columns of each $\V_k$ are orthonormal. The values
+$\lambda_r(\mathbf w)$ being distinct, the leading left singular vector of
+$\X^{(t)}$ is $\pm\uu^{(r_t)}$, with $r_t=\argmax_{r\in\mathcal R_t}\lambda_r(\mathbf w)$.
+Then $\X_k^{(t)\intercal}\uu^{(r_t)}=\sqrt{w_k}\,\sigma_k^{(r_t)}\vv_k^{(r_t)}$:
+the MCOA weight is $\sqrt{w_k}\,\sigma_k^{(r_t)}$ and, when it is positive, the
+normalised loading is $\pm\vv_k^{(r_t)}$ (with the sign of $\uu$), so that the
+deflation $\X_k^{(t)}(\mathbf I-\vv_k^{(r_t)}\vv_k^{(r_t)\intercal})$ removes exactly the
+term $r_t$. When the weight is zero, the term $r_t$ is absent from block $k$
+and the block is left unchanged. The induction hypothesis holds at step
+$t+1$ with $\mathcal R_{t+1}=\mathcal R_t\setminus\{r_t\}$. After $R$ steps,
+MCOA has recovered $\U$ and the $\V_k$ (columns with a positive weight) up to
+order and signs, and gives a zero value to criterion~\eqref{Crit} for the
+weighted blocks: by (a), it coincides with the OMCOA solution.
+
+\emph{(c)} Let $t$ be the first step where
+$\max_{r\in\mathcal R_t}\lambda_r(\mathbf w)$ is attained by several dimensions
+$r\in\mathcal T\subset\mathcal R_t$. Up to step $t-1$, the argument of (b)
+applies, and the leading eigenvalue of $\X^{(t)}\X^{(t)\intercal}$ has the
+eigenspace $\mathrm{span}\{\uu^{(r)},r\in\mathcal T\}$, of dimension
+$|\mathcal T|\geq2$. Every unit vector of this space maximises the MCOA
+criterion at step $t$; a vector other than $\pm\uu^{(r)}$, $r\in\mathcal T$,
+gives a common component that is not a column of $\U$ up to sign, hence, by
+(a), a solution different from the OMCOA one.
+\end{proof}
+
+
+
+\begin{proof}[Proposition 3]
 (1)--(2): by \eqref{eq:expand}, the conditional density of $\U$ is proportional to
 $\exp\{\sum_k\tau_k\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)\}=\exp\{\trace(\F_{\U}^\intercal\U)\}$, and
 $\trace(\F_{\U}^\intercal\Q\tilde\U)=\trace\bigl((\Q^\intercal\F_{\U})^\intercal\tilde\U\bigr)$; the same argument applies to $\V_k$
@@ -754,7 +894,7 @@ $\sigma_k^{(r)}>0$.
 (4): the Gamma prior is conjugate for the precision of a Gaussian likelihood.
 \end{proof}
 
-\begin{proof}[Proposition 3]
+\begin{proof}[Proposition 4]
 Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
 conjugacy). For item 3, the terms of the log-likelihood involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand2},
 $\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is

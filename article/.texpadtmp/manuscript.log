@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.5.14)  5 NOV 2026 13:07
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.5.14)  5 NOV 2026 16:21
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -387,7 +387,7 @@ Overfull \hbox (19.32076pt too wide) in paragraph at lines 176--178
 [3]
 
 [4]
-LaTeX Font Info:    Trying to load font information for U+euf on input line 278.
+LaTeX Font Info:    Trying to load font information for U+euf on input line 348.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 )
@@ -399,13 +399,15 @@ File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 [7]
 
 [8]
+
+[9]
 File: figs/figure1.eps Graphic file (type eps)
 <figs/figure1.eps>
 File: figs/figure2.eps Graphic file (type eps)
 <figs/figure2.eps>
 
 
-[9]
+[10]
 File: figs/figure3.eps Graphic file (type eps)
 <figs/figure3.eps>
 File: figs/figure4.eps Graphic file (type eps)
@@ -414,44 +416,46 @@ File: figs/figure6.eps Graphic file (type eps)
 <figs/figure6.eps>
 
 
-[10]
-
 [11]
 
-[12] (/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.bbl
+[12]
+
+[13] (/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.bbl
 Missing character: There is no – ("2013) in font ec-lmr10!
 Missing character: There is no – ("2013) in font ec-lmr10!
 )
 
-[13
+[14
 
 ]
-Overfull \hbox (25.61748pt too wide) in paragraph at lines 718--720
+Overfull \hbox (25.61748pt too wide) in paragraph at lines 792--794
  \T1/lmr/bx/n/10.95 Up-date of $\OT1/lmr/m/n/10.95 ^^F[]$[] \T1/lmr/m/n/10.95 With $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 and $\OT1/lmr/bx/n/10.95 V[]$ \T1/lmr/m/n/10.95 fixed (both hav-ing or-thonor-mal columns), and $\OT1/lmr/m/n/10.95 ^^F[] = [](\OML/lmm/m/it/10.95 ^^[[]; [] ; ^^[[]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/n/10.95 ,
  []
 
 
 
-[14]
-Overfull \hbox (44.69978pt too wide) in paragraph at lines 747--755
+[15]
+
+[16]
+Overfull \hbox (44.69978pt too wide) in paragraph at lines 887--895
 []\T1/lmr/m/n/10.95 (1)--(2): by [], the con-di-tional den-sity of $\OT1/lmr/bx/n/10.95 U$ \T1/lmr/m/n/10.95 is pro-por-tional to $[]\OMS/lmsy/m/n/10.95 f[][] \OML/lmm/m/it/10.95 ^^\[] []\OT1/lmr/m/n/10.95 (^^F[]\OT1/lmr/bx/n/10.95 V[]X[]U\OT1/lmr/m/n/10.95 )\OMS/lmsy/m/n/10.95 g \OT1/lmr/m/n/10.95 =
  []
 
 
 
-[15] (/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.aux)
+[17] (/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 6018 strings out of 473832
- 95046 string characters out of 5729481
- 503977 words of memory out of 5000000
- 28974 multiletter control sequences out of 15000+600000
+ 6022 strings out of 473832
+ 95114 string characters out of 5729481
+ 503042 words of memory out of 5000000
+ 28978 multiletter control sequences out of 15000+600000
  627247 words of font info for 80 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 57i,16n,65p,958b,448s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,16n,65p,958b,444s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on /Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.pdf (15 pages).
+Output written on /Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript.pdf (17 pages).

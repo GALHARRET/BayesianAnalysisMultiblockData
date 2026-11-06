@@ -15,48 +15,51 @@
 \@writefile{toc}{\contentsline {section}{\numberline {2}Canonical factorisation}{2}{}\protected@file@percent }
 \newlabel{Cano_Facto}{{1}{2}{}{equation.1}{}}
 \citation{chessel1996}
-\citation{hoff2009}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Canonical Factorisation under orthogonal block-loadings constraint}{3}{}\protected@file@percent }
 \newlabel{Crit}{{2}{3}{}{equation.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Bayesian framework for Canonical Factorisation}{3}{}\protected@file@percent }
-\newlabel{eq:model}{{3}{3}{}{equation.3}{}}
-\citation{besag1986}
+\newlabel{prop:identif}{{2}{3}{}{proposition.2}{}}
+\citation{hoff2009}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Bayesian framework for Canonical Factorisation}{4}{}\protected@file@percent }
+\newlabel{eq:model}{{3}{4}{}{equation.3}{}}
 \@writefile{toc}{\contentsline {paragraph}{Priors.}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Full conditional distributions}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Likelihood.}{4}{}\protected@file@percent }
 \newlabel{eq:expand}{{4}{4}{}{equation.4}{}}
-\newlabel{prop:cond}{{2}{4}{}{proposition.2}{}}
-\newlabel{sec:align}{{3.1}{5}{}{enumi.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{Post-processing: label switching and signs}{5}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Gibbs sampler for OMCOA}}{5}{}\protected@file@percent }
-\newlabel{alg:gibbs}{{1}{5}{}{algorithm.1}{}}
+\citation{besag1986}
+\newlabel{prop:cond}{{3}{5}{}{proposition.3}{}}
+\newlabel{sec:align}{{3.1}{6}{}{enumi.4}{}}
+\@writefile{toc}{\contentsline {paragraph}{Post-processing: label switching and signs}{6}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Gibbs sampler for OMCOA}}{6}{}\protected@file@percent }
+\newlabel{alg:gibbs}{{1}{6}{}{algorithm.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Sparse Bayesian Framework for canonical factorisation}{6}{}\protected@file@percent }
 \newlabel{eq:spike}{{5}{6}{}{equation.5}{}}
-\@writefile{toc}{\contentsline {paragraph}{Priors.}{6}{}\protected@file@percent }
-\newlabel{eq:expand2}{{6}{6}{}{equation.6}{}}
-\newlabel{prop:cond2}{{3}{6}{}{proposition.3}{}}
-\citation{benaychgeorges2012}
-\newlabel{dec_rule}{{4}{7}{}{enumi.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Empirical performance via simulation}{7}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Simulation design}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Priors.}{7}{}\protected@file@percent }
+\newlabel{eq:expand2}{{6}{7}{}{equation.6}{}}
+\newlabel{prop:cond2}{{4}{7}{}{proposition.4}{}}
+\newlabel{dec_rule}{{4}{8}{}{enumi.5}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Sparse Gibbs sampler for OMCOA}}{8}{}\protected@file@percent }
 \newlabel{alg:sparse}{{2}{8}{}{algorithm.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Grid for noise variance:}{8}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Thresholds for the standard deviation of noise that make the weight of the dimension on the block undetectable.}}{8}{}\protected@file@percent }
-\newlabel{tab:thres}{{1}{8}{}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Empirical coverage probability for gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda =1$, blue for $\lambda =.1$ and purple for $\lambda =10$) as a function of $\sigma $. }}{9}{}\protected@file@percent }
-\newlabel{fig1}{{1}{9}{}{figure.1}{}}
+\citation{benaychgeorges2012}
+\citation{hoff2007}
+\citation{gavish2014}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Empirical performance via simulation}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Simulation design}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Grid for noise variance:}{9}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Thresholds for the standard deviation of noise that make the weight of the dimension on the block undetectable.}}{9}{}\protected@file@percent }
+\newlabel{tab:thres}{{1}{9}{}{table.1}{}}
 \@writefile{toc}{\contentsline {paragraph}{Slab parameter $\lambda $:}{9}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Results}{9}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Estimated block weights and their 95\% empirical confidence intervals for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean. }}{10}{}\protected@file@percent }
-\newlabel{fig2}{{2}{10}{}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Empirical coverage probability for gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda =1$, blue for $\lambda =.1$ and purple for $\lambda =10$) as a function of the noise parameter $\sigma $. }}{10}{}\protected@file@percent }
+\newlabel{fig1}{{1}{10}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Results}{10}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Analysis of sensitivity to $\lambda $:}{10}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda $. }}{11}{}\protected@file@percent }
-\newlabel{fig3}{{3}{11}{}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda $. }}{11}{}\protected@file@percent }
-\newlabel{fig4}{{4}{11}{}{figure.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Proportion of the number of dimension chosen as function of the residual parameter $\sigma $ and of the parameter $\lambda $. }}{12}{}\protected@file@percent }
-\newlabel{fig6}{{5}{12}{}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Estimated block weights and their 95\% empirical confidence intervals for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean. }}{11}{}\protected@file@percent }
+\newlabel{fig2}{{2}{11}{}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda $. }}{12}{}\protected@file@percent }
+\newlabel{fig3}{{3}{12}{}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda $. }}{12}{}\protected@file@percent }
+\newlabel{fig4}{{4}{12}{}{figure.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Proportion of the number of dimension chosen as function of the residual parameter $\sigma $ and of the parameter $\lambda $. }}{13}{}\protected@file@percent }
+\newlabel{fig6}{{5}{13}{}{figure.5}{}}
 \bibstyle{apalike}
 \bibdata{Biblio}
 \bibcite{benaychgeorges2012}{{1}{2012}{{Benaych-Georges and Nadakuditi}}{{}}}
@@ -64,17 +67,18 @@
 \bibcite{bougeard2024}{{3}{2024}{{Bougeard et~al.}}{{}}}
 \bibcite{chessel1996}{{4}{1996}{{Chessel and Hanafi}}{{}}}
 \bibcite{cliff1966}{{5}{1966}{{Cliff}}{{}}}
-\bibcite{george1993}{{6}{1993}{{George and McCulloch}}{{}}}
-\bibcite{hoff2007}{{7}{2007}{{Hoff}}{{}}}
-\bibcite{hoff2009}{{8}{2009}{{Hoff}}{{}}}
-\bibcite{mitchell1988}{{9}{1988}{{Mitchell and Beauchamp}}{{}}}
-\bibcite{wang2026}{{10}{2026}{{Wang et~al.}}{{}}}
-\bibcite{yuchi2023}{{11}{2023}{{Yuchi et~al.}}{{}}}
-\bibcite{zhai2023}{{12}{2023}{{Zhai and Gutman}}{{}}}
+\bibcite{gavish2014}{{6}{2014}{{Gavish and Donoho}}{{}}}
+\bibcite{george1993}{{7}{1993}{{George and McCulloch}}{{}}}
+\bibcite{hoff2007}{{8}{2007}{{Hoff}}{{}}}
+\bibcite{hoff2009}{{9}{2009}{{Hoff}}{{}}}
+\bibcite{mitchell1988}{{10}{1988}{{Mitchell and Beauchamp}}{{}}}
+\bibcite{wang2026}{{11}{2026}{{Wang et~al.}}{{}}}
+\bibcite{yuchi2023}{{12}{2023}{{Yuchi et~al.}}{{}}}
+\bibcite{zhai2023}{{13}{2023}{{Zhai and Gutman}}{{}}}
 \citation{cliff1966}
 \citation{cliff1966}
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{14}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{14}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{14}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{15}{}\protected@file@percent }
-\gdef \@abspage@last{15}
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {U}$}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\mathbf  {V}_k$}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Update of $\Sigma _k$}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Global Convergence}{16}{}\protected@file@percent }
+\gdef \@abspage@last{17}

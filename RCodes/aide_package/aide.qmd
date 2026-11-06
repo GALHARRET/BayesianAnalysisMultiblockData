@@ -1,0 +1,65 @@
+---
+title: "Explications package OMCOA"
+format: html
+editor: visual
+---
+
+# Modèle de simulation
+
+```{r}
+library(BayesCanoFacto)
+
+N <- 100; P <- c(10, 5, 15); H <- 5; K <- 3
+sig_true <- rbind(c(.7, .5,0 ,0,0), c(.5, .7, 0,0,0), c(.3,0, .5,0,0))
+Sigma=list(sig_true[1,],sig_true[2,],sig_true[3,])
+orth <- function(n, h) qr.Q(qr(scale(matrix(rnorm(n * h), n, h), scale = FALSE)))
+sigma<-0.02
+
+U0 <- orth(N,H)
+V <- vector("list", K)
+X <- vector("list", K)
+Xs <- vector("list", K)
+normX<-rep(NA,K)
+for(k in seq_len(K)) {
+    E <- matrix(rnorm(N * P[k], 0, sigma), nrow = N, ncol = P[k])
+    V[[k]]<-orth(P[k],H)
+    X[[k]] <- U0 %*% diag(Sigma[[k]]) %*% t(V[[k]]) + E
+    X[[k]] <- scale(X[[k]], center = TRUE, scale = FALSE)   
+    normX[k] <- norm(X[[k]], "F")                           
+    Xs[[k]] <- X[[k]] / normX[k]
+}
+```
+
+On divise par $\Vert X_k\Vert$ pour retrouver les bons poids en pratique on ne fera pas ça.
+
+# OMCOA
+
+```{r}
+m1<-omcoa_als(Xs)
+m1<-align_solution(U=m1$U,S=m1$S,V=m1$V,U_ref=U0)
+summary_sigma(m1)
+```
+
+Là encore j'aligne la solution en pratique on ne le fera pas car on ne connait pas $U_0$ !
+
+# OMCOA version bayésienne
+
+```{r}
+m2<-gibbs_omcoa(Xs,init=list(U=m1$U,V=m1$V,S=m1$S))
+m2<-align_draws(m2,U_ref=U0)
+summary_sigma(m2)
+```
+
+Ici tu as un intervalle de crédibilité de tous tes paramètres.
+
+# OMCOA version sparse bayésienne
+
+```{r}
+m2<-gibbs_sparse_omcoa(Xs,init=list(U=m1$U,V=m1$V,S=m1$S))
+m2<-align_draws(m2,U_ref=U0)
+summary_sigma(m2)
+```
+Ici en plus de la version précédente tu as les probabilités que la dimension soit active (pip) si pip>.5 alors on dit que la dimension est active !
+
+
+

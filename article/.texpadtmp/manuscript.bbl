@@ -25,6 +25,11 @@ Cliff, N. (1966).
 \newblock Orthogonal rotation to congruence.
 \newblock {\em Psychometrika}, 31(1):33--42.
 
+\bibitem[Gavish and Donoho, 2014]{gavish2014}
+Gavish, M. and Donoho, D.~L. (2014).
+\newblock The optimal hard threshold for singular values is $4\times\sqrt{3}$.
+\newblock {\em IEEE Transactions on Information Theory}, 60(8):5040--5053.
+
 \bibitem[George and McCulloch, 1993]{george1993}
 George, E.~I. and McCulloch, R.~E. (1993).
 \newblock Variable selection via gibbs sampling.
