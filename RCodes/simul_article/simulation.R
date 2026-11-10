@@ -1,9 +1,8 @@
+#remotes::install_github("GALHARRET/BayesCanoFacto")
 library(BayesCanoFacto)
+B<-1
 B<-500
 
-resMCOA<-list()
-resOMCOA<-list()
-resGOMCOA<-list()
 resGSOMCOA1<-list()
 resGSOMCOA2<-list()
 resGSOMCOA3<-list()

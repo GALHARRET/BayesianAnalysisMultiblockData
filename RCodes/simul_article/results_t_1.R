@@ -6,7 +6,7 @@ true_value<-c(c(.7, .5, 0,0), c(.5, .7, 0,0), c(.3, 0, .5,0))
 ESTIM<-NULL
 sigma<-c(0.02,0.04,0.06,0.08,0.12,0.16,0.18)
 resSIG<-NULL
-for(k in 1:6){
+for(k in 1:length(sigma)){
 load(paste("RCodes/simul_article/res",k,".RData",sep=""))
 mcoa<-NULL
 omcoa<-NULL
@@ -101,8 +101,8 @@ cov_percent<-resSIG |>
 cov_percent$model<-factor(cov_percent$model,
                           levels=c("gomcoa","gsomcoa1","gsomcoa2","gsomcoa3"),
                           labels=c("gibbs_omcoa","gibbs_sparse_omcoa(l=.1)","gibbs_sparse_omcoa(l=1)","gibbs_sparse_omcoa(l=10)"))
-cov_percent$dim<-factor(cov_percent$dim,labels=paste("dim",1:4))
-cov_percent$block<-factor(cov_percent$block,labels=paste("block",1:3))
+cov_percent$dim<-factor(cov_percent$dim,labels=paste("dim",1:H))
+cov_percent$block<-factor(cov_percent$block,labels=paste("block",1:K))
 p<-ggplot(cov_percent,aes(x=sigma,y=P,color=model,group=model))+
   geom_point()+
   geom_line()+
@@ -140,7 +140,6 @@ p<-ggplot(ESTIM3,aes(x = sigma, y = estim, color = model)) +
   theme_bw() +ylim(c(-0.5,2.0))+
   facet_grid(block ~ dim)+
   theme(legend.position = "bottom")
-
 ggsave(filename = "article/figs/figure2.eps", plot = p, width = 10, height = 5, units = "in")
 
 ESTIM2 =ESTIM|>filter(model %in% c("gsomcoa1","gsomcoa2","gsomcoa3"))
@@ -158,7 +157,7 @@ TRUE_DF <- distinct(ESTIM2, block, dim, true_value)
 
 PIP<-NULL
 
-for(k in 1:6){
+for(k in 1:length(sigma)){
 load(paste("RCodes/simul_article/res",k,".RData",sep=""))
 B<-length(res$mcoa)
 for(b in 1:B){
@@ -189,45 +188,59 @@ p<-ggplot(res1|>filter(statut_id=="active"),aes(x=sigma,y=proba,group=lambda,col
   facet_grid(block~dim)+
   theme_bw()+
   theme(legend.position = "bottom")
-
-ggsave(filename = "article/figs/figure4.eps", plot = p, width = 12, height = 6, units = "in")
+p
+ggsave(filename = "article/figs/figure1a.eps", plot = p, width = 12, height = 6, units = "in")
 
 
 #### RANK STUDY ####
 
 RANK<-NULL
-for(k in 1:7){
+for(k in 1:length(sigma)){
 load(paste("RCodes/simul_article/res",k,".RData",sep=""))
 for(b in 1:B){
 RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa1[[b]]$rank)),lambda=.1,sigma=sigma[k],model="gibbs_sparse_omcoa"))
 RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa2[[b]]$rank)),lambda=1,sigma=sigma[k],model="gibbs_sparse_omcoa"))
-RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa1[[b]]$rank)),lambda=10,sigma=sigma[k],model="gibbs_sparse_omcoa"))
+RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa3[[b]]$rank)),lambda=10,sigma=sigma[k],model="gibbs_sparse_omcoa"))
 }
 }
-
 rank<-RANK |>
-  filter(lambda==1)|>
   group_by(lambda,sigma,effective_rank) |>
   count()
-rank$prop<-rank$n/B
-rank$model<-"gibbs_sparse_omcoa(l=1)"
-rank$effective_rank<-factor(rank$effective_rank,labels=c(paste("Reff=",0:5,sep="")))
-#rank4$sigma<-factor(rank4$sigma)
+
+rank$effective_rank<-factor(rank$effective_rank,labels=paste("Reff=",0:4,sep=""))
+rank$lambda<-factor(rank$lambda,levels=c(0.1,1,10),labels=paste("lambda=",c(0.1,1,10),sep=""))
+rank$proportion<-rank$n/B
+table(rank$effective_rank)
+p<-ggplot(rank,aes(x=sigma,y=proportion,color=lambda,group=lambda))+
+  geom_point() +
+  geom_line()+
+  #geom_errorbar(aes(ymin = q1, ymax = q2),
+  #              width = 0.05, position = pd) +
+  theme_bw() +
+  ylim(c(0,1))+
+  facet_grid(.~effective_rank)+
+  theme(legend.position = "bottom")
+
+p
+
+ggsave(filename = "article/figs/figure2a.eps", plot = p, width = 10, height = 5, units = "in")
+
+
 
 load("RCodes/simul_article/resGD.RData")
 rank2<-resGD |>
   as.data.frame()|>
   group_by(sigma,effective_rank)|>
   count()
-B<-dim(resGD)[1]
-rank2$prop<-rank2$n/B
+B<-dim(resGD)[1]/length(sigma)
+rank2$proportion<-rank2$n/B
 rank2$effective_rank<-factor(rank2$effective_rank,levels=0:5,labels=paste("Reff=",0:5,sep=""))
 rank2$model<-"Gavish–Donoho"
 
 load("RCodes/simul_article/resHoff.RData")
 B<-dim(resHoff)[1]/length(sigma)
 resH<-data.frame(matrix(NA,nrow=dim(resHoff)[1],ncol=2))
-for(b in 1:dim(resHoff)[1]) resH[b,]<-c(names(which.max(resHoff[b,1:6])),as.numeric(resHoff[b,7]))
+for(b in 1:dim(resHoff)[1]) resH[b,]<-c(names(which.max(resHoff[b,1:H])),as.numeric(resHoff[b,6]))
 colnames(resH)<-c("effective_rank","sigma")
 
 rank3<-resH |>
@@ -235,15 +248,16 @@ rank3<-resH |>
   group_by(sigma,effective_rank)|>
   count()
 
-rank3$prop<-rank3$n/B
+rank3$proportion<-rank3$n/B
 #rank6$sigma<-factor(rank6$sigma)
-rank3$effective_rank<-factor(rank3$effective_rank,levels=0:5,labels=paste("Reff=",0:5,sep=""))
+rank3$effective_rank<-factor(rank3$effective_rank,levels=0:H,labels=paste("Reff=",0:H,sep=""))
 rank3$model<-"Hoff"
 rank3$sigma<-as.numeric(rank3$sigma)
 print(rank3)
-ColSelec<-c("sigma","effective_rank","prop","model")
-rank4<-rbind(rank[,ColSelec],rank2[,ColSelec],rank3[,ColSelec])
-p<-ggplot(rank4,aes(x=sigma,y=prop,color=model,group=model))+
+ColSelec<-c("sigma","effective_rank","proportion","model")
+rank$model="sparse_gibbs_model"
+rank4<-rbind(rank[rank$lambda=="lambda=1",ColSelec],rank2[,ColSelec],rank3[,ColSelec])
+p<-ggplot(rank4,aes(x=sigma,y=proportion,color=model,group=model))+
   geom_point() +
   geom_line()+
   #geom_errorbar(aes(ymin = q1, ymax = q2),
@@ -257,15 +271,6 @@ p
 
 ggsave(filename = "article/figs/figure5.eps", plot = p, width = 10, height = 5, units = "in")
 
-x<-RANK3 |>
-  group_by(lambda,sigma,choice) |>
-  count()
-
-x$prop<-x$n/sum(x$n[1:3])
-
-library(xtable)
-xtable(x[,-3])
-
 
 
 #### SENSITIVITY to A_theta and B_theta
@@ -275,7 +280,7 @@ B<-250
 
 sigma<-c(0.04,0.06,0.08,0.12)
 PIP<-NULL
-for(i in 1:2){
+for(i in 1:length(sigma)){
   load(paste("RCodes/simul_article/res",i,"AB.RData",sep=""))
     for(b in 1:B){
       PIP<-rbind(PIP,cbind(res$gsomcoa1[[b]]$summary[,c("block","dim","pip")],a=1,b=1,sigma=sigma[i]))
@@ -294,18 +299,19 @@ PIP$dim<-factor(PIP$dim,labels=paste("dim",1:H))
 res1<-PIP |>
   group_by(sigma,block,dim,spike) |>
   count(statut_id)
-res1$proba<-res1$n/B
+res1$proportion<-res1$n/B
 
 
 
-p<-ggplot(res1|>filter(statut_id=="active"),aes(x=sigma,y=proba,group=spike,color=spike))+
+p<-ggplot(res1|>filter(statut_id=="active"),aes(x=sigma,y=proportion,group=spike,color=spike))+
   geom_point()+
   geom_line()+
   facet_grid(block~dim)+
   theme_bw()+
   theme(legend.position = "bottom")
 
-ggsave(filename = "article/figs/figure1appendix.eps", plot = p, width = 12, height = 6, units = "in")
+p
+ggsave(filename = "article/figs/figure3a.eps", plot = p, width = 12, height = 6, units = "in")
 
 RANK<-NULL
 
@@ -314,7 +320,7 @@ for(i in 1:length(sigma)){
   for(b in 1:B){
     RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa1[[b]]$rank)),a=1,b=1,sigma=sigma[i]))
     RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa2[[b]]$rank)),a=1,b=3,sigma=sigma[i]))
-    RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa1[[b]]$rank)),a=0.5,b=0.5,sigma=sigma[i]))
+    RANK<-rbind(RANK,data.frame(effective_rank=names(which.max(res$gsomcoa3[[b]]$rank)),a=0.5,b=0.5,sigma=sigma[i]))
   }
 }
 RANK$spike<-factor(paste("(",RANK$a,",",RANK$b,")",sep=""))
@@ -323,7 +329,7 @@ rank<-RANK |>
   group_by(spike,sigma,effective_rank) |>
   count()
 rank$prop<-rank$n/B
-rank$effective_rank<-factor(rank$effective_rank,levels=1:4,labels=paste("Reff=",1:4,sep=""))
+rank$effective_rank<-factor(rank$effective_rank,levels=0:H,labels=paste("Reff=",0:H,sep=""))
 p<-ggplot(rank,aes(x=sigma,y=prop,group=spike,color=spike))+
   geom_point()+
   geom_line()+
@@ -333,5 +339,5 @@ p<-ggplot(rank,aes(x=sigma,y=prop,group=spike,color=spike))+
 
 p
 
-ggsave(filename = "article/figs/figure2appendix.eps", plot = p, width = 12, height = 6, units = "in")
+ggsave(filename = "article/figs/figure4a.eps", plot = p, width = 12, height = 6, units = "in")
 
