@@ -462,8 +462,12 @@ The posterior distribution of $\gamma_k^{(r)}$ gives a decision rule for the rep
 \end{equation}
 \noindent Moreover, this model makes it possible to estimate the effective dimension of the common subspace,
 \[R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},\]
- whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
-$a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
+ whose posterior distribution is estimated by its empirical distribution over the draws. 
+Conditionnaly to $\theta_r$, the parameters $\gamma_k^{r}\in \{0,1\}$ are distributed from independant Bernoulli, the probability for a dimension $r$ to be inactive for all the $K$ blocks is equal to $(1-\theta_r)^K$. Since $\theta^r\sim \Be(a_\theta,b_\theta)$ we have 
+$q_0=\mathbb E((1-\theta_r)^K)=\Pi_{i=0}^{K-1}\frac{b_\theta+i}{a_\theta+b_\theta+i}.$
+Since the dimensions are a priori independent, $R_{\mathrm{eff}}$ is the sum of $\R_{\max}$ independent indicators of probability $1-q_0$:
+$$R_{\mathrm{eff}}\sim \text{Bin}(R_{\max}), \qquad \mathbb E[R_{\mathrm{eff}}]=R_{\max}(1-q_0).$$
+The prior $\theta^r\sim \Be(a_\theta,b_\theta)$ controls the expected sparsity: $a_\theta=b_\theta=1$ is a neutral choice since in this case $\mathbb E[R_{\mathrm{eff}}]=\frac{K}{K+1}R_{\max}$. Therefore, the prior distribution of $R_{\mathrm{eff}}$ depends heavily on $R_{\max}$
 
 
 
@@ -528,15 +532,45 @@ dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\
 \end{table}
 
 
-\textcolor{red}{[Sensitivity to the indexing of the slab: to be added, the sparse sampler with the slab scaled by the block norm ($\lambda=1$) against the slab indexed on the noise ($g_k=(N-1)p_k$), on the same data sets, with $R_{\max}=4$; e.g.\ selection probabilities as in Figure~\ref{fig4} and distribution of $R_{\mathrm{eff}}$ as in Figure~\ref{fig6}.]}
+\paragraph{Indexing of the slab:} to be added, the sparse sampler with the slab scaled by the block norm ($\lambda=1$) against the slab indexed on the noise ($g_k=(N-1)p_k$), on the same data sets, with $R_{\max}=4$; e.g.\ selection probabilities as in Figure~\ref{fig4} and distribution of $R_{\mathrm{eff}}$ as in Figure~\ref{fig6}.
 
-\paragraph{Slab parameter $\lambda$:} The relative slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero ratio $\sigma_k^{(r)}/\|\X_k\|$: under the slab, its mean is $s_0\sqrt{2/\pi}$. Since $\sigma_k^{(r)}\le\|\X_k\|$, only the values of the ratio in $[0,1]$ are attainable. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable
-values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions and makes the selection less conservative.
 
-%\textcolor{red}{[To be checked against the code: the Gibbs samplers, ; the Gibbs samplers do not need it, since their priors are scaled by the block norms, and Hoff's SVD and the Gavish--Donoho threshold assume i.i.d. noise on all the entries of the concatenated matrix. MCOA and OMCOA depend on the scale of the blocks: state whether they are applied to the raw blocks or to the blocks divided by their Frobenius norm, with the weights brought back to the original scale.]} 
-The Gibbs samplers were run with $T=6000$ iterations and a burn-in of $T_0=1000$. In order to evaluate the estimation of each dimension, all the fitted configurations $\hat\U$ were aligned on the true $\U$ (permutation and signs of the dimensions); in practice, the alignment is made on the OMCOA solution (Section~\ref{sec:align}). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayesian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
+\paragraph{Slab parameter $\lambda$:} The relative slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero ratio $\sigma_k^{(r)}/\|\X_k\|$: under the slab, its mean is $s_0\sqrt{2/\pi}$. Since $\sigma_k^{(r)}\le\|\X_k\|$, only the values of the ratio in $[0,1]$ are attainable. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions and makes the selection less conservative.
+
+\paragraph{Spike parameter $(a_\theta,b_\theta)$:} 
+
+
+\paragraph{Other parameters:} The Gibbs samplers were run with $T=6000$ iterations and a burn-in of $T_0=1000$. In order to evaluate the estimation of each dimension, all the fitted configurations $\hat\U$ were aligned on the true $\U$ (permutation and signs of the dimensions); in practice, the alignment is made on the OMCOA solution (Section~\ref{sec:align}). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayesian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
 
 \subsection{Results}
+
+\subsubsection*{Analysis of sensitivity to the spike-and-slab parameters:} 
+
+The sensitivities were compared as a function of the proportion of active dimensions that are selected using the decision rule defined in (\ref{dec_rule}).
+
+\paragraph{Slab parameter:}  (Figure \ref{fig1a}) provides the probability of selection of a dimension $r$ on a block $k$ as a function of the noise parameter $s$ and the slab precision $\lambda$. For all $\lambda$, when the noise standard deviation was low ($s<0.06$), all the active dimensions were selected. When $s$ increased ($s>0.08$), the active weights were lost in the following order: dimension 3 on block 3 , dimension 1 on block 3, dimension 2 on block 1, dimension 1 on block 2, dimension 1 on block 1, and finally dimension 2 on block 2. Apart from the first two, this order follows the detectability thresholds of Table~\ref{tab:thres}. The first two are inverted: the weight $0.3$ of dimension 1 on block 3 (threshold $0.05$) was still selected in about 65\% of the data sets for $s=0.06$ ($\lambda=1$), whereas the weight $0.5$ of dimension 3 on block 3 (threshold $0.08$) was already selected in only about 25\% of them. Dimension 1 is shared by the three blocks, so that $\uu^{(1)}$ is well estimated from blocks 1 and 2 and its weight in block 3 remains detectable beyond the single-block threshold. Dimension 3 is only present in block 3: $\uu^{(3)}$ is estimated from this block alone, and the Bayes factor requires a margin above the spectral threshold. The multiblock model therefore borrows strength across blocks and detects weights that a block-by-block analysis would miss.
+With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimension 4 , as well as the zero weights of dimensions 1 to 3 (dimension 3 on blocks 1 and 2, dimension 2 on block 3), were almost never selected. With $\lambda=10$, the active weights were lost at slightly higher noise levels, at the cost of about 25\% of false selections in blocks 1 and 2. In this design, $\lambda=1$ offers the best trade-off between the detection of weak weights and false selections.    
+
+\paragraph{Spike parameter:} For $\lamba=1$, 
+
+
+
+\subsubsection*{MCMC diagnostics:} 
+Bulk Effective Sample Size
+\begin{table}[ht]
+\centering
+\begin{tabular}{cccccccccc}
+  \hline
+$s$ & $\hat R(R_{eff})$ & Max Diff & $bulkESS(R_{eff})$ & $\max(\hat R(\sigma^{(r)}_k))$ & $k$ & $r$ & $\min(bulkESS(\sigma^{(r)}_k))$ & $k$ & $r$ \\ 
+  \hline
+0.04 & 1.00 & 0.04 & 488.00 & 1.01 &   1 &   2 & 203.00 &   3 &   4 \\ 
+  0.06 & 1.05 & 0.11 & 99.00 & 1.03 &   2 &   4 & 78.00 &   2 &   4 \\ 
+  0.08 & 1.01 & 0.07 & 131.00 & 1.02 &   1 &   4 & 97.00 &   2 &   4 \\ 
+  0.12 & 1.00 & 0.06 & 100.00 & 1.01 &   1 &   2 & 223.00 &   3 &   3 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
 
 \subsubsection*{Estimation of the weights $\sigma_k^{(r)}$:}
 Figure~\ref{fig1} provides the empirical coverage of the 95\% credible intervals of the block weights for the active dimensions (dimensions 1 to 3), as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. The coverage was close to the nominal level for $s\leq0.04$. For the weights equal to zero, the coverage of the non-sparse sampler was 0, since its half-normal prior excludes the value 0, whereas the sparse sampler covered the true value in all cases. For the active weights at high noise levels, the non-sparse sampler was over-conservative, with a coverage close to 1, since its credible intervals widened. For the active weights, the coverage of the sparse sampler decreased when $s$ increased, because a weight that is not selected gets the degenerate interval $\{0\}$; as expected, this decrease was smaller for larger values of $\lambda$, which favour the inclusion. The weight of dimension 3, which is only present in block 3, was the first to be affected ($s>0.05$), whereas the coverage of the weight of dimension 2 on block 2 remained good until $s=0.08$.
@@ -556,12 +590,6 @@ Figure~\ref{fig2} provides the estimated block weights of the active dimensions,
 \end{figure}
 For the inactive dimensions 4 and 5 (not shown), the estimated weights of MCOA, OMCOA and of the non-sparse sampler increased with $s$, since these methods fit the noise, whereas the sparse sampler kept them at 0 in almost all cases.
 
-\subsubsection*{Analysis of sensitivity to the spike-and-slab parameters:} 
-
-\paragraph{Slab parameter:} We compare the performances in terms of the proportion of active dimensions that are selected using the decision rule defined in (\ref{dec_rule}) as a function of the slab parameter $\lambda$ (Figure \ref{fig4}). For all $\lambda$, when the noise standard deviation was low ($s<0.05$), all the active dimensions were selected. When $s$ increased, the active weights were lost in the following order: dimension 3 on block 3, dimension 1 on block 3, dimension 2 on block 1, dimension 1 on block 2, dimension 1 on block 1, and finally dimension 2 on block 2. Apart from the first two, this order follows the detectability thresholds of Table~\ref{tab:thres}. The first two are inverted: the weight $0.3$ of dimension 1 on block 3 (threshold $0.05$) was still selected in about 65\% of the data sets for $s=0.06$ ($\lambda=1$), whereas the weight $0.5$ of dimension 3 on block 3 (threshold $0.08$) was already selected in only about 25\% of them. Dimension 1 is shared by the three blocks, so that $\uu^{(1)}$ is well estimated from blocks 1 and 2 and its weight in block 3 remains detectable beyond the single-block threshold. Dimension 3 is only present in block 3: $\uu^{(3)}$ is estimated from this block alone, and the Bayes factor requires a margin above the spectral threshold. The multiblock model therefore borrows strength across blocks and detects weights that a block-by-block analysis would miss.
-With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimensions 4 and 5, as well as the zero weights of dimensions 1 to 3 (dimension 3 on blocks 1 and 2, dimension 2 on block 3), were almost never selected. With $\lambda=10$, the active weights were lost at slightly higher noise levels, at the cost of about 20\% of false selections in block 2. A possible explanation is that $p_2=R_{\max}=5$: $\V_2$ is then a square orthogonal matrix, so that every direction of block 2 is associated with a dimension and the noise of this block always has a column to occupy. In this design, $\lambda=1$ offers the best trade-off between the detection of weak weights and false selections.    
-
-\paragraph{Spike parameter:} 
 
 
 % \begin{figure}
@@ -570,28 +598,9 @@ With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimensions 
 % \end{figure}
 
 
-\begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure4.eps}
-  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig4}}
-\end{figure}
 
 \subsubsection*{Comparison of the estimates of the effective rank:} 
 
-\paragraph{MCMC diagnostics:} 
-Bulk Effective Sample Size
-\begin{table}[ht]
-\centering
-\begin{tabular}{cccccccccc}
-  \hline
-$s$ & $\hat R(R_{eff})$ & Max Diff & $bulkESS(R_{eff})$ & $\max(\hat R(\sigma^{(r)}_k))$ & $k$ & $r$ & $\min(bulkESS(\sigma^{(r)}_k))$ & $k$ & $r$ \\ 
-  \hline
-0.04 & 1.00 & 0.04 & 488.00 & 1.01 &   1 &   2 & 203.00 &   3 &   4 \\ 
-  0.06 & 1.05 & 0.11 & 99.00 & 1.03 &   2 &   4 & 78.00 &   2 &   4 \\ 
-  0.08 & 1.01 & 0.07 & 131.00 & 1.02 &   1 &   4 & 97.00 &   2 &   4 \\ 
-  0.12 & 1.00 & 0.06 & 100.00 & 1.01 &   1 &   2 & 223.00 &   3 &   3 \\ 
-   \hline
-\end{tabular}
-\end{table}
 
 
 \textcolor{red}{[Paragraph to be rewritten once Hoff's SVD and the Gavish--Donoho threshold have been rerun on the non-standardised blocks.]} Figure~\ref{fig6} provides the distribution of the estimated effective rank as a function of the noise standard deviation $s$, for the Gavish--Donoho criterion, the sparse Gibbs sampler and Hoff's Bayesian SVD. For values of $s$ less than 0.06, the sparse Gibbs sampler identified three active dimensions in more than 50\% of the simulated data, whereas the effective rank of 3, chosen according to the Hoff and Gavish-Donoho criteria, dropped very rapidly below 50\% ($s > 0.025$). When no dimension was detectable ($s>0.15$), Hoff’s Bayesian SVD model overestimated the effective rank because it retained five active dimensions in more than 75\% of cases; the sparse Gibbs sampler found a rank between 1 and 3 most of the time; and the Gavish-Donoho criterion estimated the effective rank to be 1 most of the time.   
@@ -753,10 +762,9 @@ $s$ & $\hat R(R_{eff})$ & Max Diff & $bulkESS(R_{eff})$ & $\max(\hat R(\sigma^{(
 \bibliographystyle{apalike}
 \bibliography{Biblio}
 
-\section*{Appendix: proofs of the propositions}
 
-
-
+\appendix
+\section{Appendix: proofs of the propositions}
 
 \begin{proof}[Proposition 1]
 	The criterion to be minimized is:
@@ -930,9 +938,25 @@ which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The 
 $\gamma_k^{(r)}=1$ is obtained by completing the square.
 \end{proof}
 
-\paragraph{MCMC diagnostics}F
+\section{MCMC diagnostics}
 
-\includegraphics[width=\linewidth]{figs/diagnostic_plot_sig_06.png}
+\begin{figure}
+ \includegraphics[width=\linewidth]{figs/diagnostic_plot_sig_06.png}
+ \caption{} 
+\end{figure}
+
+
+\section{Analyisis of sensitivity}
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure1a.eps}
+  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig1a}}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure2a.eps}
+  \caption{Empirical effective rank as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig2a}}
+\end{figure}
 
 
 \end{document}

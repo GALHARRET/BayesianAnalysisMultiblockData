@@ -9,8 +9,8 @@ N <- 100; P <- c(10, 5, 15); R <- 4; K <- 3
 sig_true <- rbind(c(.7, .5,0 ,0), c(.5, .7, 0,0), c(.3,0, .5,0))
 Sigma=list(sig_true[1,],sig_true[2,],sig_true[3,])
 orth <- function(n, h) qr.Q(qr(scale(matrix(rnorm(n * h), n, h), scale = FALSE)))
-sigma<-c(0.04,0.06,0.08,0.12)
-
+sigma<-c(0.02,0.16,0.18)
+IND<-c(1,6,7)
 t0<-Sys.time()
 for(j in 1:length(sigma)){
 for(b in 1:B){
@@ -48,7 +48,7 @@ res<-list(gsomcoa1=resGSOMCOA1,
            gsomcoa2=resGSOMCOA2,
            gsomcoa3=resGSOMCOA3)
 
-save(res,file=paste("res",j,"AB.RData",sep=""))
+save(res,file=paste("res",IND[j],"AB.RData",sep=""))
 }
 t1<-Sys.time()
 
