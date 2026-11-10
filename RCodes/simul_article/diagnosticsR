@@ -1,10 +1,11 @@
-library()
+library(BayesCanoFacto)
 N <- 100; P <- c(10, 5, 15); R <- 4; K <- 3
 sig_true <- rbind(c(.7, .5,0 ,0), c(.5, .7, 0,0), c(.3,0, .5,0))
 Sigma=list(sig_true[1,],sig_true[2,],sig_true[3,])
 orth <- function(n, h) qr.Q(qr(scale(matrix(rnorm(n * h), n, h), scale = FALSE)))
 sigma<-c(0.04,0.06,0.08,0.12)
-
+diagnostic<-list()
+for(j in 1:length(sigma)){
 U0 <- orth(N,R)
 V <- vector("list", K)
 X <- vector("list", K)
@@ -19,17 +20,31 @@ for(k in seq_len(K)) {
     Xs[[k]] <- X[[k]] #/ normX[k]
   }
 
-  m2<-omcoa_als(Xs,R)
+m2<-omcoa_als(Xs,R)
 
-  dr <- gibbs_sparse_omcoa(X, R, n_iter = 10000, burn = 5000, init = m2,lambda=1,a_theta = 1,b_theta = 1)
-  dr <- align_draws(dr,U0)
-  resGSOMCOA1[[b]]<-list(summary=summary_sigma(dr,sparse=T),rank=rank_posterior(dr))
+chains <- lapply(c("all", "none"), function(ig)
+    gibbs_sparse_omcoa(Xs, R = R, n_iter = 10000, burn = 5000, init_gamma = ig,lambda=1,init=m2,
+                       verbose = FALSE))
+diagnostic[[j]] <- mcmc_diagnostics(chains)
+    }
 
-  dr <- gibbs_sparse_omcoa(X, R, n_iter = 10000, burn = 5000, init = m2,lambda=1,a_theta = 1,b_theta = 3)
-  dr <- align_draws(dr, U0)
-  resGSOMCOA2[[b]]<-list(summary=summary_sigma(dr,sparse=T),rank=rank_posterior(dr))
 
-  dr <- gibbs_sparse_omcoa(X, R, n_iter = 10000, burn = 5000, init = m2,lambda = 1,,a_theta = 0.5,b_theta = 0.5)
-  dr <- align_draws(dr, U0)
-  resGSOMCOA3[[b]]<-list(summary=summary_sigma(dr,sparse=T),rank=rank_posterior(dr))
+#save(diagnostic,file="diagnostic.RData")
+
+
+res_diag<-data.frame(matrix(NA,nrow=length(sigma),ncol=10))
+
+
+for(j in 1:length(sigma)){
+D<-diagnostic[[j]]
+res_diag[j,]<-c(sigma[j],D$reff$rhat,D$reff$max_diff,round(D$reff$ess_bulk),max(D$sigma$rhat),D$sigma[which.max(D$sigma$rhat),1:2],round(min(D$sigm$ess_bulk)),D$sigma[which.min(D$sigm$ess_bulk),1:2])
 }
+colnames(res_diag)<-c("sigma","Rhat(Reff)","Max Diff P(Reff=j)","ess_bulk(Reff)","Max (Rhat(sigma)","block","dim","Min ess_bulk(sigma)","block","dim")
+res_diag
+library(xtable)
+tab<-xtable(res_diag)
+
+print(tab,include.rownames = FALSE)
+p<-plot(diagnostic[[2]]
+save(p,file="p.png")
+ggsave(filename = "article/figs/diagnostic.eps", plot = p, width = 10, height = 5, units = "in")
