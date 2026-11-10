@@ -10,7 +10,9 @@ Xs <- vector("list", K)
 normX<-rep(NA,K)
 Sigma=list(sig_true[1,],sig_true[2,],sig_true[3,])
 resHoff<-NULL
-B<-300
+B<-500
+
+t0<-Sys.time()
 for(j in 1:length(sigma)){
 for(b in 1:B){
   U0 <- orth(N,H)
@@ -24,14 +26,16 @@ for(b in 1:B){
     X[[k]] <- U0 %*% diag(Sigma[[k]]) %*% t(V[[k]]) + E
     X[[k]] <- scale(X[[k]], center = TRUE, scale = FALSE)   
     normX[k] <- norm(X[[k]], "F")                           
-    Xs[[k]] <- X[[k]] / normX[k]
+    Xs[[k]] <- X[[k]] 
   }
   Y<-NULL
  for(k in seq_len(K)) Y<-cbind(Y,Xs[[k]]) 
-fit <- hoff_svd(Y, Rmax = 5, n_iter = 1000, burn = 500, center = TRUE)
-resHoff<-rbind(resHoff,c(fit$post_K,sigma[j]))
+fit <- hoff_svd(Y, R = 5, n_iter = 1000, burn = 500, center = TRUE)
+
+resHoff<-rbind(resHoff,c(fit$post,sigma[j]))
 }
 }
-colnames(resHoff)<-c("effective_rank","sigma")
+t1<-Sys.time()
+
 save(resHoff,file="resHoff.RData")
 

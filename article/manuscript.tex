@@ -517,37 +517,36 @@ dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\
 
 \paragraph{Slab parameter $\lambda$:} The slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero weight $\sigma_k^{(r)}$ on the data scale: under the slab, the mean of $\sigma_k^{(r)}$ is $s_0\sqrt{2/\pi}$. When the blocks are standardized
 ($\|\mathbf X_k\|=1$), the weights are bounded, $\sigma_k^{(r)}\le 1$, and $(\sigma_k^{(r)})^2$ is the proportion of the variance of block $k$ explained by dimension $r$. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable
-values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions.
+values, which penalizes the slab against the spike and makes the selection less conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions (i.e. selection more conservative).
 
-The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$. For the sparse version, the parameter $\lambda$ varied in $\{0.1,1,10\}$ and $a_\theta=b_\theta=1$. All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayasian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
+The gibbs sampler was built with $T=6000$ iterations, a burn-in of $T_0=1000$.  All the fitted configuration $\hat U$ were aligned on the true $\U$ (permutation and signs of the dimensions). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayasian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
 
 \subsection{Results}
+
+\paragraph{Estimation of the weights $\sigma_k^{(r)}$:}
+Figure~\ref{fig1} provides the 95\% credible intervals of the block weights for the active dimensions (dimension 1 to 3) as a function of the proportion $\sigma$ associated to the residual error and of the slab parameter $\lambda$. The empirical level of these credible intervals remained accurate for $\sigma$ varying from 0 to 0.04. As expected, the higher the slab parameter $\lambda$, the higher was the empirical level. The third dimension was only related to the third block, its weight decreased highly for $\sigma>0.05$. On the contrary, the empirical level of the 95\% of the weight of the dimension 2 on the block 2 remained good until $\sigma=0.08$. Figure~\ref{fig2} provides the estimated block weights and their 95\%-CI of the active dimensions (dimension 1 to 3) as a function of the residual standard deviation $\sigma$. When the weights were non-null, they were accurately estimated using both Bayesian frameworks and the mcoa and omcoa algorithms when $\sigma$ is lower than 0.04. The bias estimation of these weights with the sequential model (mcoa) and the simultaneous model (omcoa)  increased with $\sigma$. When the dimension became inactive ($\sigma>0.15$), the estimate weights using the sparse version remained 0 for all dimensions ($\lambda=1$) whereas the bias of the others increased with $\sigma$. We can note that estimates obtained using the Gibbs sampler degrade less than those obtained using sequential and simultaneous methods.      
+
 \begin{figure}
   \includegraphics[width=\linewidth]{figs/figure1.eps}
-  \caption{Empirical coverage probability for gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda=1$, blue for $\lambda=.1$ and purple for $\lambda=10$) as a function of the noise parameter $\sigma$. \label{fig1}}
+  \caption{Empirical coverage probability of the weights $\sigma_k^{(r)}$ using gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda=.1$, blue for $\lambda=1$ and purple for $\lambda=10$) as a function of the noise parameter $\sigma$. \label{fig1}}
 \end{figure}
-
-Figure~\ref{fig1} provides the estimated block weights and their 95\%-CI of the active dimensions (dimension 1 to 3) as function of the proportion $\sigma$ associated to the residual error . When the weigths were non null, they were accurately estimated using both bayesian frameworks and the omcoa algorithm for all values of $\sigma$.The bias estimation of these weights with the sequential approach (mcoa) can be increased with $\sigma$ (for example the variance of the block 2 explained by dimension 1). When the weights were null, as expected, the bias of the sparse version remained near from 0 for all $\sigma$, whereas the bias of the others increased with $\sigma$. We can note that estimates obtained using the Gibbs sampler degrade less than those obtained using mcoa and omcoa methods.
 
 
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figs/figure2.eps}
-  \caption{Estimated block weights and their 95\% empirical confidence intervals from the $B=1000$ simulated data for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
+  \caption{Estimated block weights and their 95\% empirical confidence intervals from the $B=1000$ simulated data for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA with $\lambda=1$ in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
 \end{figure}
 Figure~\ref{fig2} provides the estimated block weights and their 95\%-CI of the inactive dimensions (dimension 4 and 5) as function of the proportion $\sigma$ associated to the residual error . The bias of estimate of the sequential approach (mcoa, omcoa) and the gibbs sampler increased with $\sigma$. For the sparse version, the bias remained to 0 in all cases.
 
-\paragraph{Analysis of sensitivity to $\lambda$:} We compare the performances in terms of sensitivity (the proportion of active dimensions that are selected) and of specificity (proportion of inactive dimensions that are not selected) of the decision rule defined in (\ref{dec_rule}).     
-The selection rule had a very high empirical sensitivity : $100\%$ for all $\sigma$. Its empirical specificity  decreased as a function of $\sigma$ but remainded very high: exceeding $99.4\%$ for $\lambda=0.1$, above $98.3\%$ for $\lambda=1$ and above $92.7\%$ for $\lambda=10$. Figure~\ref{fig3} shows the empirical specificity at block and dimension levels. The specificity for  block 2 with dimensions 4 and 5 can be linked to the estimated values obtained for the block weights (Figure~\ref{fig2}). Figure~\ref{fig4} displays the proportion of dimensions chosen.
-The posterior mode of $R_{\mathrm{eff}}$ equals the true value of $3$ in $95.4\%$ of cases on average for $\sigma$ with $\lambda=0.1$ and in $85.7\%$ of cases on average for $\sigma$ with $\lambda=1$. For $\lambda=10$, this proportion is only $0.404$, the choice $R_{\mathrm{eff}}=4$ is the majoritory choice.
+\paragraph{Selection of active dimensions as a function of $\lambda$:} We compare the performances in terms of the proportion of active dimensions that are selected using the decision rule defined in (\ref{dec_rule}) as a function of the slab parameter $\lambda$ (Figure \ref{fig4}). For all $\lambda$, when the residual standard deviation is low ($\sigma<0.05$), all the active dimensions were selected. The dimension 3 was the first to be selected much less frequently, followed by the dimension 1 on block 3, and then by the dimension 2 on block 1 and finally by the dimension 1 on the block 1. These results were coherent with the values of the thresholds for $\sigma$ defined in Table \ref{tab:thres}. With both less conservative values of the slab parameter $\lambda$, dimension 4 and 5 were almost never identified as active. This was also the case for inactive dimensions for the corresponding blocks (dimension 2 on block3, dimension 3 on block 1 and block 2).    
 
 
-
-\begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure3.eps}
-  \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda$.  \label{fig3}}
-\end{figure}
+% \begin{figure}
+%   \includegraphics[width=\linewidth]{figs/figure3.eps}
+%   \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda$.  \label{fig3}}
+% \end{figure}
 
 
 \begin{figure}
@@ -555,9 +554,11 @@ The posterior mode of $R_{\mathrm{eff}}$ equals the true value of $3$ in $95.4\%
   \caption{Empirical probability of detection an active dimension in a block as function of the standard deviation $s$ of the residual error of the slab precision $\lambda$. \label{fig4}}
 \end{figure}
 
+\paragraph{Comparaison of the estimate of the effective rank:} Figure~\ref{fig6} provides the estimated effective rank as a function of the standard deviation $\sigma$ of the residuals. The estimates from Gavish-Donoho criterium, sparse Gibbs sampler and the Hoff Bayesian. For values of $\sigma$ less than 0.06, the sparse Gibbs sampler identified three active dimensions in more than 50\% of the simulated data, whereas the effective rank of 3, chosen according to the Hoff and Gavish-Donoho criteria, dropped very rapidly below 50\% ($\sigma > 0.025$). When no dimensions were active ($\sigma>0.15$), Hoff’s Bayesian SVD model overestimated the effective rank because it retained five active dimensions in more than 75\% of cases; the sparse Gibbs sampler found a rank between 1 and 3 most of the time; and the Gavish-Donoho criterion estimated the effective rank to be 1 most of the time.   
+
 \begin{figure}
   \includegraphics[width=\linewidth]{figs/figure6.eps}
-  \caption{Proportion of the number of dimension chosen as function of the residual parameter $\sigma$ and of the parameter $\lambda$. \label{fig6}}
+  \caption{Proportion of the estimated effective rank, using the Gavish-Donoho criterium, the sparse Gibbs sampler and Hoff Bayesian SVD, as a function of the residual parameter $\sigma$ and of the slab parameter $\lambda$. \label{fig6}}
 \end{figure}
 
 

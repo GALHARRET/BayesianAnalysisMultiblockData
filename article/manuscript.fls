@@ -201,17 +201,6 @@ INPUT ./figs/figure2.eps
 INPUT ./figs/figure2-eps-converted-to.pdf
 INPUT ./figs/figure2-eps-converted-to.pdf
 INPUT ./figs/figure2-eps-converted-to.pdf
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3-eps-converted-to.pdf
-INPUT ./figs/figure3-eps-converted-to.pdf
-INPUT ./figs/figure3.eps
-INPUT ./figs/figure3-eps-converted-to.pdf
-INPUT ./figs/figure3-eps-converted-to.pdf
-INPUT ./figs/figure3-eps-converted-to.pdf
 INPUT ./figs/figure4.eps
 INPUT ./figs/figure4.eps
 INPUT ./figs/figure4.eps
@@ -256,6 +245,7 @@ INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb

@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex manuscript"] 1793880532.62893 "manuscript.aux" "manuscript.bbl" "manuscript" 1793881688.64766 0
-  "./Biblio.bib" 1793698110.83087 6336 da2f2c0f6f43d5c7039c8c4ec69c0a9e ""
+["bibtex manuscript"] 1794159025.35156 "manuscript.aux" "manuscript.bbl" "manuscript" 1794159026.18906 0
+  "./Biblio.bib" 1793891712.3305 6916 aa4496d6420a3845596d0e4f7eed0e0a ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
-  "manuscript.aux" 1793881688.4156 6322 7efb60930734b10e66317a005f2c22e4 "pdflatex"
+  "manuscript.aux" 1794159025.90383 6177 4847b7563acdc8a30ee775abb7e2c386 "pdflatex"
   (generated)
   "manuscript.bbl"
   "manuscript.blg"
   (rewritten before read)
-["pdflatex"] 1793881688.00154 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1793881688.64778 0
-  "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1793881687.82238 54027 ecc8ef5572e57208457471982927a014 ""
+["pdflatex"] 1794159025.45331 "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" "manuscript.pdf" "manuscript" 1794159026.1892 0
+  "/Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/manuscript.tex" 1794159024.40139 61713 1da54751d765d57821226d0cfeac49a6 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -73,6 +73,7 @@
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb" 1255129361 121065 50bbfa703ce7e11638752ef5a6d120c7 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb" 1255129361 112593 fda2373ba4420af33949610de4c28fe8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb" 1254269338 27863 09ce3735688ffde955e72da27c95b61a ""
+  "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb" 1254269338 28109 6d61305ed3d0eb794ebe36f15cf44aa0 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb" 1254269338 27802 5c876bb2c4040caaf035d60bd74a86bd ""
   "/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2025/texmf-dist/tex/generic/babel-english/english.ldf" 1496785618 7008 9ff5fdcc865b01beca2b0fe4a46231d4 ""
@@ -129,14 +130,13 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1747203790 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1747203749 3345733 e5360f354b310b62ce5167b14af0c915 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "figs/figure1.eps" 1793880449.60644 34400 431ac9ccf0630e2c248b57236ec4c121 ""
-  "figs/figure2.eps" 1793878960.15158 72010 f5b64c11fe7b76377b4c910489151219 ""
-  "figs/figure3.eps" 1793878870.78935 42787 eafe796aacb42a45a29310e0bf21e616 ""
-  "figs/figure4.eps" 1793879001.43154 55423 5c42862fb3ba2cfdc9d38e441b52eb5d ""
+  "figs/figure1.eps" 1794158611.86171 34411 ec17a4be5d9a0f28e325b651fef21136 ""
+  "figs/figure2.eps" 1794158612.15992 71967 49b00b9d41de5bc49cd905904fa81100 ""
+  "figs/figure4.eps" 1794158636.65828 55277 37e5335f6b764a0dd64bbbe0d8c278b6 ""
   "figs/figure6.eps" 1793880125.91232 22682 5e1b935cb80a6c656e3777f072a28452 ""
-  "manuscript.aux" 1793881688.4156 6322 7efb60930734b10e66317a005f2c22e4 "pdflatex"
-  "manuscript.bbl" 1793880841.18371 2874 37f3e46101f10776009ccaf066bd9f1d "bibtex manuscript"
-  "manuscript.tex" 1793881687.82238 54027 ecc8ef5572e57208457471982927a014 ""
+  "manuscript.aux" 1794159025.90383 6177 4847b7563acdc8a30ee775abb7e2c386 "pdflatex"
+  "manuscript.bbl" 1794159025.45101 3090 5023a67e1f4917eee4926a1f170294bf "bibtex manuscript"
+  "manuscript.tex" 1794159024.40139 61713 1da54751d765d57821226d0cfeac49a6 ""
   (generated)
   "manuscript.aux"
   "manuscript.log"

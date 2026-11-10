@@ -1,0 +1,939 @@
+\documentclass[11pt]{article}
+%
+%
+% Retirez le caractere "%" au debut de la ligne ci-dessous si votre
+% editeur de texte utilise des caracteres accentues
+% \usepackage[latin1]{inputenc}
+\setlength{\headheight}{14pt}
+%
+% Retirez le caractere "%" au debut des lignes ci-dessous si vous
+% utilisez les symboles et macros de l'AMS
+ \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\usepackage{multirow}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{natbib}
+%\usepackage{biblatex}
+%\addbibresource{Biblio.bib}
+
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\setlength{\parskip}{6pt}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+%\usepackage{caption}
+
+
+\usepackage{amsopn}             % pour \DeclareMathOperator
+\usepackage{amssymb}            % pour \leqslant
+\usepackage{algorithmicx}
+%\usepackage{algorithm2e}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\DeclareMathOperator{\cov}{cov}
+\DeclareMathOperator{\cor}{cor}
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\sumss}{SS}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator{\trace}{\mathrm{trace}}
+\DeclareMathOperator{\vMF}{vMF}
+\DeclareMathOperator{\Ga}{Gamma}
+\DeclareMathOperator{\Bern}{Bernoulli}
+\DeclareMathOperator{\Be}{Beta}
+
+\newcommand{\X}{\mathbf{X}}
+\newcommand{\U}{\mathbf{U}}
+\newcommand{\V}{\mathbf{V}}
+\newcommand{\EE}{\mathbf{E}}
+\newcommand{\HH}{\mathbf{H}}
+\newcommand{\F}{\mathbf{F}}
+\newcommand{\W}{\mathbf{W}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\ww}{\mathbf{w}}
+\newcommand{\f}{\mathbf{f}}
+\newcommand{\z}{\mathbf{z}}
+\newcommand{\I}{\mathbf{I}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\Stiefel}[2]{\mathcal V_{#1,#2}}
+
+
+
+\begin{document}
+\renewcommand{\headrulewidth}{0pt}
+
+
+%--------------------------------------------------------------------------
+
+\begin{center}
+{\Large
+	{\textsc Bayesian Framework for Canonical factorization of multiblock data}
+}
+\bigskip
+
+ %\underline{Jean-Michel Galharret}$^{1}$ \& Stephanie Bougeard $^{2}$ \& Katrijn Van Deun$^{3}$ \& Mohamed Hanafi$^{1}$
+\bigskip
+
+%{\it
+%$^{1}$ Oniris, INRAE, StatSC, Nantes, France. \\
+%$^{2}$ Epidemiology and Welfare, ANSES, Ploufragan, France. \\
+%$^{3}$ Department of Methodology and Statistics, Tilburg University, Tilburg, The Netherlands.
+%}
+\end{center}
+\bigskip
+
+\begin{abstract}
+The canonical factorization provides a common framework for multiblock methods: each block is decomposed as $\X_k=\U\Sigma_k\V_k^\intercal$, where $\U$ gathers components common to all the blocks and the diagonal matrix $\Sigma_k$ measures the contribution of each component to block $k$. Two questions remain open in practice: the axes of the common subspace are only identified by conventions, and the number of dimensions has to be chosen. We impose orthonormal block loadings and show that the axes are then identified as soon as the profiles of the weights differ across blocks, a weaker condition than the one required by Multiple Co-Inertia Analysis (MCOA). Optimal MCOA (OMCOA), the simultaneous solution of this problem, is computed by alternating least squares. We then propose a Bayesian formulation whose full conditional distributions are matrix von Mises--Fisher, truncated normal and Gamma distributions: OMCOA is the iterated conditional modes algorithm of this posterior, and the Gibbs sampler provides credible intervals for the block weights. A spike-and-slab prior on the weights allows them to be exactly zero, which yields block-specific posterior inclusion probabilities and the posterior distribution of the dimension of the common subspace. A simulation study assesses the estimation of the weights and the selection of the dimensions as a function of the noise level, in relation to theoretical detectability thresholds, and compares the estimated dimension with the Bayesian singular value decomposition of Hoff and the Gavish--Donoho threshold.
+
+\medskip
+\noindent\textbf{Keywords:} multiblock data analysis; canonical factorization; multiple co-inertia analysis; matrix von Mises--Fisher distribution; spike-and-slab prior; rank selection.
+\end{abstract}
+\bigskip
+
+\section{Introduction}
+
+Data sets structured into blocks of variables measured on the same set of observations are frequently encountered in practice. These blocks may consist of quantitative variables originating from distinct measurement sources or correspond to thematic groupings defined by the user. For instance, in omics studies, blocks typically comprise variables derived from different analytical techniques (e.g., proteomics, metabolomics). In psychology, multiblock data commonly arise when several sets of variables are collected on the same individuals to capture different psychological domains, such as
+self-report questionnaire scores assessing personality traits, behavioral task performance measures, and neurophysiological indicators such as electroencephalography features.
+
+Exploratory multiblock data analysis has four main objectives: (i) to perform a joint dimensionality reduction, (ii) to examine relationships among blocks, (iii) to investigate associations among variables both within and across blocks, and (iv) to capture within-block variability in order to reveal shared and block-specific structures in a common latent space.
+A unified algebraic framework based on factorization strategies, called \textit{canonical factorization}, was proposed by \cite{bougeard2024} for multiblock methods to achieve these objectives. In practice, canonical factorization provides a structured framework for analyzing data variability at multiple levels: differences between and within blocks, and
+differences between observations through their projection onto a common subspace. It also facilitates the harmonization of the outputs of different methods and supports a criterion-based selection among competing approaches.
+
+The canonical factorization is exact when the dimension of the common subspace equals the rank of the concatenated matrix, which can be large. Determining a reduced dimension, and which dimensions are active in each block, is therefore a major issue. Bayesian approaches address the first question for a single matrix: \cite{hoff2007} proposed a Bayesian singular value decomposition (SVD) that quantifies the uncertainty on the rank, and competing approaches were obtained with other priors on the singular values, such as the
+double exponential distribution \citep{zhai2023}, the repulsed normal distribution \citep{yuchi2023} and the horseshoe prior \citep{wang2026}, which shrinks small singular values towards zero.
+
+In the multiblock setting, the number of components and their activity in each block have also been addressed by rank-selection procedures for joint decompositions, such as AJIVE \citep{feng2018} and SLIDE \citep{gaynanova2019}, and by Bayesian factor models with sparsity-inducing priors on the loadings, such as Group Factor Analysis \citep{klami2015} and MOFA \citep{argelaguet2018}, which switch off the factors that are inactive in a block. These approaches rely on unconstrained loadings; here, the orthonormality constraints of the canonical factorization identify the axes, and the activity of each dimension in each block is read directly on the block weights $\sigma_k^{(r)}$.
+
+Following this line of work, we propose a Bayesian framework for the canonical factorization of multiblock data. The model imposes orthonormality constraints on both the common components and the block loadings, which makes the axes of the common subspace identifiable and leads to matrix von Mises--Fisher full conditional distributions. We derive an efficient Gibbs sampler and show that its conditional modes coincide with the updates of Optimal Multiple Co-Inertia Analysis (OMCOA), the simultaneous alternative to Multiple Co-Inertia Analysis \citep{chessel1996}. We then propose a sparse
+version based on a spike-and-slab prior \citep{mitchell1988,george1993} on the block weights, whose slab is scaled by the norm of each block. Unlike continuous shrinkage priors, and in the spirit of the point-mass prior used by \citet{hoff2007} for the singular values of a single matrix, this prior yields exact zeros and block-specific posterior inclusion probabilities, which directly provide an estimate of the dimension of the common subspace.  
+
+%This framework is a compass among multiblock models:  Generalized Canonical Correlation Analysis (GCCA, \cite{Carroll68}) and its popular case MAXVAR \cite{Carroll68}, Hierarchical Principal Component Analysis (HPCA, \cite{Wold96,Westerhuis98}), Structuration de Tableaux A Tois Indices de la Statistique (Statis, \cite{Lavit94}), Multiple Factorial Analysis (MFA, \cite{escofier1994}), Common Components and Specific Weights Analysis (CCWSA, \cite{Qannari001}), Multiple CO-inertia Analysis (MCOA, \cite{Chessel96})  fall within this framework. A benchmark of these methods had been done in \cite{Bougeard024}.
+
+%Initially, MCOA was proposed as an alternative to generalized canonical analysis, also known as MAXVAR \cite{Carroll68,Horst59}, for correlating multiple data tables. Compared with other generalisations of Hotelling's canonical correlation analysis \cite{Hotelling35}, such as those proposed by \cite{Kettenring71}, MCOA offers three main advantages. Firstly, it is computationally straightforward as it reduces to a singular value decomposition, the other approaches typically rely on iterative optimisation procedures. Secondly, MCOA is particularly effective at summarizing results across multiple datasets. Finally, MCOA provides sequential estimation of canonical factorisation under an orthogonality constraint.  In this work, we propose a new method, Optimal Multiple CO-inertia Analysis (OMCOA), which is a simultaneous version of MCOA. We compare this model with the previous one using simulated data whose structure is known.     
+
+\section{Canonical factorisation}
+\subsection*{Notations}
+
+\begin{itemize}
+	\item $K$ blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively of $p_1,\ldots,p_K$ variables on $N$ individuals,
+	\item  $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks,
+	\item $\textbf{U}^\intercal$ designates the transposed matrix of $\textbf{U}$, 
+	\item $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ are diagonal matrices,
+	\item $\Vert . \Vert$ corresponds to the Frobenius norm,
+	\item $\Stiefel{N}{R}=\{\W\in\mathcal M_{N,R}(\mathbb R):\W^\intercal\W=\I_R\}$
+denotes the Stiefel manifold.
+\end{itemize}
+ 
+Consider $K$ column blocks  $(\textbf{X}_1,\ldots,\textbf{X}_K)$ respectively in $\mathcal M_{N,p_1}(\mathbb R),...,\mathcal M_{N,p_K}(\mathbb R)$. Let $\textbf{X}=[\textbf{X}_1|\ldots|\textbf{X}_K]\in \mathcal M_{N,P}(\mathbb R)$ ($P=\sum_{k=1}^K p_k$) be the concatenation of these $K$-blocks. Without loss of generality, the blocks are assumed to be column-centered.
+
+\cite{bougeard2024} demonstrated that the $(K+1)-$blocks $(\textbf{X}_1,\ldots,\textbf{X}_K,\textbf{X})$ can be factorized in dimension $R=\rank(\textbf{X})$ as follows  
+\begin{align}
+  \left\{
+	\begin{array}{ll}
+		&\X   = \U \Sigma \V^\intercal   \\
+		&\X_k = \U \Sigma_k \V_k^\intercal \quad \textrm{for} \quad k=(1, \dots, K)    \\	
+		&\textrm{with the constraints} \quad \U\in \Stiefel{N}{R} \quad \textrm{and} \quad \Vert\vv_k^{(1)}\Vert=\ldots=\Vert\vv_k^{(R)}\Vert=1 \quad \textrm{for} \quad k=(1, \dots, K), 
+	\end{array}
+	\right. \label{Cano_Facto}
+\end{align}
+where
+\begin{itemize}
+	\item $\U\in \Stiefel{N}{R}$ is the block-common components,
+	\item $\V_k \in \mathcal M_{p_k,R}(\mathbb R)$ are the  block-loadings, and $\V=[\V_1|...|\V_K] \in \mathcal M_{P,R}(\mathbb R)$,
+  \item $\Sigma\in \mathcal M_{R,R}(\mathbb R)$ the diagonal scaling matrices with property $\Sigma^2 = \sum_{k=1}^K \Sigma_k^2$ that relate common and block-analyses.
+\end{itemize}
+Without loss of generality, we can assume $\sigma_k^{(r)}\geq 0$ for all $k,r$, since a joint sign change of $\sigma_k^{(r)}$ and $\vv_k^{(r)}$ leaves the model and the constraints unchanged. Since the blocks $\X_1,\ldots,\X_K$ are column-centered, the block-common components are centered as well:
+\[\U\in\Stiefel{N}{R}, \quad \one_N^\intercal\U=0.\]
+This factorization is \textit{the canonical factorization}. Each multiblock method derives a common component $\U$ using a different optimization criterion. Projecting the data onto these common components enables their canonical factorization (for details see \cite{bougeard2024}). For all the multiblock methods, once $\U$ is fixed, the decomposition $\X_k=\U\Sigma_k\V_k^\intercal$ of each block is unique (up to sign). The methods differ in how the axes $\uu^{(1)},\ldots,\uu^{(R)}$ themselves are determined. When the block loadings are only normalized ($\|\vv_k^{(r)}\|=1$), the optimal loadings are
+$\vv_k^{(r)}=\X_k^\intercal\uu^{(r)}/\|\X_k^\intercal\uu^{(r)}\|$ and the least-squares criterion reduces to
+\[
+  \sum_{k=1}^K\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X\|^2-\bigl\|\X^\intercal\U\bigr\|^2 ,
+\]
+which is invariant under any rotation $\U\mapsto\U\mathbf O$, $\mathbf O$ orthogonal: only $\mathrm{span}(\U)$ is determined by the data, and the axes have to be fixed by an external convention, usually the SVD of $\X$. This convention becomes unstable when the singular values of $\X$ are close. When $\V_k\in\Stiefel{p_k}{R}$ for all $k$, the criterion is no longer rotation invariant, and the axes of $\U$ are identified (up to permutation and sign) by the block-specific profiles $\Sigma_1,\ldots,\Sigma_K$, as long as these profiles differ across blocks. 
+ 
+%For $R<rank(\textbf{X})$, the objective is to determine the optimal approximation of the form given in \eqref{Cano_Facto} by minimizing an ordinary least square criterion.    
+
+\subsection{Canonical Factorisation under orthogonal block-loadings constraint}
+
+Providing a solution for canonical factorization means minimizing
+\begin{equation}
+	\sum_{k=1}^K\Vert \X_k - \U\Sigma_k \V_k^\intercal\Vert^2= \Vert \X- \U \Sigma \V^\intercal\Vert^2, \label{Crit}
+\end{equation}
+with $\U\in\Stiefel{N}{R}$, $\V_k\in\Stiefel{p_k}{R}$ for $k=1,\ldots,K$, which requires $R\leq\min_kp_k$. Unlike \eqref{Cano_Facto}, where the block loadings are only normalized, an exact factorization in dimension $\rank(\X)$ is therefore not attainable in general under this constraint: \eqref{Crit} defines a constrained version of the canonical factorization, whose benefit is the identifiability of the axes of $\U$ (Proposition~\ref{prop:identif}).
+%Note that, with standardized and orthogonal block-loadings matrices $\V_1,\ldots,\V_K$, the solution of this problem is unique. 
+\citet{chessel1996} proposed a sequential solution, known as Multiple Co-Inertia Analysis (MCOA): the dimensions are computed one at a time, each from the blocks deflated with respect to the previous block loadings. This procedure yields orthonormal matrices $\U$ and $\V_1,\ldots,\V_K$, and each stage is optimal in the
+least-squares sense given the previous ones. The resulting solution is nevertheless suboptimal with respect to \eqref{Crit}, since each dimension is chosen without taking the next ones into account, so that the $R$ dimensions are not fitted simultaneously.
+Optimal Multiple Co-Inertia Analysis (OMCOA) is proposed as a simultaneous solution of \eqref{Crit} under the constraints $\U\in \Stiefel{N}{R}$ and $\V_k\in \Stiefel{p_k}{R}$ ($k=1,\ldots,K$). It is computed by an alternating least squares (ALS) algorithm, in which each step minimizes \eqref{Crit} with respect to one set of parameters, the others being fixed:
+\begin{itemize}
+  \item \textbf{Update of $\U$:} $\U=\mathbf A\mathbf B^\intercal$, where $\X\mathbf H^\intercal=\mathbf A\mathbf D\mathbf B^\intercal$ is the SVD of
+        $\X\mathbf H^\intercal$, with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$ (orthogonal Procrustes problem);
+  \item \textbf{Update of $\V_k$:} $\V_k=\mathbf A_k\mathbf B_k^\intercal$, where $\X_k^\intercal\U\Sigma_k=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal$
+        is the SVD of $\X_k^\intercal\U\Sigma_k$, for $k=1,\ldots,K$;
+  \item \textbf{Update of $\Sigma_k$:} $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, for $k=1,\ldots,K$.
+\end{itemize}
+%These steps are iterated until the decrease of \eqref{Crit} falls below a given tolerance. Since each step cannot increase the criterion, which is bounded below, the sequence of criterion values converges; 
+
+\begin{proposition}
+  The successive updates of $\U,\V_k,\Sigma_k$ guarantee that the criterion defined in \eqref{Crit} decreases or remains constant at each step, so that the sequence of criterion values converges.
+\end{proposition}
+The proof is given in the appendix.
+\begin{remark}
+This guarantees the convergence of the criterion values, not of the parameters themselves. Since the limit may moreover be a local minimum, the algorithm is started from the MCOA solution and from several random initializations, and the solution with the lowest criterion is retained.  
+\end{remark}
+
+\begin{proposition}[Noiseless identifiability]\label{prop:identif}
+Let $\X_k=\U\Sigma_k\V_k^\intercal$, $k=1,\ldots,K$, with $\U\in\Stiefel{N}{R}$,
+$\V_k\in\Stiefel{p_k}{R}$, $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$,
+$\sigma_k^{(r)}\geq 0$, and assume that every dimension is present in at least one block: for each $r$ there is a $k$ with $\sigma_k^{(r)}>0$. Denote by
+$\mathbf s^{(r)}=(\sigma_1^{(r)},\ldots,\sigma_K^{(r)})$ the profile of dimension
+$r$ across the blocks and, for block weights $w_1,\ldots,w_K>0$, by
+$\lambda_r(\mathbf w)=\sum_{k=1}^K w_k\bigl(\sigma_k^{(r)}\bigr)^2$ the squared singular values of the weighted concatenated matrix $[\tilde\X_1|\cdots|\tilde\X_K]$, $\tilde \X_k=\sqrt{w_k}\X_k$.
+\begin{enumerate}
+  \item[(a)] \textbf{OMCOA.} If $\mathbf s^{(r)}\neq\mathbf s^{(r')}$ for all $r\neq r'$, every minimiser of \eqref{Crit} in dimension $R$, weighted or not, is equal to $(\U,\V_k,\Sigma_k)$ up to a common permutation of the dimensions and to the joint change of sign $(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})\mapsto-(\uu^{(r)},\vv_1^{(r)},\ldots,\vv_K^{(r)})$; the columns $\vv_k^{(r)}$ with $\sigma_k^{(r)}=0$ are not determined.
+  \item[(b)] \textbf{MCOA.} If $\lambda_r(\mathbf w)\neq\lambda_{r'}(\mathbf w)$ for all $r\neq r'$, MCOA applied to the weighted blocks $\tilde\X_k$ recovers $(\U,\V_k)$ up to the order and the signs of the dimensions, and the weights $\sqrt{w_k}\,\sigma_k^{(r)}$; its solution then coincides with the OMCOA solution (once the weights are divided by $\sqrt{w_k}$).
+  \item[(c)] If $\lambda_r(\mathbf w)=\lambda_{r'}(\mathbf w)$ for some $r\neq r'$, the MCOA solution is not determined by the data: at the first step where the largest remaining value is tied, any unit vector of the corresponding eigenspace is a solution, and the computed solution differs in general from $(\U,\V_k)$, even when the profiles are distinct.
+\end{enumerate}
+\end{proposition}
+The proof is given in the appendix.
+
+\begin{remark}
+Equal profiles give equal values $\lambda_r(\mathbf w)$ for every $\mathbf w$. Hence, whatever the weights, if the values $\lambda_r(\mathbf w)$ are distinct, the profiles are distinct too, and MCOA and OMCOA recover the same solution. Conversely, for any weights there are designs with distinct profiles and tied values $\lambda_r(\mathbf w)$, where only OMCOA is identified: OMCOA identifies strictly more configurations than MCOA, and its identifiability does not depend on the block weighting.
+\end{remark}
+
+%\begin{remark}
+%In \texttt{ade4}, the weight $w_k$ combines the column weights of the
+%\texttt{ktab} object (by default $1/p_k$ for each column of block $k$ with
+%\texttt{ktab.list.df}) and the block weighting of \texttt{mcoa}: $1$ for
+%\texttt{option="uniform"}, the inverse of the total inertia for
+%\texttt{"inertia"}, the inverse of the first eigenvalue for \texttt{"lambda1"}.
+%The condition of (b) therefore depends on these choices: for instance, with
+%blocks of different sizes, the default column weights $1/p_k$ can break a tie
+%of the unweighted values $\sum_k(\sigma_k^{(r)})^2$, and conversely.
+%Standardising the columns of the blocks (\texttt{dudi.pca(scale=TRUE)}) is not
+%a block weighting: it multiplies $\X_k$ on the right by a diagonal matrix
+%$\mathbf D_k^{-1}$, and $\X_k\mathbf D_k^{-1}$ is no longer of the form
+%$\U\Sigma_k\V_k^\intercal$ with orthonormal $\V_k$, unless all the columns of
+%block $k$ have the same variance.
+%\end{remark}
+
+%\begin{remark}
+%With noise, exact ties become near ties. When two values $\lambda_r(\mathbf w)$
+%are close, the corresponding MCOA axes are only determined up to a rotation
+%within their plane: by the Davis--Kahan theorem \cite{davis1970}, the angle
+%between estimated and true axes is bounded by the noise level divided by the
+%gap between the two values, and this bound is attained in the worst case.
+%OMCOA does not rely on this gap, but on the separation of the profiles. The
+%simulation with the parameter $t$, which moves continuously from distinct to
+%tied values of $\lambda_r(\mathbf w)$ with distinct profiles, illustrates the
+%difference.
+%\end{remark}
+
+
+
+\section{Bayesian framework for Canonical Factorisation}
+
+A probabilistic counterpart of \eqref{Crit} is obtained by assuming a Gaussian noise:
+\begin{equation}
+  \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad
+  \EE_k\ \text{with i.i.d. entries}\ \mathcal N\bigl(0,\tau_k^{-1}\bigr),\qquad k=1,\ldots,K,
+  \label{eq:model}
+\end{equation}
+where $\tau_k$ is the noise precision of block $k$. Since the blocks are centered, the latent components are constrained to be
+centered as well: $\U\in\Stiefel{N}{R}$ with $\one_N^\intercal\U=0$.
+
+\paragraph{Priors.} We use the following independent priors:
+\begin{itemize}
+  \item $\U$ and $\V_1,\ldots,\V_K$ are uniformly distributed on their Stiefel manifolds (non-informative von Mises--Fisher distribution). A random matrix $\W\in\Stiefel{m}{R}$ follows the matrix von Mises--Fisher distribution $\vMF(\F)$, with parameter $\F\in\mathcal M_{m,R}(\mathbb R)$, if its density with
+respect to the uniform measure on $\Stiefel{m}{R}$ is proportional to $\exp\{\trace(\F^\intercal\W)\}$
+\citep{hoff2009}. If $\F=\mathbf A\mathbf D\mathbf B^\intercal$ is the SVD of $\F$, the mode of $\vMF(\F)$ is the
+polar factor $\mathbf A\mathbf B^\intercal$, and the distribution concentrates around it as the singular values of $\F$ increase.
+  \item $\sigma_k^{(r)}\sim\mathcal N^+\bigl(0,\|\X_k\|^2/\lambda\bigr)$, a half-normal distribution scaled by the norm of the block, with a small dimensionless precision $\lambda$ (e.g.\ $\lambda=10^{-2}$);
+  \item $p(\tau_k)\propto1/\tau_k$, the Jeffreys prior (limit $a_0=b_0=0$ of the Gamma prior).
+\end{itemize}
+Since $\sigma_k^{(r)}=\uu^{(r)\intercal}\X_k\vv_k^{(r)}\le\|\X_k\|$, the ratio $(\sigma_k^{(r)}/\|\X_k\|)^2$ is the proportion of the variance of block $k$ explained by dimension $r$, and scaling the prior by $\|\X_k\|$ is equivalent to dividing each block by its Frobenius norm, the usual block weighting of multiblock methods. With the Jeffreys prior on $\tau_k$, multiplying a block by a constant $c$ multiplies $\sigma_k^{(r)}$ by $c$ and $\tau_k$ by $c^{-2}$ and leaves the posterior distribution of $\U$ and of the $\V_k$ unchanged: the model is applied to the raw (centred) blocks, and the weights are estimated on their original scale. The posterior distribution is proper as long as no block can be fitted exactly, which requires $R<\min_kp_k$: when $R=p_k$, $\U$ can span the column space of $\X_k$, the residual of block $k$ can vanish, and the marginal posterior, proportional to $\|\X_k-\U\Sigma_k\V_k^\intercal\|^{-(N-1)p_k}$ in this block, is not integrable.
+
+\subsection{Full conditional distributions}
+
+\paragraph{Likelihood.} Because $\U$ and $\V_k$ have orthonormal columns and $\Sigma_k$ is diagonal,
+\begin{equation}
+  \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2
+  =\|\X_k\|^2-2\trace\bigl(\Sigma_k\V_k^\intercal\X_k^\intercal\U\bigr)+\sum_{r=1}^R\bigl(\sigma_k^{(r)}\bigr)^2 .
+  \label{eq:expand}
+\end{equation}
+Since the blocks are centered, each $\X_k$ carries $(N-1)p_k$ degrees of freedom, and the log-likelihood is
+\[
+  \log p(\X_1,\ldots,\X_K\mid\cdot)=\sum_{k=1}^K\Bigl[\tfrac{(N-1)p_k}{2}\log\tau_k
+  -\tfrac{\tau_k}{2}\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2\Bigr]+\text{const}.
+\]
+By \eqref{eq:expand}, $\U$ and $\V_k$ only appear in the linear term $\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)$.
+This is the key property: all the full conditionals belong to standard families.
+
+
+
+\begin{proposition}[Full conditionals]\label{prop:cond}
+Under model \eqref{eq:model} and the above priors:
+\begin{enumerate}
+  \item \textbf{Common space.} Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of
+        $\one_N^\perp$ and write $\U=\Q\tilde\U$ with $\tilde\U\in\Stiefel{N-1}{R}$. Then
+        \[
+          \tilde\U\mid\cdot\ \sim\ \vMF\bigl(\Q^\intercal\F_{\U}\bigr),\qquad
+          \F_{\U}=\sum_{k=1}^K\tau_k\,\X_k\V_k\Sigma_k .
+        \]
+  \item \textbf{Block loadings.} For $k=1,\ldots,K$,
+        \[
+          \V_k\mid\cdot\ \sim\ \vMF\bigl(\F_{\V_k}\bigr),\qquad \F_{\V_k}=\tau_k\,\X_k^\intercal\U\Sigma_k .
+        \]
+  \item \textbf{Block weights.} For $k=1,\ldots,K$ and $r=1,\ldots,R$, let $d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$. Then
+        \[
+          \sigma_k^{(r)}\mid\cdot\ \sim\ \mathcal N^+\Bigl(\frac{\tau_k\,d_k^{(r)}}{\tau_k+\lambda_k},\ \frac{1}{\tau_k+\lambda_k}\Bigr),\qquad \lambda_k=\frac{\lambda}{\|\X_k\|^2},
+        \]
+        a normal distribution truncated to $(0,+\infty)$.
+  \item \textbf{Noise precisions.} For $k=1,\ldots,K$,
+        \[
+          \tau_k\mid\cdot\ \sim\ \Ga\Bigl(\frac{(N-1)p_k}{2},\ \frac{1}{2}\bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2\Bigr).
+        \]
+\end{enumerate}
+\end{proposition}
+\noindent The modes of the full conditionals of Proposition~\ref{prop:cond} are
+\[
+  \U=\mathbf A\mathbf B^\intercal\ \text{with}\ \F_{\U}=\mathbf A\mathbf D\mathbf B^\intercal,\qquad
+  \V_k=\mathbf A_k\mathbf B_k^\intercal\ \text{with}\ \F_{\V_k}=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal,\qquad
+  \sigma_k^{(r)}=\max\Bigl(0,\frac{\tau_k}{\tau_k+\lambda_k}\,d_k^{(r)}\Bigr) .
+\]
+When $\lambda\to0$ and the precisions are equal ($\tau_1=\cdots=\tau_K$), these are exactly the OMCOA updates:
+Procrustes rotation of $\X\mathbf H^\intercal$ for $\U$ (with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$),
+Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, with the sign convention $\sigma_k^{(r)}\geq0$ of Proposition~1. OMCOA is therefore the iterated conditional modes (ICM) algorithm \citep{besag1986} associated with this posterior, and the Gibbs sampler is its
+stochastic counterpart. With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion \eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with full conditional
+$\tau\mid\cdot\sim\Ga\bigl(\sum_k(N-1)p_k/2,\ \sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
+
+\subsection{Post-processing: label switching and signs}\label{sec:align}
+
+The posterior distribution is invariant under any permutation $\pi$ of the $R$ dimensions applied jointly to
+$\U$, $\V_1,\ldots,\V_K$ and $\Sigma_1,\ldots,\Sigma_K$, and under a joint change of sign of $\uu^{(r)}$ and
+$\vv_1^{(r)},\ldots,\vv_K^{(r)}$. Posterior summaries are therefore computed after aligning each draw on a reference
+$\U_{\mathrm{ref}}$ (in practice the OMCOA solution). For each draw, with $\mathbf C=\U_{\mathrm{ref}}^\intercal\U$,
+\[
+  \hat\pi=\argmax_{\pi\in\mathfrak S_R}\sum_{r=1}^R\bigl|C_{r,\pi(r)}\bigr|,\qquad
+  s_r=\operatorname{sign}\bigl(C_{r,\hat\pi(r)}\bigr),
+\]
+and the columns of $\U$ and $\V_k$ are reordered by $\hat\pi$ and multiplied by $s_r$, while the diagonal of
+$\Sigma_k$ is reordered by $\hat\pi$ (it stays positive). Posterior means and credible intervals of $\sigma_k^{(r)}$
+are then obtained from the empirical distribution of the aligned draws.
+
+The resulting sampler is summarised in Algorithm~\ref{alg:gibbs}.
+
+\begin{algorithm}[ht]
+\caption{Gibbs sampler for OMCOA}\label{alg:gibbs}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; dimension $R<\min_kp_k$; number of iterations $T$; burn-in $T_0$;
+           prior precision $\lambda$
+  \State \textbf{Initialization:} $\U=\Q\tilde\U$, $\V_k$, $\Sigma_k$ from OMCOA (or MCOA, or at random);
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State $\F_{\U}\gets\sum_{k}\tau_k\,\X_k\V_k\Sigma_k$;\quad update $\tilde\U$ by one column-wise sweep of $\vMF(\Q^\intercal\F_{\U})$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State $\F_{\V_k}\gets\tau_k\,\X_k^\intercal\U\Sigma_k$;\quad update $\V_k$ by one column-wise sweep of $\vMF(\F_{\V_k})$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$;\quad draw
+                  $\sigma_k^{(r)}\sim\mathcal N^+\bigl(\tau_k d_k^{(r)}/(\tau_k+\lambda_k),\,1/(\tau_k+\lambda_k)\bigr)$, $\lambda_k=\lambda/\|\X_k\|^2$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\V_1,\ldots,\V_K,\Sigma_1,\ldots,\Sigma_K,\tau_1,\ldots,\tau_K\bigr)$ \EndIf
+  \EndFor
+  \State \textbf{Post-processing:} align each stored draw on a reference solution (Section~\ref{sec:align})
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+% \begin{remark}[What the sampler adds]
+% Besides point estimates close to the OMCOA solution, the sampler provides the posterior distribution of the block
+% weights $\sigma_k^{(h)}$ and of the noise levels $\tau_k^{-1}$. Credible intervals on $\sigma_k^{(h)}$ can be used to assess
+% whether a dimension is common to all blocks, shared by some of them, or specific to one block.
+% \end{remark}
+
+% \begin{remark}[Practical aspects]
+% Starting from the OMCOA solution shortens the burn-in. The column-wise sweeps make successive draws of $\U$ and
+% $\V_k$ correlated, so convergence should be checked on trace plots of the $\sigma_k^{(h)}$. Because the posterior is
+% strongly concentrated when the noise is small, the chain rarely jumps between the $H!$ equivalent modes; the alignment step
+% remains necessary nonetheless, in particular when several dimensions have close weights.
+% \end{remark}
+
+\section{Sparse Bayesian Framework for canonical factorisation}
+In OMCOA, each block is approximated as $\X_k\approx\U\Sigma_k\V_k^\intercal$, where the diagonal matrix
+$\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each latent dimension $\uu^{(r)}$ contributes to block $k$. 
+%The variance of the blocks can be read from the pattern of zeros of $\Sigma_1,\ldots,\Sigma_K$: dimension $r$ explains
+%\begin{itemize}
+%  \item variance of all the blocks if $\sigma_k^{(r)}>0$ for all $k$;
+%  \item variance of a subset of the blocks, if $\sigma_k^{(r)}>0$ for these blocks only;
+%  \item variance of the block $k$ if $\sigma_k^{(r)}>0$ for this block only;
+%  \item \emph{inactive} if $\sigma_k^{(r)}=0$ for all $k$.
+%\end{itemize}
+OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose a Bayesian version of OMCOA in which a spike-and-slab prior on the weights $\sigma_k^{(r)}$ allows them to be exactly zero. The dimension $R$ is then a \emph{maximal} rank: inactive dimensions are switched off by the sampler, and the effective rank is inferred from the data.
+
+The sparsity of the model is based on the diagonal terms $\sigma_k^{(r)}$ as follows
+\begin{equation}
+  \sigma_k^{(r)}=\gamma_k^{(r)}\,s_k^{(r)},\qquad \gamma_k^{(r)}\in\{0,1\},\quad s_k^{(r)}>0 .
+  \label{eq:spike}
+\end{equation}
+
+\paragraph{Priors.} The difference between the two sets of prior distributions lies in the prior distributions of the diagonal terms: 
+\begin{itemize}
+  \item spike-and-slab on the weights, with a slab scaled by the norm of the block:
+        $\gamma_k^{(r)}\mid\theta_r\sim\Bern(\theta_r)$ and $s_k^{(r)}\sim\mathcal N^+(0,\|\X_k\|^2/\lambda)$, i.e.\
+        \[
+          p\bigl(\sigma_k^{(r)}\mid\theta_r\bigr)=(1-\theta_r)\,\delta_0\bigl(\sigma_k^{(r)}\bigr)+\theta_r\,\mathcal N^+\bigl(\sigma_k^{(r)};0,\|\X_k\|^2/\lambda\bigr);
+        \]
+  \item $\theta_r\sim\Be(a_\theta,b_\theta)$, one inclusion probability per dimension, shared by the $K$ blocks;
+  \item $p(\tau_k)\propto1/\tau_k$, as in Section~3.
+\end{itemize}
+As in Section~3, the slab is scaled by the block norm, so that $\lambda$ is dimensionless, the selection of the dimensions does not depend on the scale of the blocks, and the posterior is proper when $R<\min_kp_k$. The slab precision $\lambda$ is no longer small, however: it now controls the selection (see below). The prior depends on the data only through the block norms.
+Sharing $\theta_r$ across blocks borrows strength: a dimension that is active in several blocks is more likely
+to be active in another one, and a dimension that is inactive everywhere sees $\theta_r$ shrink towards zero.
+
+As in the non-sparse case, the orthonormality of $\U$ and $\V_k$ gives
+\begin{equation}
+  \bigl\|\X_k-\U\Sigma_k\V_k^\intercal\bigr\|^2=\|\X_k\|^2-2\sum_{r=1}^R\sigma_k^{(r)}d_k^{(r)}+\sum_{r=1}^R\bigl(\sigma_k^{(r)}\bigr)^2,
+  \qquad d_k^{(r)}={\uu^{(r)}}^\intercal\X_k\vv_k^{(r)} .
+  \label{eq:expand2}
+\end{equation}
+
+\begin{proposition}[Full conditionals]\label{prop:cond2}
+Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\perp$ and write $\U=\Q\tilde\U$.
+\begin{enumerate}
+  \item \textbf{Common space:} $\tilde\U\mid\cdot\sim\vMF(\Q^\intercal\F_{\U})$ with $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$.
+  \item \textbf{Block loadings:} $\V_k\mid\cdot\sim\vMF(\F_{\V_k})$ with $\F_{\V_k}=\tau_k\X_k^\intercal\U\Sigma_k$.
+        When $\sigma_k^{(r)}=0$, the $r$-th column of $\F_{\V_k}$ is zero and $\vv_k^{(r)}$ is uniform on the orthogonal
+        complement of the other columns.
+  \item \textbf{Weights (joint update of $\gamma_k^{(r)}$ and $\sigma_k^{(r)}$).} Let
+        \[
+          \lambda_k=\frac{\lambda}{\|\X_k\|^2},\qquad \omega_k=\tau_k+\lambda_k,\qquad m_k^{(r)}=\frac{\tau_k\,d_k^{(r)}}{\omega_k}.
+        \]
+        Then, with $\sigma_k^{(r)}$ integrated out,
+        \[
+          P\bigl(\gamma_k^{(r)}=1\mid\cdot\bigr)=\frac{\theta_r B_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r},\qquad
+          B_k^{(r)}=2\sqrt{\frac{\lambda_k}{\omega_k}}\,
+          \exp\Bigl(\frac{\omega_k\bigl(m_k^{(r)}\bigr)^2}{2}\Bigr)\,\Phi\Bigl(m_k^{(r)}\sqrt{\omega_k}\Bigr),
+        \]
+        where $\Phi$ is the standard normal c.d.f.; and
+        \[
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\cdot\ \sim\ \mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr),\qquad
+          \sigma_k^{(r)}\mid\gamma_k^{(r)}=0,\cdot\ =\ 0 .
+        \]
+  \item \textbf{Inclusion probabilities:}
+        $\theta_r\mid\cdot\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$.
+  \item \textbf{Noise precisions:}
+        $\tau_k\mid\cdot\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
+\end{enumerate}
+\end{proposition}
+The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column being drawn from a vector von Mises--Fisher distribution with Wood's algorithm \citep{wood1994}, as in the non-sparse sampler. Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
+drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$. The loading $\vv_k^{(r)}$ is not integrated out, however: while $\gamma_k^{(r)}=0$, it is drawn uniformly, so that $d_k^{(r)}$ is small and the reactivation of the dimension in block $k$ may be slow. The mixing of the indicators should therefore be checked, for instance with chains started from $\gamma_k^{(r)}=0$. Finally, the condition $R<\min_kp_k$ is also needed in practice with a proper Gamma prior on $\tau_k$: when $R=p_k$, the dimensions can fit block $k$ almost entirely, including its noise, so that $\tau_k$ is overestimated and the Bayes factors of this block are inflated, which keeps spurious dimensions active.
+In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow. Moreover, $B_k^{(r)}$ contains the factor $\sqrt{\lambda_k/\omega_k}$: a very diffuse slab ($\lambda\to0$) always favours
+the spike (Lindley's paradox). Since the slab is scaled by $\|\X_k\|$, the value of $\lambda$ does not depend on the scale of the data: with $\lambda=1$, the slab standard deviation is the norm of the block, so that a single dimension may explain most of its variance.
+
+\begin{remark}[Slab indexed on the noise]
+The slab may instead be indexed on the noise level of the block, $\sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\tau_k\sim\mathcal N^+(0,g_k/\tau_k)$, in the spirit of Zellner's $g$-prior \citep{zellner1986,liang2008}, e.g.\ with $g_k=(N-1)p_k$, for which the slab scale is the expected Frobenius norm of the noise $\EE_k$. The Bayes factor then becomes
+\[
+  B_k^{(r)}=\frac{2}{\sqrt{1+g_k}}\exp\Bigl(\frac{g_k}{1+g_k}\,\frac{\tau_k(d_k^{(r)})^2}{2}\Bigr)\Phi\Bigl(d_k^{(r)}\sqrt{\frac{g_k\tau_k}{1+g_k}}\Bigr),
+\]
+which only depends on the signal-to-noise ratio $\tau_k(d_k^{(r)})^2$, and the active weights enter the full conditional of $\tau_k$, $\tau_k\mid\cdot\sim\Ga\bigl(((N-1)p_k+\sum_r\gamma_k^{(r)})/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2+\sum_r(\sigma_k^{(r)})^2/(2g_k)\bigr)$. Both priors make the selection invariant to the scale of the blocks, but they differ in two respects. With the slab scaled by $\|\X_k\|$, the Bayes factor depends on $\tau_k\|\X_k\|^2$, that is on the whole signal of the block: a weak dimension is judged relative to the size of its block, and is penalised when the block also contains strong dimensions. With the slab indexed on the noise, each weight is judged against the noise only, independently of the other weights of the block, and the prior does not depend on the data; in return, the slab is coupled with $\tau_k$, so that an overestimated noise precision inflates the Bayes factors. The two priors coincide when $g_k/\tau_k=\|\X_k\|^2/\lambda$, that is, for $\lambda=1$, when $g_k=\tau_k\|\X_k\|^2\approx(N-1)p_k+\tau_k\|\U\Sigma_k\V_k^\intercal\|^2$: with the default $g_k=(N-1)p_k$, they only differ when the total signal-to-noise ratio $\tau_k\|\U\Sigma_k\V_k^\intercal\|^2$ of the block is not negligible with respect to $(N-1)p_k$, i.e.\ at low noise levels, where the active weights are selected by both priors. We use the slab scaled by the block norm, which is consistent with the usual block weighting of OMCOA and keeps the interpretation of $\lambda$ in terms of explained variance, and compare both priors in Section~5.
+\end{remark}
+
+The posterior distribution of $\gamma_k^{(r)}$ gives a decision rule for the representation of block $\X_k$ on the component $\uu^{(r)}$: the component $\uu^{(r)}$ is declared active in block $k$ if and only if
+\begin{equation}
+  P\bigl(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K\bigr)>1/2 .
+  \label{dec_rule}
+\end{equation}
+\noindent Moreover, this model makes it possible to estimate the effective dimension of the common subspace,
+\[R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},\]
+ whose posterior distribution is estimated by its empirical distribution over the draws. The prior $\Be(a_\theta,b_\theta)$ controls the expected sparsity;
+$a_\theta=b_\theta=1$ is a neutral choice, and $b_\theta>a_\theta$ favours sparser structures.
+
+
+
+The resulting sparse Gibbs sampler is summarised in Algorithm~\ref{alg:sparse}.
+
+\begin{algorithm}[ht]
+\caption{Sparse Gibbs sampler for OMCOA}\label{alg:sparse}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R<\min_kp_k$; iterations $T$; burn-in $T_0$;
+           slab precision $\lambda$; hyperparameters $a_\theta,b_\theta$
+  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions on the blocks divided by their Frobenius norms, weights brought back to the original scale; $\gamma_k^{(r)}\gets1$; $\theta_r\gets1/2$;
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State update $\tilde\U$ by one sweep of $\vMF\bigl(\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k\bigr)$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State update $\V_k$ by one sweep of $\vMF\bigl(\tau_k\X_k^\intercal\U\Sigma_k\bigr)$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$,\quad $\omega_k\gets\tau_k+\lambda/\|\X_k\|^2$,\quad $m_k^{(r)}\gets\tau_kd_k^{(r)}/\omega_k$
+           \State draw $\gamma_k^{(r)}\sim\Bern\Bigl(\dfrac{\theta_rB_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r}\Bigr)$
+           \State \textbf{if} $\gamma_k^{(r)}=1$ \textbf{then} draw $\sigma_k^{(r)}\sim\mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr)$ \textbf{else} $\sigma_k^{(r)}\gets0$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \For{$r=1,\ldots,R$}
+        \State draw $\theta_r\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\Sigma_1,\ldots,\Sigma_K,\boldsymbol\gamma,\boldsymbol\theta,\boldsymbol\tau\bigr)$ \EndIf
+  \EndFor
+  \State align the stored draws (permutation and signs) on a reference $\U_{\mathrm{ref}}$
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+\section{Empirical performance via simulation}
+
+\subsection{Simulation design}
+We consider $K=3$ blocks with $p_1=10$, $p_2=5$, $p_3=15$ variables and $N=100$ observations generated from
+\[
+  \X_k=\U\Sigma_k\V_k^\intercal+\EE_k,\qquad k=1,2,3,
+\]
+where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sigma_k$ is the diagonal matrix of the block weights and $\EE_k$ is a noise term. The true effective rank is $R_{\mathrm{eff}}=3$. The diagonal matrices are set to 
+\[\Sigma_1=\diag(0.7,0.5,0), \quad \Sigma_2=\diag(0.5,0.7,0), \quad \Sigma_3=\diag(0.3,0,0.5).\] 
+All the models are fitted with the maximal rank $R_{\max}=4$, the largest value satisfying $R_{\max}<\min_kp_k$. For all models, the blocks were centered only, because Hoff's Bayesian SVD and the Gavish--Donoho threshold must be applied to the blocks without normalization.
+ 
+\paragraph{Grid for noise variance:} We assume that the terms $e_{\bullet\bullet}$ of the noise $\EE_k$ are distributed from $\mathcal{N}(0,s^2)$. For a spectral method applied to a single block, an active weight $w$ is asymptotically undetectable when the noise parameter $s$ exceeds $w/(Np_k)^{1/4}$ \cite[see][for details]{benaychgeorges2012}. Table~\ref{tab:thres} provides these thresholds as a function of the dimensional weights of the blocks. We set $s$ within the interval from 0.02 to 0.18. Note that the first column of $\U$ should remain well estimated beyond $s=0.05$, since it is shared by the three blocks, whereas the third column of $\U$ depends only on block 3 and should not be well estimated beyond $s=0.08$.    
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccrr}
+  \hline
+dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\ 
+  \hline
+1 & 3 & 0.30 & 0.05 \\ 
+  3 & 3 & 0.50 & 0.08 \\ 
+  2 & 1 & 0.50 & 0.09 \\ 
+  1 & 2 & 0.50 & 0.11 \\ 
+  1 & 1 & 0.70 & 0.12 \\ 
+  2 & 2 & 0.70 & 0.15 \\ 
+   \hline
+\end{tabular}
+\caption{Thresholds for the standard deviation of noise that make the weight of the dimension on the block undetectable.\label{tab:thres}}
+\end{table}
+
+
+\textcolor{red}{[Sensitivity to the indexing of the slab: to be added, the sparse sampler with the slab scaled by the block norm ($\lambda=1$) against the slab indexed on the noise ($g_k=(N-1)p_k$), on the same data sets, with $R_{\max}=4$; e.g.\ selection probabilities as in Figure~\ref{fig4} and distribution of $R_{\mathrm{eff}}$ as in Figure~\ref{fig6}.]}
+
+\paragraph{Slab parameter $\lambda$:} The relative slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero ratio $\sigma_k^{(r)}/\|\X_k\|$: under the slab, its mean is $s_0\sqrt{2/\pi}$. Since $\sigma_k^{(r)}\le\|\X_k\|$, only the values of the ratio in $[0,1]$ are attainable. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable
+values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions and makes the selection less conservative.
+
+%\textcolor{red}{[To be checked against the code: the Gibbs samplers, ; the Gibbs samplers do not need it, since their priors are scaled by the block norms, and Hoff's SVD and the Gavish--Donoho threshold assume i.i.d. noise on all the entries of the concatenated matrix. MCOA and OMCOA depend on the scale of the blocks: state whether they are applied to the raw blocks or to the blocks divided by their Frobenius norm, with the weights brought back to the original scale.]} 
+The Gibbs samplers were run with $T=6000$ iterations and a burn-in of $T_0=1000$. In order to evaluate the estimation of each dimension, all the fitted configurations $\hat\U$ were aligned on the true $\U$ (permutation and signs of the dimensions); in practice, the alignment is made on the OMCOA solution (Section~\ref{sec:align}). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayesian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
+
+\subsection{Results}
+
+\subsubsection*{Estimation of the weights $\sigma_k^{(r)}$:}
+Figure~\ref{fig1} provides the empirical coverage of the 95\% credible intervals of the block weights for the active dimensions (dimensions 1 to 3), as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. The coverage was close to the nominal level for $s\leq0.04$. For the weights equal to zero, the coverage of the non-sparse sampler was 0, since its half-normal prior excludes the value 0, whereas the sparse sampler covered the true value in all cases. For the active weights at high noise levels, the non-sparse sampler was over-conservative, with a coverage close to 1, since its credible intervals widened. For the active weights, the coverage of the sparse sampler decreased when $s$ increased, because a weight that is not selected gets the degenerate interval $\{0\}$; as expected, this decrease was smaller for larger values of $\lambda$, which favour the inclusion. The weight of dimension 3, which is only present in block 3, was the first to be affected ($s>0.05$), whereas the coverage of the weight of dimension 2 on block 2 remained good until $s=0.08$.
+Figure~\ref{fig2} provides the estimated block weights of the active dimensions, with the 2.5\% and 97.5\% empirical quantiles over the $B$ replications, as a function of $s$. When the weights were non-null, they were accurately estimated by the two Bayesian samplers and by MCOA and OMCOA for $s\leq0.04$. The upward bias of MCOA and OMCOA increased with $s$, since these methods fit part of the noise, which inflates the estimated weights. The non-sparse Gibbs sampler degraded less. The sparse sampler behaved differently: a weight that is not detected is set to 0, so that the true zero weights were kept at 0, whereas the active weights were biased downwards at high noise levels; for instance, the weight $0.7$ of dimension 1 on block 1 was estimated between about $0.1$ and $0.3$ for $s\geq0.12$. This is a consequence of the selection, not an absence of bias.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure1.eps}
+  \caption{Empirical coverage probability of the weights $\sigma_k^{(r)}$ using gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda=.1$, blue for $\lambda=1$ and purple for $\lambda=10$) as a function of the noise standard deviation $s$. \label{fig1}}
+\end{figure}
+
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figs/figure2.eps}
+  \caption{Estimated block weights, with the 2.5\% and 97.5\% empirical quantiles over the $B=1000$ simulated data sets, for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA with $\lambda=1$ in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
+\end{figure}
+For the inactive dimensions 4 and 5 (not shown), the estimated weights of MCOA, OMCOA and of the non-sparse sampler increased with $s$, since these methods fit the noise, whereas the sparse sampler kept them at 0 in almost all cases.
+
+\subsubsection*{Analysis of sensitivity to the spike-and-slab parameters:} 
+
+\paragraph{Slab parameter:} We compare the performances in terms of the proportion of active dimensions that are selected using the decision rule defined in (\ref{dec_rule}) as a function of the slab parameter $\lambda$ (Figure \ref{fig4}). For all $\lambda$, when the noise standard deviation was low ($s<0.05$), all the active dimensions were selected. When $s$ increased, the active weights were lost in the following order: dimension 3 on block 3, dimension 1 on block 3, dimension 2 on block 1, dimension 1 on block 2, dimension 1 on block 1, and finally dimension 2 on block 2. Apart from the first two, this order follows the detectability thresholds of Table~\ref{tab:thres}. The first two are inverted: the weight $0.3$ of dimension 1 on block 3 (threshold $0.05$) was still selected in about 65\% of the data sets for $s=0.06$ ($\lambda=1$), whereas the weight $0.5$ of dimension 3 on block 3 (threshold $0.08$) was already selected in only about 25\% of them. Dimension 1 is shared by the three blocks, so that $\uu^{(1)}$ is well estimated from blocks 1 and 2 and its weight in block 3 remains detectable beyond the single-block threshold. Dimension 3 is only present in block 3: $\uu^{(3)}$ is estimated from this block alone, and the Bayes factor requires a margin above the spectral threshold. The multiblock model therefore borrows strength across blocks and detects weights that a block-by-block analysis would miss.
+With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimensions 4 and 5, as well as the zero weights of dimensions 1 to 3 (dimension 3 on blocks 1 and 2, dimension 2 on block 3), were almost never selected. With $\lambda=10$, the active weights were lost at slightly higher noise levels, at the cost of about 20\% of false selections in block 2. A possible explanation is that $p_2=R_{\max}=5$: $\V_2$ is then a square orthogonal matrix, so that every direction of block 2 is associated with a dimension and the noise of this block always has a column to occupy. In this design, $\lambda=1$ offers the best trade-off between the detection of weak weights and false selections.    
+
+\paragraph{Spike parameter:} 
+
+
+% \begin{figure}
+%   \includegraphics[width=\linewidth]{figs/figure3.eps}
+%   \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda$.  \label{fig3}}
+% \end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure4.eps}
+  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig4}}
+\end{figure}
+
+\subsubsection*{Comparison of the estimates of the effective rank:} 
+
+\paragraph{MCMC diagnostics:} 
+Bulk Effective Sample Size
+\begin{table}[ht]
+\centering
+\begin{tabular}{cccccccccc}
+  \hline
+$s$ & $\hat R(R_{eff})$ & Max Diff & $bulkESS(R_{eff})$ & $\max(\hat R(\sigma^{(r)}_k))$ & $k$ & $r$ & $\min(bulkESS(\sigma^{(r)}_k))$ & $k$ & $r$ \\ 
+  \hline
+0.04 & 1.00 & 0.04 & 488.00 & 1.01 &   1 &   2 & 203.00 &   3 &   4 \\ 
+  0.06 & 1.05 & 0.11 & 99.00 & 1.03 &   2 &   4 & 78.00 &   2 &   4 \\ 
+  0.08 & 1.01 & 0.07 & 131.00 & 1.02 &   1 &   4 & 97.00 &   2 &   4 \\ 
+  0.12 & 1.00 & 0.06 & 100.00 & 1.01 &   1 &   2 & 223.00 &   3 &   3 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+\textcolor{red}{[Paragraph to be rewritten once Hoff's SVD and the Gavish--Donoho threshold have been rerun on the non-standardised blocks.]} Figure~\ref{fig6} provides the distribution of the estimated effective rank as a function of the noise standard deviation $s$, for the Gavish--Donoho criterion, the sparse Gibbs sampler and Hoff's Bayesian SVD. For values of $s$ less than 0.06, the sparse Gibbs sampler identified three active dimensions in more than 50\% of the simulated data, whereas the effective rank of 3, chosen according to the Hoff and Gavish-Donoho criteria, dropped very rapidly below 50\% ($s > 0.025$). When no dimension was detectable ($s>0.15$), Hoff’s Bayesian SVD model overestimated the effective rank because it retained five active dimensions in more than 75\% of cases; the sparse Gibbs sampler found a rank between 1 and 3 most of the time; and the Gavish-Donoho criterion estimated the effective rank to be 1 most of the time.   
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/figure6.eps}
+  \caption{Distribution of the estimated effective rank with the Gavish--Donoho criterion, the sparse Gibbs sampler ($\lambda=1$) and Hoff's Bayesian SVD, as a function of the noise standard deviation $s$. \label{fig6}}
+\end{figure}
+
+
+
+% We compare\item $\Sigma_1=\diag(.7,.5,0), \Sigma_1=\diag(.6,.4,0), \Sigma_1=\diag(.5,0,0),$ the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with.6MCOA and OMCOA.
+% The diagonal matrices depend on a parameter $t\in[0,1]$:
+% \[
+% \Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
+% \]
+% where
+% \begin{itemize}
+%   \item for $t=0$, all the blocks share the same profile:
+%   $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
+%   \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
+%   $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
+% \end{itemize}
+
+
+% \begin{lemma} \label{lemma1}
+% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R)$, the maximum of $\trace(\T^\intercal\X\h)$ with the constraint $\T^\intercal.\T=I_R$ is $\T=\textbf{U}.\textbf{V}^\intercal$ where the columns of $\textbf{U}$ (respectively $\textbf{V}$) are the $R$ first left (respectively right) singular vectors of $\X\h$. (see \cite{cliff66}) 
+% \end{lemma}
+
+% \begin{proof}
+% 	Consider the SVD of $\X.\h =\textbf{U}.\Sigma.\textbf{V}^t$. We have $\trace(\textbf{T}^t.\textbf{U}.\Sigma.\textbf{V}^t)=\trace(\Sigma.\textbf{V}^t.\textbf{T}^t.\textbf{U})$
+% 	($\trace(\textbf{A}.\textbf{B})=\trace(\textbf{B}.\textbf{A})$). The matrix $\textbf{W}=\textbf{V}^t.\textbf{T}^t.\textbf{U}$ is orthogonal. 
+% The problem of maximization remains to maximizing 
+% \[\trace(\Sigma.\textbf{W})=\sum_{h=1}^H\sigma^2_h.w_{hh}.\]
+% Since $\textbf{W}$ is orthogonal, $|w_{hh}| \leq 1$ for all $h$. The trace of $\Sigma.\textbf{W}$ is maximal for $w_{hh}=1$, that implies $\textbf{W}=I_H$ and $\textbf{T}=\textbf{U}.\textbf{V}^t$. Moreover, the maximum of the trace is  $\sum_{h=1}^H\sigma^2_h$. 
+
+% \end{proof}
+
+% \begin{lemma} \label{lemma2}
+% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R), \T \in \mathcal M_{N,R}(\mathbb R)$ we have 
+% 	\[\trace(\textbf{X}^\intercal.\textbf{T}.\textbf{H}^\intercal)=\trace(\textbf{T}^\intercal\textbf{X}\textbf{H}).\]
+% \end{lemma}
+
+%  \begin{proof}
+%  $\trace(\X^\intercal\T\h^\intercal)=\trace(\h^\intercal\X^\intercal\T)=\trace(\T^\intercal\X\h).$
+%  The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose.
+%  \end{proof}
+
+
+% \medskip
+% \noindent
+% \textbf{Remark.} This proof guarantees convergence of the values of the criterion, but not necessarily uniqueness of the limit point. Uniqueness of the solution is established separately, via the orthogonality of the columns of $\V_k$ for all $k$.
+
+% \section{Comparison of MCOA and OMCOA}
+% \subsection{Simulation study}
+% MCOA and OMCOA are compared on simulated data. $K=3$ blocks $\X_1,\X_2,\X_3$ with respectively
+% $p_1=10$, $p_2=15$, $p_3=20$ variables and $N=100$ observations are generated from
+% \[
+% \X_k=\U\Sigma_k\V_k^\intercal+\EE_k, \qquad k=1,2,3,
+% \]
+% where $\U\in\mathcal M_{N,R}(\mathbb R)$ (column-centered) and $\V_k\in\mathcal M_{p_k,R}(\mathbb R)$ have orthonormal
+% columns, $R=3$, $\Sigma_k$ is diagonal and $\EE_k$ is a Gaussian noise term.
+% We compare the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with MCOA and OMCOA.
+% The diagonal matrices depend on a parameter $t\in[0,1]$:
+% \[
+% \Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
+% \]
+% where
+% \begin{itemize}
+%   \item for $t=0$, all the blocks share the same profile:
+%   $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
+%   \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
+%   $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
+% \end{itemize}
+% In both cases $\sum_{r}(\sigma_k^{(r)})^2=0.83$ for each block. Moreover, the singular values of the
+% noise-free concatenated matrix are $\bigl(\sum_k(\sigma_k^{(r)}(t))^2\bigr)^{1/2}$: they are well separated for $t=0$
+% and all equal to $\sqrt{0.83}$ for $t=1$, since $\sum_k\Sigma_k^{(1)\,2}=0.83\,\textbf{I}_3$.
+% The noise is scaled so that $\|\EE_k\|^2=\frac{0.10}{0.90}\,\|\U\Sigma_k\V_k^\intercal\|^2$, i.e.\ it accounts for about
+% $10\%$ of the variance of each block. We use $t\in\{0,0.1,\ldots,1\}$ and $B=1000$ replications.
+
+% At each replication, the estimated axes are reordered by the permutation
+% \[
+% \hat\pi=\arg\max_{\pi\in\mathfrak S_R}\sum_{r=1}^{R}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\pi(r))}\bigr)\bigr|,
+% \]
+% the absolute value accounting for the sign indeterminacy of the axes.
+% The accuracy of the estimation of $\Sigma_1,\ldots,\Sigma_K$ is assessed by the mean absolute error
+% over the $K$ blocks and the $R$ dimensions:
+% \[
+% \mathrm{MAE}=\frac{1}{KR}\sum_{k=1}^{K}\sum_{r=1}^{R}
+% \bigl|\hat\sigma_k^{(\hat\pi(r))}-\sigma_k^{(r)}\bigr|.
+% \]
+
+% \subsection{Results}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=.8\linewidth]{figs/plot_t0.png}
+%   \caption{Common profile ($t=0$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
+%   over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t0}}
+% \end{figure}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=.8\linewidth]{figs/plot_t1.png}
+%   \caption{Permuted profiles ($t=1$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
+%   over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t1}}
+% \end{figure}
+
+% Figures~\ref{fig_t0} and~\ref{fig_t1} show the estimates obtained with MCOA and OMCOA for $t=0$ and $t=1$
+% respectively. As expected, both methods give very close estimates when the blocks share a common profile
+% (Figure~\ref{fig_t0}). When the profiles are permuted, OMCOA outperforms MCOA in terms of both bias and
+% precision (Figure~\ref{fig_t1}). In both scenarios, the OMCOA estimates show very low variability.
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=.8\linewidth]{figs/explained_var.png}
+%   \caption{Distribution of the percentage of explained variance $V$ over the $B=1000$ replications.\label{var_expl}}
+% \end{figure}
+
+% Figure~\ref{var_expl} shows the empirical distribution of the percentage of variance of the concatenated
+% matrix $\X$ explained by the $R$ dimensions,
+% \[
+% V=100\times\frac{\sum_{k,r}\bigl(\hat\sigma^{(r)}_k\bigr)^2}{\|\X\|^2},
+% \qquad \|\X\|^2=\sum_{k=1}^{K}\|\X_k\|^2,
+% \]
+% to be compared with the percentage of variance due to the signal, which is about $90\%$ by construction.
+% OMCOA slightly exceeds this value in all cases, since part of the noise is captured by the fitted
+% dimensions, whereas MCOA clearly underestimates it when the profiles are permuted ($t=1$).
+
+% Figure~\ref{comparison_t} shows the distribution of the MAE as a function of $t$. MCOA and OMCOA coincide as
+% long as the singular values of $\X$ are well separated; MCOA breaks down when they get close ($t\geq 0.8$).
+% Indeed, MCOA starts with the SVD of $\X$: when the singular values are close, $\u^{(1)}$ is an arbitrary
+% direction of $\mathrm{span}(\U)$ driven by the noise, and this error propagates to the next dimensions through
+% the deflation. OMCOA fits all the blocks simultaneously, so that the block-specific profiles identify $\U$.
+% Figure~\ref{comparison_cos} illustrates the resulting misestimation of the axes $\u^{(1)},\ldots,\u^{(R)}$
+% by MCOA for $t\geq 0.8$.
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=.5\linewidth]{figs/comparaison_t.png}
+%   \caption{Median and 10--90\% empirical quantiles of the MAE as a function of $t$ ($B=1000$ replications).\label{comparison_t}}
+% \end{figure}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=.5\linewidth]{figs/comparaison_cos.png}
+%   \caption{Median and 10--90\% empirical quantiles of the worst axis recovery
+%   $\displaystyle\min_{r}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\hat\pi(r))}\bigr)\bigr|$ as a function of $t$
+%   ($B=1000$ replications).\label{comparison_cos}}
+% \end{figure}
+
+% \section*{Conclusion}
+% \cite{Bougeard024} have compared estimations for the canonical factorisation problem. In this work, we propose on optimal version of Multiple COinertia Analysis that performs better on the simulated data. Constraining the matrices $(\V_1,\dots,\V_K)$ to be orthogonal ensures uniqueness of the solution. In particular, if $|\mathbf{E}_k|=0$, the OMCOA method recovers the exact canonical factorization while other methods do not guarantee this."    
+% Furthermore, in practical applications the canonical factorisation is more readily interpreted under orthogonal configurations, as these yield a clearer decomposition of the effects.
+
+
+\clearpage
+
+\bibliographystyle{apalike}
+\bibliography{Biblio}
+
+\section*{Appendix: proofs of the propositions}
+
+
+
+
+\begin{proof}[Proposition 1]
+	The criterion to be minimized is:
+\[
+  \mathcal{L}(\U, \V_1, \ldots, \V_K, \Sigma_1, \ldots, \Sigma_K)
+  = \sum_{k=1}^{K} \bigl\| \X_k - \U \Sigma_k \V_k^\top \bigr\|^2,
+\]
+subject to $\U\in\Stiefel{N}{R}$ and $\V_k\in \Stiefel{p_k}{R}$ for all $k = 1, \ldots, K$.
+
+The algorithm is of the \emph{Alternating Least Squares} (ALS) type: at each iteration, the criterion is minimized successively with respect to each parameter, while the others are held fixed. It therefore suffices to show that each individual update decreases or maintains $\mathcal{L}$.
+
+\paragraph{Update of $\U$} With $\V_k$ and $\Sigma_k$ fixed, let $\HH_k = \Sigma_k \V_k^\intercal \in \mathcal{M}_{R,p_k}(\mathbb{R})$ and
+$\HH = [\HH_1 \mid \cdots \mid \HH_K] \in \mathcal{M}_{R,P}(\mathbb{R})$. Then:
+\[
+  \mathcal{L} = \sum_{k=1}^{K} \|\X_k - \U \HH_k\|^2 = \|\X - \U \HH^\intercal\|^2.
+\]
+Expanding:
+$\|\X - \U \HH^\intercal\|^2
+  = \|\X\|^2 - 2\,\operatorname{trace}(\X^\intercal \U \HH^\intercal) + \|\U \HH^\intercal\|^2.$
+
+\noindent Since $\U^\intercal \U = I_R$: $\|\U \HH^\intercal\|^2
+  = \operatorname{trace}(\HH \U^\intercal \U \HH^\intercal)
+  = \operatorname{trace}(\HH \HH^\intercal)
+  = \|\HH\|^2 \quad \text{(constant w.r.t.\ } \U\text{)}.$
+
+\noindent Minimizing $\mathcal{L}$ with respect to $\U$ is therefore equivalent to
+maximizing $$\trace(\X^\intercal\U\HH^\intercal)=\trace(\HH^\intercal\X^\intercal\U)=\trace(\U^\intercal\X\HH),$$
+subject to $\U^\intercal \U = I_R$. The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{B}\textbf{A})$ for $\textbf{A},\textbf{B}$ of dimensions $N\times P$ and $P\times N$. The second equality comes from the equality of the trace of a square matrix and its transpose. By \cite{cliff1966}, the maximum is attained at $\U^* = \mathbf A\mathbf B^\intercal$, where $\X\HH^\intercal=\mathbf A\mathbf D\mathbf B^\intercal$ is the thin SVD of $\X\HH^\intercal\in\mathcal M_{N,R}(\mathbb R)$.
+This update is the global minimizer of $\mathcal{L}$ with respect to $\U$, hence:
+\[
+  \mathcal{L}(\U^*, \ldots) \leq \mathcal{L}(\U_{\mathrm{old}}, \ldots).
+\]
+\paragraph{Update of $\V_k$} With $\U$ and $\Sigma_k$ fixed, expanding the contribution of block $k$:
+\[
+  \|\X_k - \U \Sigma_k \V_k^\intercal\|^2
+  = \|\X_k\|^2
+    - 2\,\operatorname{trace}(\X_k^\intercal \U \Sigma_k \V_k^\intercal)
+    + \|\U \Sigma_k \V_k^\intercal\|^2.
+\]
+Since $\U^\intercal \U = I_R$ and $\V_k^\intercal \V_k = I_R$:
+\[
+  \|\U \Sigma_k \V_k^\intercal\|^2
+  = \operatorname{trace}(\V_k \Sigma_k^\intercal \U^\intercal \U \Sigma_k \V_k^\intercal)
+  = \operatorname{trace}(\Sigma_k^2)
+  \quad \text{(constant w.r.t.\ } \V_k\text{)}.
+\]
+Minimizing therefore reduces to maximizing
+$\operatorname{trace}(\X_k^\intercal \U \Sigma_k \V_k^\intercal) = \operatorname{trace}(\V_k^\intercal\X_k^\intercal\U\Sigma_k)$
+subject to $\V_k^\intercal \V_k = I_R$, which requires $R\leq p_k$. By \cite{cliff1966}, the maximum is attained at $\V_k^* = \mathbf A_k\mathbf B_k^\intercal$, where $\X_k^\intercal\U\Sigma_k=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal$ is the thin SVD of $\X_k^\intercal\U\Sigma_k$. Note that $\Sigma_k$ cannot be dropped: in general the polar factor of $\X_k^\intercal\U\Sigma_k$ differs from that of $\X_k^\intercal\U$. If some $\sigma_k^{(r)}$ are zero, $\X_k^\intercal\U\Sigma_k$ is rank deficient and the maximizer is not unique, but any maximizer gives the same value of the criterion. Hence:
+\[
+  \mathcal{L}(\ldots, \V_k^*, \ldots) \leq \mathcal{L}(\ldots, \V_{k,\mathrm{old}}, \ldots).
+\]
+
+%---------------------------------------------------------------
+\paragraph{Update of $\Sigma_k$} With $\U$ and $\V_k$ fixed (both having orthonormal columns), and $\Sigma_k = \operatorname{diag}(\sigma^{(1)}_k,
+\ldots, \sigma^{(R)}_k)$, the contribution of block $k$ is:
+\[
+  \|\X_k - \U \Sigma_k \V_k^\intercal\|^2
+  = \|\X_k\|^2
+    - 2\,\operatorname{trace}(\V_k^\intercal \X_k^\intercal \U \Sigma_k)
+    + \operatorname{trace}(\Sigma_k^2).
+\]
+Since $\Sigma_k$ is diagonal, it remains to minimize:
+\[
+  \sum_{r=1}^{R} \Bigl[ (\sigma^{(r)}_k)^2 - 2\,\sigma^{(r)}_k\,(\U^\intercal \X_k \V_k)_{rr} \Bigr].
+\]
+Each term is a convex parabola in $\sigma^{(r)}_k$, minimized at: $(\sigma^{(r)}_k)^* = (\U^\intercal \X_k \V_k)_{rr},$ or, in matrix form:$\Sigma_k^* = \operatorname{diag}(\U^\intercal \X_k \V_k).$
+This update is therefore the exact minimizer with respect to $\Sigma_k$. If $(\U^\intercal\X_k\V_k)_{rr}<0$, replacing $\vv_k^{(r)}$ by $-\vv_k^{(r)}$ and $\sigma_k^{(r)}$ by $|(\U^\intercal\X_k\V_k)_{rr}|$ keeps $\V_k$ orthonormal and leaves the criterion unchanged, so that the constraint $\sigma_k^{(r)}\geq0$ costs nothing. Hence:
+\[
+  \mathcal{L}(\ldots, \Sigma_k^*, \ldots) \leq \mathcal{L}(\ldots, \Sigma_{k,\mathrm{old}}, \ldots).
+\]
+
+%---------------------------------------------------------------
+\paragraph{Global Convergence} At each complete iteration (update of $\U$, then all $\V_k$, then all $\Sigma_k$), the criterion $\mathcal{L}$ is monotonically decreasing and bounded below by zero. A monotone sequence bounded below converges, so the sequence of values $(\mathcal{L}^{(t)})_{t \geq 0}$
+converges:
+\[
+  \mathcal{L}^{(t+1)} \leq \mathcal{L}^{(t)}, \quad \mathcal{L}^{(t)} \geq 0
+  \implies
+  \mathcal{L}^{(t)} \xrightarrow[t \to \infty]{} \ell^* \geq 0.
+\]
+\end{proof}
+
+\begin{proof}[Proposition 2]
+\emph{(a)} The true parameters give the value $0$ to criterion~\eqref{Crit}, so
+every minimiser $(\U',\V_k',\Sigma_k')$ satisfies
+$\X_k=\U'\Sigma_k'\V_k'^\intercal$ for all $k$; this does not depend on the
+weights given to the blocks. Since every dimension is present in some block,
+the column space of $\X=[\X_1|\cdots|\X_K]$ is the span of $\U$, of dimension
+$R$. It is contained in the span of $\U'$, which also has dimension $R$; hence
+$\U'=\U\mathbf O$ with $\mathbf O$ orthogonal. From
+$\X_k\X_k^\intercal=\U\Sigma_k^2\U^\intercal=\U'\Sigma_k'^2\U'^\intercal$ we get
+\[
+  \mathbf O^\intercal\Sigma_k^2\,\mathbf O=\Sigma_k'^2,\qquad k=1,\ldots,K .
+\]
+For $\mathbf c\in\mathbb R^K$, the diagonal matrix
+$\mathbf A(\mathbf c)=\sum_k c_k\Sigma_k^2$ has entries
+$a_r=\sum_k c_k(\sigma_k^{(r)})^2$, and $\mathbf O^\intercal\mathbf A(\mathbf c)\mathbf O$
+is diagonal. Since the profiles are distinct and nonnegative, the squared
+profiles are distinct, and $\mathbf c$ can be chosen outside the finite union
+of hyperplanes $\{a_r=a_{r'}\}$, so that the entries of $\mathbf A(\mathbf c)$
+are pairwise distinct. An orthogonal matrix that diagonalises a diagonal
+matrix with distinct entries is a signed permutation matrix:
+$\mathbf O=\mathbf P\mathbf D$, with $\mathbf P$ a permutation matrix and
+$\mathbf D=\diag(\pm1)$. Hence $\U'=\U\mathbf P\mathbf D$ and
+$\Sigma_k'^2=\mathbf P^\intercal\Sigma_k^2\mathbf P$, that is
+$\Sigma_k'=\mathbf P^\intercal\Sigma_k\mathbf P$ since the weights are
+nonnegative. Finally, $\U'^\intercal\X_k=\Sigma_k'\V_k'^\intercal$ gives, for
+every $(k,r)$ with $\sigma_k'^{(r)}>0$,
+$\vv_k'^{(r)}=\X_k^\intercal\uu'^{(r)}/\sigma_k'^{(r)}$, which is the matching
+column of $\V_k$ with the sign of $\uu'^{(r)}$; the columns with
+$\sigma_k'^{(r)}=0$ are only constrained by $\V_k'\in\Stiefel{p_k}{R}$.
+
+\emph{(b)} Write $\mathcal R_t$ for the set of dimensions not yet extracted at
+step $t$ of MCOA ($\mathcal R_1=\{1,\ldots,R\}$), and assume that the deflated
+blocks are
+$\X_k^{(t)}=\sqrt{w_k}\sum_{r\in\mathcal R_t}\sigma_k^{(r)}\uu^{(r)}\vv_k^{(r)\intercal}$,
+which holds for $t=1$. Then
+\[
+  \X^{(t)}\X^{(t)\intercal}=\sum_{k}\X_k^{(t)}\X_k^{(t)\intercal}
+  =\sum_{r\in\mathcal R_t}\lambda_r(\mathbf w)\,\uu^{(r)}\uu^{(r)\intercal},
+\]
+because the columns of each $\V_k$ are orthonormal. The values
+$\lambda_r(\mathbf w)$ being distinct, the leading left singular vector of
+$\X^{(t)}$ is $\pm\uu^{(r_t)}$, with $r_t=\argmax_{r\in\mathcal R_t}\lambda_r(\mathbf w)$.
+Then $\X_k^{(t)\intercal}\uu^{(r_t)}=\sqrt{w_k}\,\sigma_k^{(r_t)}\vv_k^{(r_t)}$:
+the MCOA weight is $\sqrt{w_k}\,\sigma_k^{(r_t)}$ and, when it is positive, the
+normalised loading is $\pm\vv_k^{(r_t)}$ (with the sign of $\uu$), so that the
+deflation $\X_k^{(t)}(\mathbf I-\vv_k^{(r_t)}\vv_k^{(r_t)\intercal})$ removes exactly the
+term $r_t$. When the weight is zero, the term $r_t$ is absent from block $k$
+and the block is left unchanged. The induction hypothesis holds at step
+$t+1$ with $\mathcal R_{t+1}=\mathcal R_t\setminus\{r_t\}$. After $R$ steps,
+MCOA has recovered $\U$ and the $\V_k$ (columns with a positive weight) up to
+order and signs, and gives a zero value to criterion~\eqref{Crit} for the
+weighted blocks: by (a), it coincides with the OMCOA solution.
+
+\emph{(c)} Let $t$ be the first step where
+$\max_{r\in\mathcal R_t}\lambda_r(\mathbf w)$ is attained by several dimensions
+$r\in\mathcal T\subset\mathcal R_t$. Up to step $t-1$, the argument of (b)
+applies, and the leading eigenvalue of $\X^{(t)}\X^{(t)\intercal}$ has the
+eigenspace $\mathrm{span}\{\uu^{(r)},r\in\mathcal T\}$, of dimension
+$|\mathcal T|\geq2$. Every unit vector of this space maximises the MCOA
+criterion at step $t$; a vector other than $\pm\uu^{(r)}$, $r\in\mathcal T$,
+gives a common component that is not a column of $\U$ up to sign, hence, by
+(a), a solution different from the OMCOA one.
+\end{proof}
+
+
+
+\begin{proof}[Proposition 3]
+(1)--(2): by \eqref{eq:expand}, the conditional density of $\U$ is proportional to
+$\exp\{\sum_k\tau_k\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)\}=\exp\{\trace(\F_{\U}^\intercal\U)\}$, and
+$\trace(\F_{\U}^\intercal\Q\tilde\U)=\trace\bigl((\Q^\intercal\F_{\U})^\intercal\tilde\U\bigr)$; the same argument applies to $\V_k$
+with $\trace(\Sigma_k\V_k^\intercal\X_k^\intercal\U)=\trace(\F_{\V_k}^\intercal\V_k)/\tau_k$.
+(3): the terms of the log-likelihood involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand}, $-\frac{\tau_k}{2}\bigl[(\sigma_k^{(r)})^2-2\sigma_k^{(r)}d_k^{(r)}\bigr]$;
+adding the log-prior $-\frac{\lambda_k}{2}(\sigma_k^{(r)})^2$, $\lambda_k=\lambda/\|\X_k\|^2$, and completing the square gives a Gaussian kernel, restricted to
+$\sigma_k^{(r)}>0$.
+(4): the likelihood contributes $\tau_k^{(N-1)p_k/2}\exp(-\tau_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2)$ and the Jeffreys prior $\tau_k^{-1}$, which gives a Gamma kernel.
+\end{proof}
+
+\begin{proof}[Proposition 4]
+Items 1, 2, 4 and 5 follow as in the non-sparse sampler (linearity of \eqref{eq:expand} in $\U$ and $\V_k$, and
+conjugacy; for item 5, the Jeffreys prior contributes the factor $\tau_k^{-1}$). For item 3, the terms of the log-likelihood involving $\sigma_k^{(r)}$ are, by \eqref{eq:expand2},
+$\tau_kd_k^{(r)}\sigma_k^{(r)}-\frac{\tau_k}{2}(\sigma_k^{(r)})^2$. Under $\gamma_k^{(r)}=0$, $\sigma_k^{(r)}=0$ and this quantity is
+$0$. Under $\gamma_k^{(r)}=1$, integrating against the half-normal slab of density
+$2\sqrt{\lambda_k/(2\pi)}\exp(-\lambda_k s^2/2)$ on $(0,\infty)$, $\lambda_k=\lambda/\|\X_k\|^2$, gives
+\[
+  2\sqrt{\frac{\lambda_k}{2\pi}}\int_0^{\infty}\exp\Bigl(-\frac{\omega_k}{2}s^2+\tau_kd_k^{(r)}s\Bigr)ds
+  =2\sqrt{\frac{\lambda_k}{\omega_k}}\exp\Bigl(\frac{\omega_k(m_k^{(r)})^2}{2}\Bigr)\Phi\bigl(m_k^{(r)}\sqrt{\omega_k}\bigr)=B_k^{(r)},
+\]
+which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The conditional of $\sigma_k^{(r)}$ given
+$\gamma_k^{(r)}=1$ is obtained by completing the square.
+\end{proof}
+
+\paragraph{MCMC diagnostics}F
+
+\includegraphics[width=\linewidth]{figs/diagnostic_plot_sig_06.png}
+
+
+\end{document}
+
