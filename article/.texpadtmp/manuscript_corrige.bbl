@@ -15,10 +15,20 @@ Besag, J. (1986).
 \newblock On the statistical analysis of dirty pictures.
 \newblock {\em Journal of the Royal Statistical Society: Series B (Methodological)}, 48(3):259--279.
 
+\bibitem[Bhattacharya and Dunson, 2011]{bhattacharya2011}
+Bhattacharya, A. and Dunson, D.~B. (2011).
+\newblock Sparse {B}ayesian infinite factor models.
+\newblock {\em Biometrika}, 98(2):291--306.
+
 \bibitem[Bougeard et~al., 2024]{bougeard2024}
 Bougeard, S., Peltier, C., Jaillais, B., Boulet, J.-C., and Hanafi, M. (2024).
 \newblock Benchmarking multiblock methods with canonical factorization.
 \newblock {\em Chemometrics and Intelligent Laboratory Systems}, 254:105240.
+
+\bibitem[{Cancer Genome Atlas Network}, 2012]{tcga2012}
+{Cancer Genome Atlas Network} (2012).
+\newblock Comprehensive molecular portraits of human breast tumours.
+\newblock {\em Nature}, 490(7418):61--70.
 
 \bibitem[Chessel and Hanafi, 1996]{chessel1996}
 Chessel, D. and Hanafi, M. (1996).
@@ -50,6 +60,11 @@ George, E.~I. and McCulloch, R.~E. (1993).
 \newblock Variable selection via gibbs sampling.
 \newblock {\em Journal of the American Statistical Association}, 88(423):881--889.
 
+\bibitem[Griffiths and Ghahramani, 2011]{griffiths2011}
+Griffiths, T.~L. and Ghahramani, Z. (2011).
+\newblock The {I}ndian buffet process: an introduction and review.
+\newblock {\em Journal of Machine Learning Research}, 12:1185--1224.
+
 \bibitem[Hoff, 2007]{hoff2007}
 Hoff, P.~D. (2007).
 \newblock Model averaging and dimension selection for the singular value decomposition.
@@ -65,6 +80,11 @@ Klami, A., Virtanen, S., Lepp{\"a}aho, E., and Kaski, S. (2015).
 \newblock Group factor analysis.
 \newblock {\em IEEE Transactions on Neural Networks and Learning Systems}, 26(9):2136--2147.
 
+\bibitem[Legramanti et~al., 2020]{legramanti2020}
+Legramanti, S., Durante, D., and Dunson, D.~B. (2020).
+\newblock Bayesian cumulative shrinkage for infinite factorizations.
+\newblock {\em Biometrika}, 107(3):745--752.
+
 \bibitem[Liang et~al., 2008]{liang2008}
 Liang, F., Paulo, R., Molina, G., Clyde, M.~A., and Berger, J.~O. (2008).
 \newblock Mixtures of $g$ priors for {B}ayesian variable selection.
@@ -74,6 +94,21 @@ Liang, F., Paulo, R., Molina, G., Clyde, M.~A., and Berger, J.~O. (2008).
 Mitchell, T.~J. and Beauchamp, J.~J. (1988).
 \newblock Bayesian variable selection in linear regression.
 \newblock {\em Journal of the American Statistical Association}, 83(404):1023--1032.
+
+\bibitem[Rohart et~al., 2017]{rohart2017}
+Rohart, F., Gautier, B., Singh, A., and L{\^e}~Cao, K.-A. (2017).
+\newblock {mixOmics}: an {R} package for 'omics feature selection and multiple data integration.
+\newblock {\em PLoS Computational Biology}, 13(11):e1005752.
+
+\bibitem[Singh et~al., 2019]{singh2019}
+Singh, A., Shannon, C.~P., Gautier, B., Rohart, F., Vacher, M., Tebbutt, S.~J., and L{\^e}~Cao, K.-A. (2019).
+\newblock {DIABLO}: an integrative approach for identifying key molecular drivers from multi-omics assays.
+\newblock {\em Bioinformatics}, 35(17):3055--3062.
+
+\bibitem[Vehtari et~al., 2021]{vehtari2021}
+Vehtari, A., Gelman, A., Simpson, D., Carpenter, B., and B{\"u}rkner, P.-C. (2021).
+\newblock Rank-normalization, folding, and localization: an improved $\widehat{R}$ for assessing convergence of {MCMC}.
+\newblock {\em Bayesian Analysis}, 16(2):667--718.
 
 \bibitem[Wang et~al., 2026]{wang2026}
 Wang, J., Gong, Y., Lin, H., Zhang, R., and Zhao, W. (2026).

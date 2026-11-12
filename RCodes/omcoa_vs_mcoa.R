@@ -1,15 +1,3 @@
-## =====================================================================
-##  MCOA vs OMCOA : un exemple où les deux méthodes divergent (version R)
-## ---------------------------------------------------------------------
-##  Modèle : X_k = U Sigma_k V_k^T + E_k,  U (N x H) orthonormé commun,
-##           V_k orthonormés, Sigma_k diagonales.
-##  Profils permutés : Sigma_1 = diag(a,b,c), Sigma_2 = diag(b,c,a),
-##           Sigma_3 = diag(c,a,b)  =>  sum_k Sigma_k^2 = (a²+b²+c²) I.
-##  Les valeurs singulières de X sont égales : la MCOA (1re étape = SVD
-##  de X) ne peut pas identifier U ; l'OMCOA le peut.
-##  t in [0,1] fait passer d'un profil commun (t=0) aux profils permutés (t=1).
-## =====================================================================
-
 library(ggplot2)
 set.seed(2026)
 
@@ -17,10 +5,10 @@ N <- 100; P <- c(10, 5, 15); H <- 3; K <- length(P)
 a <- 0.7; b <- 0.5; c <- 0.3
 BASE <- c(a, b, c)
 PERM <- list(c(a, b, c), c(b, c, a), c(c, a, b))
-NOISE <- 0.10        # part de variance due au bruit dans chaque bloc
-R_EXT <- 200         # répétitions pour t = 0 et t = 1
-R_MID <- 60          # répétitions pour les t intermédiaires
-N_STARTS <- 10       # départs aléatoires de l'OMCOA (en plus de l'init MCOA)
+NOISE <- 0.10        
+R_EXT <- 200         
+R_MID <- 60          
+N_STARTS <- 10       
 
 ## ---------------------------------------------------------------- outils
 orth <- function(n, h, center = FALSE) {

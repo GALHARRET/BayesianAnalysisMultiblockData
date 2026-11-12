@@ -1,0 +1,63 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: /Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript_corrige2.aux
+The style file: apalike.bst
+Database file #1: ../Biblio.bib
+Repeated entry---line 252 of file ../Biblio.bib
+ : @article{feng2018
+ :                  ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 262 of file ../Biblio.bib
+ : @article{gaynanova2019
+ :                       ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 273 of file ../Biblio.bib
+ : @article{klami2015
+ :                   ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 284 of file ../Biblio.bib
+ : @article{argelaguet2018
+ :                        ,
+I'm skipping whatever remains of this entry
+You've used 27 entries,
+            1935 wiz_defined-function locations,
+            662 strings with 8588 characters,
+and the built_in function-call counts, 11734 in all, are:
+= -- 1166
+> -- 477
+< -- 17
++ -- 168
+- -- 160
+* -- 1079
+:= -- 2015
+add.period$ -- 82
+call.type$ -- 27
+change.case$ -- 214
+chr.to.int$ -- 27
+cite$ -- 27
+duplicate$ -- 391
+empty$ -- 828
+format.name$ -- 205
+if$ -- 2269
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 27
+newline$ -- 138
+num.names$ -- 83
+pop$ -- 148
+preamble$ -- 1
+purify$ -- 214
+quote$ -- 0
+skip$ -- 299
+stack$ -- 0
+substring$ -- 1012
+swap$ -- 36
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 162
+warning$ -- 0
+while$ -- 105
+width$ -- 0
+write$ -- 355
+(There were 4 error messages)

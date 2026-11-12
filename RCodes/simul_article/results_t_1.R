@@ -278,7 +278,6 @@ ggsave(filename = "article/figs/figure5.eps", plot = p, width = 10, height = 5, 
 
 B<-250
 
-sigma<-c(0.04,0.06,0.08,0.12)
 PIP<-NULL
 for(i in 1:length(sigma)){
   load(paste("RCodes/simul_article/res",i,"AB.RData",sep=""))
@@ -296,14 +295,15 @@ PIP$spike<-factor(paste("(",PIP$a,",",PIP$b,")",sep=""))
 PIP$block<-factor(PIP$block,labels=paste("block",1:K))
 PIP$dim<-factor(PIP$dim,labels=paste("dim",1:H))
 
-res1<-PIP |>
-  group_by(sigma,block,dim,spike) |>
-  count(statut_id)
+res1 <- PIP |>
+  group_by(sigma, block, dim, spike) |>
+  summarise(n = sum(statut_id == "active"), .groups = "drop")
 res1$proportion<-res1$n/B
 
 
 
-p<-ggplot(res1|>filter(statut_id=="active"),aes(x=sigma,y=proportion,group=spike,color=spike))+
+
+p<-ggplot(res1,aes(x=sigma,y=proportion,group=spike,color=spike))+
   geom_point()+
   geom_line()+
   facet_grid(block~dim)+
@@ -340,4 +340,43 @@ p<-ggplot(rank,aes(x=sigma,y=prop,group=spike,color=spike))+
 p
 
 ggsave(filename = "article/figs/figure4a.eps", plot = p, width = 12, height = 6, units = "in")
+
+#### SENSITIVITY to lambda against noise
+
+
+B<-250
+
+PIP<-NULL
+for(i in 1:length(sigma)){
+  load(paste("RCodes/simul_article/res",i,".l_vs_g.RData",sep=""))
+  for(b in 1:B){
+    PIP<-rbind(PIP,cbind(res$gsomcoa1[[b]]$summary[,c("block","dim","pip")],choice=1,sigma=sigma[i]))
+    PIP<-rbind(PIP,cbind(res$gsomcoa2[[b]]$summary[,c("block","dim","pip")],choice=2,sigma=sigma[i]))
+    PIP<-rbind(PIP,cbind(res$gsomcoa3[[b]]$summary[,c("block","dim","pip")],choice=3,sigma=sigma[i]))
+  }
+}
+
+PIP$statut<-rep(factor(true_value>0,labels=c("inactive","active")),dim(PIP)[1]/length(true_value))
+PIP$statut_id<-factor(PIP$pip>=0.5,labels=c("inactive","active"))
+
+PIP$choice<-factor(PIP$choice,levels=1:3,labels=c("lambda","noise 1","noise 2"))
+PIP$block<-factor(PIP$block,labels=paste("block",1:K))
+PIP$dim<-factor(PIP$dim,labels=paste("dim",1:H))
+
+res1 <- PIP |>
+  group_by(sigma, block, dim, choice) |>
+  summarise(n = sum(statut_id == "active"), .groups = "drop")
+res1$proportion<-res1$n/B
+print(res1, n=32)
+
+p<-ggplot(res1,aes(x=sigma,y=proportion,group=choice,color=choice))+
+  geom_point()+
+  geom_line()+
+  facet_grid(block~dim)+
+  theme_bw()+
+  theme(legend.position = "bottom")
+
+p
+ggsave(filename = "article/figs/figure3a.eps", plot = p, width = 12, height = 6, units = "in")
+
 

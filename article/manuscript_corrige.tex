@@ -21,6 +21,7 @@
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{natbib}
+\usepackage{hyperref}
 %\usepackage{biblatex}
 %\addbibresource{Biblio.bib}
 
@@ -72,7 +73,7 @@
 \newcommand{\I}{\mathbf{I}}
 \newcommand{\one}{\mathbf{1}}
 \newcommand{\Stiefel}[2]{\mathcal V_{#1,#2}}
-
+\newcommand{\Reff}{R_{\mathrm{eff}}}
 
 
 \begin{document}
@@ -310,7 +311,7 @@ Under model \eqref{eq:model} and the above priors:
         \]
 \end{enumerate}
 \end{proposition}
-\noindent The modes of the full conditionals of Proposition~\ref{prop:cond} are
+\noindent The resulting Gibbs sampler is summarised in Algorithm~\ref{alg:gibbs_omcoa} in Appendix \ref{sec:gibbs_omcoa_algo}. The modes of the full conditionals of Proposition~\ref{prop:cond} are
 \[
   \U=\mathbf A\mathbf B^\intercal\ \text{with}\ \F_{\U}=\mathbf A\mathbf D\mathbf B^\intercal,\qquad
   \V_k=\mathbf A_k\mathbf B_k^\intercal\ \text{with}\ \F_{\V_k}=\mathbf A_k\mathbf D_k\mathbf B_k^\intercal,\qquad
@@ -318,7 +319,7 @@ Under model \eqref{eq:model} and the above priors:
 \]
 When $\lambda\to0$ and the precisions are equal ($\tau_1=\cdots=\tau_K$), these are exactly the OMCOA updates:
 Procrustes rotation of $\X\mathbf H^\intercal$ for $\U$ (with $\mathbf H=[\Sigma_1\V_1^\intercal|\cdots|\Sigma_K\V_K^\intercal]$),
-Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, with the sign convention $\sigma_k^{(r)}\geq0$ of Proposition~1. OMCOA is therefore the iterated conditional modes (ICM) algorithm \citep{besag1986} associated with this posterior, and the Gibbs sampler is its
+Procrustes rotation of $\X_k^\intercal\U\Sigma_k$ for $\V_k$, and $\Sigma_k=\diag(\U^\intercal\X_k\V_k)$, with the sign convention $\sigma_k^{(r)}\geq0$ of Section~2. OMCOA is therefore the iterated conditional modes (ICM) algorithm \citep{besag1986} associated with this posterior, and the Gibbs sampler is its
 stochastic counterpart. With block-specific precisions, $\F_{\U}=\sum_k\tau_k\X_k\V_k\Sigma_k$ weights each block by its estimated noise precision, so that noisier blocks contribute less to the common space. To reproduce exactly the OMCOA criterion \eqref{Crit}, a common precision $\tau_1=\cdots=\tau_K=\tau$ can be used, with full conditional
 $\tau\mid\cdot\sim\Ga\bigl(\sum_k(N-1)p_k/2,\ \sum_k\|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
 
@@ -336,31 +337,8 @@ and the columns of $\U$ and $\V_k$ are reordered by $\hat\pi$ and multiplied by 
 $\Sigma_k$ is reordered by $\hat\pi$ (it stays positive). Posterior means and credible intervals of $\sigma_k^{(r)}$
 are then obtained from the empirical distribution of the aligned draws.
 
-The resulting sampler is summarised in Algorithm~\ref{alg:gibbs}.
+This post-processing step is the last step of Algorithms~\ref{alg:gibbs_omcoa} and~\ref{alg:gibbs_sparse_omcoa}.
 
-\begin{algorithm}[ht]
-\caption{Gibbs sampler for OMCOA}\label{alg:gibbs}
-\begin{algorithmic}[1]
-  \Require centered blocks $\X_1,\ldots,\X_K$; dimension $R<\min_kp_k$; number of iterations $T$; burn-in $T_0$;
-           prior precision $\lambda$
-  \State \textbf{Initialization:} $\U=\Q\tilde\U$, $\V_k$, $\Sigma_k$ from OMCOA (or MCOA, or at random);
-         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
-  \For{$t=1,\ldots,T$}
-     \State $\F_{\U}\gets\sum_{k}\tau_k\,\X_k\V_k\Sigma_k$;\quad update $\tilde\U$ by one column-wise sweep of $\vMF(\Q^\intercal\F_{\U})$;\quad $\U\gets\Q\tilde\U$
-     \For{$k=1,\ldots,K$}
-        \State $\F_{\V_k}\gets\tau_k\,\X_k^\intercal\U\Sigma_k$;\quad update $\V_k$ by one column-wise sweep of $\vMF(\F_{\V_k})$
-        \For{$r=1,\ldots,R$}
-           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$;\quad draw
-                  $\sigma_k^{(r)}\sim\mathcal N^+\bigl(\tau_k d_k^{(r)}/(\tau_k+\lambda_k),\,1/(\tau_k+\lambda_k)\bigr)$, $\lambda_k=\lambda/\|\X_k\|^2$
-        \EndFor
-        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
-     \EndFor
-     \If{$t>T_0$} store $\bigl(\U,\V_1,\ldots,\V_K,\Sigma_1,\ldots,\Sigma_K,\tau_1,\ldots,\tau_K\bigr)$ \EndIf
-  \EndFor
-  \State \textbf{Post-processing:} align each stored draw on a reference solution (Section~\ref{sec:align})
-  \State \Return the aligned draws
-\end{algorithmic}
-\end{algorithm}
 
 % \begin{remark}[What the sampler adds]
 % Besides point estimates close to the OMCOA solution, the sampler provides the posterior distribution of the block
@@ -385,7 +363,7 @@ $\Sigma_k=\diag(\sigma_k^{(1)},\ldots,\sigma_k^{(R)})$ measures how much each la
 %  \item variance of the block $k$ if $\sigma_k^{(r)}>0$ for this block only;
 %  \item \emph{inactive} if $\sigma_k^{(r)}=0$ for all $k$.
 %\end{itemize}
-OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose a Bayesian version of OMCOA in which a spike-and-slab prior on the weights $\sigma_k^{(r)}$ allows them to be exactly zero. The dimension $R$ is then a \emph{maximal} rank: inactive dimensions are switched off by the sampler, and the effective rank is inferred from the data.
+OMCOA always returns strictly positive weights, so that this pattern has to be assessed afterwards. We propose a Bayesian version of OMCOA in which a spike-and-slab prior on the weights $\sigma_k^{(r)}$ allows them to be exactly zero. The dimension $R$, denoted $R_{\max}$ when this needs to be emphasised, is then a \emph{maximal} rank: inactive dimensions are switched off by the sampler, and the effective rank is inferred from the data.
 
 The sparsity of the model is based on the diagonal terms $\sigma_k^{(r)}$ as follows
 \begin{equation}
@@ -442,20 +420,20 @@ Let $\Q\in\mathcal M_{N,N-1}(\mathbb R)$ be an orthonormal basis of $\one_N^\per
         $\tau_k\mid\cdot\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$.
 \end{enumerate}
 \end{proposition}
-The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column being drawn from a vector von Mises--Fisher distribution with Wood's algorithm \citep{wood1994}, as in the non-sparse sampler. Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
-drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$. The loading $\vv_k^{(r)}$ is not integrated out, however: while $\gamma_k^{(r)}=0$, it is drawn uniformly, so that $d_k^{(r)}$ is small and the reactivation of the dimension in block $k$ may be slow. The mixing of the indicators should therefore be checked, for instance with chains started from $\gamma_k^{(r)}=0$. Finally, the condition $R<\min_kp_k$ is also needed in practice with a proper Gamma prior on $\tau_k$: when $R=p_k$, the dimensions can fit block $k$ almost entirely, including its noise, so that $\tau_k$ is overestimated and the Bayes factors of this block are inflated, which keeps spurious dimensions active.
-In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow. Moreover, $B_k^{(r)}$ contains the factor $\sqrt{\lambda_k/\omega_k}$: a very diffuse slab ($\lambda\to0$) always favours
-the spike (Lindley's paradox). Since the slab is scaled by $\|\X_k\|$, the value of $\lambda$ does not depend on the scale of the data: with $\lambda=1$, the slab standard deviation is the norm of the block, so that a single dimension may explain most of its variance.
 
-\begin{remark}[Slab indexed on the noise]
-The slab may instead be indexed on the noise level of the block, $\sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\tau_k\sim\mathcal N^+(0,g_k/\tau_k)$, in the spirit of Zellner's $g$-prior \citep{zellner1986,liang2008}, e.g.\ with $g_k=(N-1)p_k$, for which the slab scale is the expected Frobenius norm of the noise $\EE_k$. The Bayes factor then becomes
+\noindent The resulting sparse Gibbs sampler is summarised in Algorithm~\ref{alg:gibbs_sparse_omcoa} in Appendix \ref{sec:gibbs_sparse_omcoa_algo}. The matrix von Mises--Fisher distributions are sampled by one column-wise sweep per iteration, each column being drawn from a vector von Mises--Fisher distribution with Wood's algorithm \citep{wood1994}, as in the non-sparse sampler. Updating $(\gamma_k^{(r)},\sigma_k^{(r)})$ jointly, with $\sigma_k^{(r)}$ integrated out when drawing $\gamma_k^{(r)}$, is essential:
+drawing $\gamma_k^{(r)}$ given the current $\sigma_k^{(r)}$ would never allow the chain to leave $\sigma_k^{(r)}=0$. The loading $\vv_k^{(r)}$ is not integrated out, however: while $\gamma_k^{(r)}=0$, it is drawn uniformly, so that $d_k^{(r)}$ is small and the reactivation of the dimension in block $k$ may be slow. The mixing of the indicators should therefore be checked, for instance with chains started from $\gamma_k^{(r)}=0$. Finally, the condition $R<\min_kp_k$ is also needed in practice with a proper Gamma prior on $\tau_k$: when $R=p_k$, the dimensions can fit block $k$ almost entirely, including its noise, so that $\tau_k$ is overestimated and the Bayes factors of this block are inflated, which keeps spurious dimensions active.
+In practice $\log B_k^{(r)}$ is computed on the log scale, with $\log\Phi$ evaluated directly, to avoid overflow. Moreover, $B_k^{(r)}$ contains the factor $\sqrt{\lambda_k/\omega_k}$: a very diffuse slab ($\lambda\to0$) always favors the spike (Lindley's paradox). Since the slab is scaled by $\|\X_k\|$, the value of $\lambda$ does not depend on the scale of the data: with $\lambda=1$, the slab standard deviation is the norm of the block, so that a single dimension may explain most of its variance.
+
+
+\paragraph{Slab indexed on the noise:} The slab may instead be indexed on the noise level of the block, $\sigma_k^{(r)}\mid\gamma_k^{(r)}=1,\tau_k\sim\mathcal N^+(0,g_k/\tau_k)$, in the spirit of Zellner's $g$-prior \citep{zellner1986,liang2008}, e.g.\ with $g_k=(N-1)p_k$, for which the slab scale is the expected Frobenius norm of the noise $\EE_k$. The Bayes factor then becomes
 \[
   B_k^{(r)}=\frac{2}{\sqrt{1+g_k}}\exp\Bigl(\frac{g_k}{1+g_k}\,\frac{\tau_k(d_k^{(r)})^2}{2}\Bigr)\Phi\Bigl(d_k^{(r)}\sqrt{\frac{g_k\tau_k}{1+g_k}}\Bigr),
 \]
 which only depends on the signal-to-noise ratio $\tau_k(d_k^{(r)})^2$, and the active weights enter the full conditional of $\tau_k$, $\tau_k\mid\cdot\sim\Ga\bigl(((N-1)p_k+\sum_r\gamma_k^{(r)})/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2+\sum_r(\sigma_k^{(r)})^2/(2g_k)\bigr)$. Both priors make the selection invariant to the scale of the blocks, but they differ in two respects. With the slab scaled by $\|\X_k\|$, the Bayes factor depends on $\tau_k\|\X_k\|^2$, that is on the whole signal of the block: a weak dimension is judged relative to the size of its block, and is penalised when the block also contains strong dimensions. With the slab indexed on the noise, each weight is judged against the noise only, independently of the other weights of the block, and the prior does not depend on the data; in return, the slab is coupled with $\tau_k$, so that an overestimated noise precision inflates the Bayes factors. The two priors coincide when $g_k/\tau_k=\|\X_k\|^2/\lambda$, that is, for $\lambda=1$, when $g_k=\tau_k\|\X_k\|^2\approx(N-1)p_k+\tau_k\|\U\Sigma_k\V_k^\intercal\|^2$: with the default $g_k=(N-1)p_k$, they only differ when the total signal-to-noise ratio $\tau_k\|\U\Sigma_k\V_k^\intercal\|^2$ of the block is not negligible with respect to $(N-1)p_k$, i.e.\ at low noise levels, where the active weights are selected by both priors. We use the slab scaled by the block norm, which is consistent with the usual block weighting of OMCOA and keeps the interpretation of $\lambda$ in terms of explained variance, and compare both priors in Section~5.
-\end{remark}
 
-The posterior distribution of $\gamma_k^{(r)}$ gives a decision rule for the representation of block $\X_k$ on the component $\uu^{(r)}$: the component $\uu^{(r)}$ is declared active in block $k$ if and only if
+
+\paragraph{The effective rank:} The posterior distribution of $\gamma_k^{(r)}$ gives a decision rule for the representation of block $\X_k$ on the component $\uu^{(r)}$: the component $\uu^{(r)}$ is declared active in block $k$ if and only if
 \begin{equation}
   P\bigl(\gamma_k^{(r)}=1\mid\X_1,\ldots,\X_K\bigr)>1/2 .
   \label{dec_rule}
@@ -463,43 +441,22 @@ The posterior distribution of $\gamma_k^{(r)}$ gives a decision rule for the rep
 \noindent Moreover, this model makes it possible to estimate the effective dimension of the common subspace,
 \[R_{\mathrm{eff}}=\#\{r:\sum_k\gamma_k^{(r)}>0\},\]
  whose posterior distribution is estimated by its empirical distribution over the draws. 
-Conditionnaly to $\theta_r$, the parameters $\gamma_k^{r}\in \{0,1\}$ are distributed from independant Bernoulli, the probability for a dimension $r$ to be inactive for all the $K$ blocks is equal to $(1-\theta_r)^K$. Since $\theta^r\sim \Be(a_\theta,b_\theta)$ we have 
-$q_0=\mathbb E((1-\theta_r)^K)=\Pi_{i=0}^{K-1}\frac{b_\theta+i}{a_\theta+b_\theta+i}.$
-Since the dimensions are a priori independent, $R_{\mathrm{eff}}$ is the sum of $\R_{\max}$ independent indicators of probability $1-q_0$:
-$$R_{\mathrm{eff}}\sim \text{Bin}(R_{\max}), \qquad \mathbb E[R_{\mathrm{eff}}]=R_{\max}(1-q_0).$$
-The prior $\theta^r\sim \Be(a_\theta,b_\theta)$ controls the expected sparsity: $a_\theta=b_\theta=1$ is a neutral choice since in this case $\mathbb E[R_{\mathrm{eff}}]=\frac{K}{K+1}R_{\max}$. Therefore, the prior distribution of $R_{\mathrm{eff}}$ depends heavily on $R_{\max}$
+
+\paragraph{Prior distribution of the effective rank.} Conditionally on $\theta_r$, the indicators $\gamma_1^{(r)},\ldots,\gamma_K^{(r)}$ are independent Bernoulli variables, so that the probability for dimension $r$ to be inactive in all the $K$ blocks is $(1-\theta_r)^K$. Since $\theta_r\sim \Be(a_\theta,b_\theta)$,
+\[
+  q_0=\mathbb E\bigl[(1-\theta_r)^K\bigr]=\frac{B(a_\theta,b_\theta+K)}{B(a_\theta,b_\theta)}=\prod_{i=0}^{K-1}\frac{b_\theta+i}{a_\theta+b_\theta+i}.
+\]
+Since the dimensions are a priori independent, $R_{\mathrm{eff}}$ is the sum of $R_{\max}$ independent indicators of probability $1-q_0$:
+\[
+  R_{\mathrm{eff}}\sim \operatorname{Bin}(R_{\max},1-q_0), \qquad \mathbb E[R_{\mathrm{eff}}]=R_{\max}(1-q_0).
+\]
+The shared $\theta_r$ also couples the blocks: two indicators of the same dimension have prior correlation $1/(a_\theta+b_\theta+1)$, so that $q_0$ is larger than under independence. With the default choice $a_\theta=b_\theta=1$, $q_0=1/(K+1)$ and $\mathbb E[R_{\mathrm{eff}}]=\frac{K}{K+1}R_{\max}$: this choice is not neutral with respect to the rank, and the prior distribution of $R_{\mathrm{eff}}$ grows linearly with $R_{\max}$. For large values of $R_{\max}$ (e.g.\ in omics studies), the prior $\theta_r\sim \Be(\alpha/R_{\max},1)$, the finite approximation of the Indian buffet process \citep{griffiths2011}, gives
+\[
+  1-q_0 \simeq \frac{\alpha}{R_{\max}} \sum_{i=1}^K \frac1{i}, \qquad\text{hence}\qquad \mathbb E[R_{\mathrm{eff}}]\longrightarrow\alpha H_K,\quad R_{\max}\to\infty,
+\]
+with $H_K=\sum_{i=1}^K1/i$: the prior expectation of $R_{\mathrm{eff}}$ then hardly depends on $R_{\max}$, and $\alpha=r_0/H_K$ corresponds to a prior guess $r_0$ of the effective rank. The convergence is slow, however (for $K=3$ and $\alpha=r_0/H_3$, $\mathbb E[R_{\mathrm{eff}}]\approx0.89\,r_0$ for $R_{\max}=60$), so that the exact value of $q_0$ should be used in practice. This prior also strengthens the coupling of the blocks, since $a_\theta+b_\theta$ decreases.
 
 
-
-The resulting sparse Gibbs sampler is summarised in Algorithm~\ref{alg:sparse}.
-
-\begin{algorithm}[ht]
-\caption{Sparse Gibbs sampler for OMCOA}\label{alg:sparse}
-\begin{algorithmic}[1]
-  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R<\min_kp_k$; iterations $T$; burn-in $T_0$;
-           slab precision $\lambda$; hyperparameters $a_\theta,b_\theta$
-  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions on the blocks divided by their Frobenius norms, weights brought back to the original scale; $\gamma_k^{(r)}\gets1$; $\theta_r\gets1/2$;
-         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
-  \For{$t=1,\ldots,T$}
-     \State update $\tilde\U$ by one sweep of $\vMF\bigl(\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k\bigr)$;\quad $\U\gets\Q\tilde\U$
-     \For{$k=1,\ldots,K$}
-        \State update $\V_k$ by one sweep of $\vMF\bigl(\tau_k\X_k^\intercal\U\Sigma_k\bigr)$
-        \For{$r=1,\ldots,R$}
-           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$,\quad $\omega_k\gets\tau_k+\lambda/\|\X_k\|^2$,\quad $m_k^{(r)}\gets\tau_kd_k^{(r)}/\omega_k$
-           \State draw $\gamma_k^{(r)}\sim\Bern\Bigl(\dfrac{\theta_rB_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r}\Bigr)$
-           \State \textbf{if} $\gamma_k^{(r)}=1$ \textbf{then} draw $\sigma_k^{(r)}\sim\mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr)$ \textbf{else} $\sigma_k^{(r)}\gets0$
-        \EndFor
-        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
-     \EndFor
-     \For{$r=1,\ldots,R$}
-        \State draw $\theta_r\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$
-     \EndFor
-     \If{$t>T_0$} store $\bigl(\U,\Sigma_1,\ldots,\Sigma_K,\boldsymbol\gamma,\boldsymbol\theta,\boldsymbol\tau\bigr)$ \EndIf
-  \EndFor
-  \State align the stored draws (permutation and signs) on a reference $\U_{\mathrm{ref}}$
-  \State \Return the aligned draws
-\end{algorithmic}
-\end{algorithm}
 
 \section{Empirical performance via simulation}
 
@@ -510,7 +467,7 @@ We consider $K=3$ blocks with $p_1=10$, $p_2=5$, $p_3=15$ variables and $N=100$ 
 \]
 where $\U\in\Stiefel{N}{3}$ is column-centered, $\V_k\in\Stiefel{p_k}{3}$, $\Sigma_k$ is the diagonal matrix of the block weights and $\EE_k$ is a noise term. The true effective rank is $R_{\mathrm{eff}}=3$. The diagonal matrices are set to 
 \[\Sigma_1=\diag(0.7,0.5,0), \quad \Sigma_2=\diag(0.5,0.7,0), \quad \Sigma_3=\diag(0.3,0,0.5).\] 
-All the models are fitted with the maximal rank $R_{\max}=4$, the largest value satisfying $R_{\max}<\min_kp_k$. For all models, the blocks were centered only, because Hoff's Bayesian SVD and the Gavish--Donoho threshold must be applied to the blocks without normalization.
+All the models are fitted with the maximal rank $R_{\max}=4$, the largest value satisfying $R_{\max}<\min_kp_k$. For all models, the blocks were centered only: the Gibbs samplers are invariant to the scale of the blocks, and Hoff's Bayesian SVD and the Gavish--Donoho threshold assume an i.i.d.\ noise on all the entries of the concatenated matrix, which a block normalization would break.
  
 \paragraph{Grid for noise variance:} We assume that the terms $e_{\bullet\bullet}$ of the noise $\EE_k$ are distributed from $\mathcal{N}(0,s^2)$. For a spectral method applied to a single block, an active weight $w$ is asymptotically undetectable when the noise parameter $s$ exceeds $w/(Np_k)^{1/4}$ \cite[see][for details]{benaychgeorges2012}. Table~\ref{tab:thres} provides these thresholds as a function of the dimensional weights of the blocks. We set $s$ within the interval from 0.02 to 0.18. Note that the first column of $\U$ should remain well estimated beyond $s=0.05$, since it is shared by the three blocks, whereas the third column of $\U$ depends only on block 3 and should not be well estimated beyond $s=0.08$.    
 
@@ -530,241 +487,154 @@ dimension ($r$) & block ($k$) & $\sigma_k^{(r)}$ & threshold \\
 \end{tabular}
 \caption{Thresholds for the standard deviation of noise that make the weight of the dimension on the block undetectable.\label{tab:thres}}
 \end{table}
+\paragraph{Slab parameter $\lambda$:} The relative slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero ratio $\sigma_k^{(r)}/\|\X_k\|$: under the slab, its mean is $s_0\sqrt{2/\pi}$. Since $\sigma_k^{(r)}\le\|\X_k\|$, only the values of the ratio in $[0,1]$ are attainable. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favors the inclusion of weak dimensions and makes the selection less conservative.
+
+\paragraph{Spike parameter $(a_\theta,b_\theta)$:} Table~\ref{tab:spike_param} displays the choices of the spike parameters. The default value $(a_\theta,b_\theta)=(1,1)$ sets the mode of the prior distribution of the $R_{\mathrm{eff}}$ to the true value and assigns a high probability (0.32) to be equal to 4. In contrast, the value $(a_\theta,b_\theta)=(1,3)$ centres the prior distribution of $\Reff$ on 2, below the true value, and the value $(a_\theta,b_\theta)=(0.5,0.5)$ corresponds to a stronger correlation between the indicators of a dimension in the different blocks, so that a dimension tends to be active (or inactive) in all the blocks simultaneously (all-or-nothing).
+
+\begin{table}
+\centering
+	\begin{tabular}{cccccccccc}
+	\hline
+	\multirow{2}{*}{$(a_\theta,b_\theta)$} & \multirow{2}{*}{$P(\gamma=1)$} & \multirow{2}{*}{$E[R_{\mathrm{eff}}]$} & \multicolumn{5}{c}{$P(R_{\mathrm{eff}}=\bullet)$} & \multirow{2}{*}{$\text{cor}(\gamma_k^{(r)},\gamma_l^{(r)})$} \\
+	& & & 0 & 1 & 2 & 3 & 4 & \\
+	\hline
+	$(1,1)$ & 0.50 & 3.0 & 0.00 & 0.05 & 0.21 & 0.42 & 0.32 & 0.33 \\
+	$(1,3)$ & 0.25 & 2.0 & 0.06 & 0.25 & 0.38 & 0.25 & 0.06 & 0.20 \\
+	$(0.5,0.5)$ & 0.50 & 2.75 & 0.01 & 0.08 & 0.28 & 0.41 & 0.22 & 0.50 \\
+	\hline
+	\end{tabular}
+	\caption{Prior distribution implied by the spike parameters $(a_\theta,b_\theta)$ ($K=3$, $R_{\max}=4$): prior probability that a weight is active ($P(\gamma=1)$), prior expectation and distribution of the effective rank ($E[R_{\mathrm{eff}}]$, $P(R_{\mathrm{eff}}=\bullet)$), and prior correlation between the indicators of a same dimension $r$ in two blocks $k\neq l$.\label{tab:spike_param}}  
+\end{table}
 
 
-\paragraph{Indexing of the slab:} to be added, the sparse sampler with the slab scaled by the block norm ($\lambda=1$) against the slab indexed on the noise ($g_k=(N-1)p_k$), on the same data sets, with $R_{\max}=4$; e.g.\ selection probabilities as in Figure~\ref{fig4} and distribution of $R_{\mathrm{eff}}$ as in Figure~\ref{fig6}.
-
-
-\paragraph{Slab parameter $\lambda$:} The relative slab scale $s_0 = \lambda^{-1/2}$ gives the expected order of magnitude of a nonzero ratio $\sigma_k^{(r)}/\|\X_k\|$: under the slab, its mean is $s_0\sqrt{2/\pi}$. Since $\sigma_k^{(r)}\le\|\X_k\|$, only the values of the ratio in $[0,1]$ are attainable. With $\lambda=1$, the slab puts 68\% of its mass on $[0,1]$ and allows a single dimension to explain most of the variance of a block. With $\lambda=0.1$ ($s_0\approx 3.2$), only 25\% of its mass lies on attainable values, which penalizes the slab against the spike and makes the selection more conservative. With $\lambda=10$ ($s_0\approx 0.32$), the slab is concentrated on small weights, which favours the inclusion of weak dimensions and makes the selection less conservative.
-
-\paragraph{Spike parameter $(a_\theta,b_\theta)$:} 
-
-
-\paragraph{Other parameters:} The Gibbs samplers were run with $T=6000$ iterations and a burn-in of $T_0=1000$. In order to evaluate the estimation of each dimension, all the fitted configurations $\hat\U$ were aligned on the true $\U$ (permutation and signs of the dimensions); in practice, the alignment is made on the OMCOA solution (Section~\ref{sec:align}). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained using the Gibbs sparse sampler are compared with the estimate of the Bayesian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
+\paragraph{Other parameters:} The Gibbs samplers were run with $T=6000$ iterations and a burn-in of $T_0=2000$.  In order to evaluate the estimation of each dimension, all the fitted configurations $\hat\U$ were aligned on the true $\U$ (permutation and signs of the dimensions); in practice, the alignment is made on the OMCOA solution (Section~\ref{sec:align}). $B=1000$ data sets were simulated in each case. For the effective rank, the estimate obtained with the sparse Gibbs sampler (posterior mean of $\Reff$) is compared with the estimate of the Bayesian SVD of Hoff on the concatenated block $\X=[\X_1|...|\X_K]$ \cite[see][for details]{hoff2007}. The effective rank estimate is also compared to the rank obtained using the Gavish-Donoho threshold when the noise variance is unknown \cite[see][for details]{gavish2014}. 
 
 \subsection{Results}
 
 \subsubsection*{Analysis of sensitivity to the spike-and-slab parameters:} 
 
-The sensitivities were compared as a function of the proportion of active dimensions that are selected using the decision rule defined in (\ref{dec_rule}).
+The sensitivity to the prior parameters is assessed on the proportion of the $B$ data sets in which each weight is selected with the decision rule~\eqref{dec_rule}.
 
-\paragraph{Slab parameter:}  (Figure \ref{fig1a}) provides the probability of selection of a dimension $r$ on a block $k$ as a function of the noise parameter $s$ and the slab precision $\lambda$. For all $\lambda$, when the noise standard deviation was low ($s<0.06$), all the active dimensions were selected. When $s$ increased ($s>0.08$), the active weights were lost in the following order: dimension 3 on block 3 , dimension 1 on block 3, dimension 2 on block 1, dimension 1 on block 2, dimension 1 on block 1, and finally dimension 2 on block 2. Apart from the first two, this order follows the detectability thresholds of Table~\ref{tab:thres}. The first two are inverted: the weight $0.3$ of dimension 1 on block 3 (threshold $0.05$) was still selected in about 65\% of the data sets for $s=0.06$ ($\lambda=1$), whereas the weight $0.5$ of dimension 3 on block 3 (threshold $0.08$) was already selected in only about 25\% of them. Dimension 1 is shared by the three blocks, so that $\uu^{(1)}$ is well estimated from blocks 1 and 2 and its weight in block 3 remains detectable beyond the single-block threshold. Dimension 3 is only present in block 3: $\uu^{(3)}$ is estimated from this block alone, and the Bayes factor requires a margin above the spectral threshold. The multiblock model therefore borrows strength across blocks and detects weights that a block-by-block analysis would miss.
-With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimension 4 , as well as the zero weights of dimensions 1 to 3 (dimension 3 on blocks 1 and 2, dimension 2 on block 3), were almost never selected. With $\lambda=10$, the active weights were lost at slightly higher noise levels, at the cost of about 25\% of false selections in blocks 1 and 2. In this design, $\lambda=1$ offers the best trade-off between the detection of weak weights and false selections.    
+\paragraph{Indexing of the slab:} Figure~\ref{fig:choice_l_vs_g} shows the probability that a dimension will be selected when the slab is scaled by the block norm ($\lambda=1$), compared to the slab indexed by the noise ($g_k=(N-1)p_k$) and by a multiple of the noise ($g_k=10(N-1)p_k$). For all values of $s$, the slab scaled by the block norm and the slab indexed on the noise with $g_k=(N-1)p_k$ gave almost the same selection probabilities, as expected from the equivalence of the two priors discussed in Section~4. The wider slab $g_k=10(N-1)p_k$ was more conservative: it selected the active weights as often as the other two priors for $s\leq0.04$, but lost them at lower noise levels (e.g.\ the weight of dimension 1 in block 1 at $s=0.08$, and the weights of block 3 from $s=0.06$), in agreement with the penalty $\log(1+g_k)$ of its Bayes factor. None of the three priors selected the zero weights. Hereafter, the slab scaled by the block norm is retained.
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/choice_l_vs_g.eps}
+  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$, for the slab scaled by the block norm ($\lambda=1$, red) and the slab indexed on the noise with $g_k=(N-1)p_k$ (green) and $g_k=10(N-1)p_k$ (blue).  \label{fig:choice_l_vs_g}}
+\end{figure}
 
-\paragraph{Spike parameter:} For $\lamba=1$, 
+\paragraph{Spike parameter:} Figure~\ref{fig:choice_spike} illustrates the probability that a dimension will be selected based on the spike parameters $(a_\theta,b_\theta)$, using the default value for $\lambda$ ($\lambda=1$). The three priors gave similar results in all the blocks, and none of them selected the zero weights: the selection is driven by the data rather than by the prior distribution of $\Reff$, although these priors differ markedly (Table~\ref{tab:spike_param}). The most conservative prior $(1,3)$ lost the active weights at slightly lower noise levels (dimension 1 in blocks 1 and 3, $s=0.06$--$0.08$). The probability of including dimension 3 in block 3 was the same for the three priors: this dimension is only present in block 3, so that $\theta_3$ is informed by this block alone, and its inclusion probability dropped sharply from $s=0.06$ to $s=0.08$ whatever the prior, even with the prior that favours the true rank. For dimension 1 in block 3, the inclusion probability decreased slightly less with the all-or-nothing prior $(0.5,0.5)$, since dimension 1 is selected in blocks 1 and 2 and the stronger coupling transfers this information to block 3. In the following, the spike parameters are set to their default value $(1,1)$.    
 
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/choice_spike.eps}
+  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the spike parameter $(a_\theta,b_\theta)$ (red for $(0.5,0.5)$, green for $(1,1)$ and blue for $(1,3)$). \label{fig:choice_spike}}
+\end{figure}
 
+\paragraph{Slab parameter:} Figure~\ref{fig:choice_lambda} provides the probability of selection of a dimension $r$ on a block $k$ as a function of the noise parameter $s$ and the slab precision $\lambda$. For all $\lambda$, when the noise standard deviation was low ($s<0.06$), all the active dimensions were selected. When $s$ increased ($s>0.08$), the active weights were lost in the following order: dimension 3 on block 3 , dimension 1 on block 3, dimension 2 on block 1, dimension 1 on block 2, dimension 1 on block 1, and finally dimension 2 on block 2. Apart from the first two, this order followed the detectability thresholds of Table~\ref{tab:thres}. The first two were inverted: the weight $0.3$ of dimension 1 on block 3 (threshold $0.05$) was still selected in about 65\% of the data sets for $s=0.06$ ($\lambda=1$), whereas the weight $0.5$ of dimension 3 on block 3 (threshold $0.08$) was already selected in only about 25\% of them. Dimension 1 is shared by the three blocks, so that $\uu^{(1)}$ is well estimated from blocks 1 and 2 and its weight in block 3 remains detectable beyond the single-block threshold. Dimension 3 is only present in block 3: $\uu^{(3)}$ is estimated from this block alone, and the Bayes factor requires a margin above the spectral threshold. The multiblock model therefore borrows strength across blocks and detects weights that a block-by-block analysis would miss.
+With the two more conservative values $\lambda=0.1$ and $\lambda=1$, dimension 4 , as well as the zero weights of dimensions 1 to 3 (dimension 3 on blocks 1 and 2, dimension 2 on block 3), were almost never selected. With $\lambda=10$, the active weights were lost at slightly higher noise levels, at the cost of about 25\% of false selections in blocks 1 and 2 and more than 75\% of false selections in block 3. In this design, $\lambda=1$ offered the best trade-off between the detection of weak weights and false selections.    
 
-\subsubsection*{MCMC diagnostics:} 
-Bulk Effective Sample Size
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/choice_lambda.eps}
+  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig:choice_lambda}}
+\end{figure}
+
+\subsubsection*{MCMC diagnostics:} Table~\ref{tab:mcmc_diag} presents the MCMC diagnostics of the sparse Gibbs sampler for one simulated data set per noise level $s$, computed with the rank-normalised $\hat R$ and bulk effective sample sizes of \citet{vehtari2021}, on the aligned draws for the weights. Four chains were run: two with all the indicators $\gamma_k^{(r)}$ initialized to 0, and two with all of them initialized to 1. The chains consisted of $T=6000$ iterations with a burn-in of $T_0=2000$. Far from the detectability thresholds ($s=0.04$ and $s=0.12$), the chains mixed well and the effective sample sizes were large for all the parameters. Close to the thresholds ($s=0.06$ and $s=0.08$), the chains started from $\gamma=0$ and from $\gamma=1$ reached the same posterior distribution of $\Reff$ ($\hat R\leq1.01$, largest difference of the posterior probabilities between chains $\leq0.11$; see Figures~\ref{fig:diag1} and~\ref{fig:diag2} in Appendix~\ref{sec:mcmc_diag}), but the mixing was slower, with a bulk effective sample size of 175 for $\Reff$ at $s=0.08$. The smallest effective sample size (70, $s=0.06$) concerned the weight of dimension 2 in block 3, which is truly zero: its draws are 0 except during rare excursions in the slab, which inflates their autocorrelation without affecting the posterior inclusion probability.  
 \begin{table}[ht]
 \centering
-\begin{tabular}{cccccccccc}
+\begin{tabular}{rrrrrrrrrr}
   \hline
-$s$ & $\hat R(R_{eff})$ & Max Diff & $bulkESS(R_{eff})$ & $\max(\hat R(\sigma^{(r)}_k))$ & $k$ & $r$ & $\min(bulkESS(\sigma^{(r)}_k))$ & $k$ & $r$ \\ 
+$s$ & $\hat R(\Reff)$ & $\max(D_{\Reff})$ & $bulkESS(\Reff)$ & $\max(\hat R(\sigma^{(r)}_k))$ &  $k_1$ & $r_1$ & $\min(bulkESS(\sigma^{(r)}_k))$ & $k_2$ & $r_2$ \\ 
   \hline
-0.04 & 1.00 & 0.04 & 488.00 & 1.01 &   1 &   2 & 203.00 &   3 &   4 \\ 
-  0.06 & 1.05 & 0.11 & 99.00 & 1.03 &   2 &   4 & 78.00 &   2 &   4 \\ 
-  0.08 & 1.01 & 0.07 & 131.00 & 1.02 &   1 &   4 & 97.00 &   2 &   4 \\ 
-  0.12 & 1.00 & 0.06 & 100.00 & 1.01 &   1 &   2 & 223.00 &   3 &   3 \\ 
+0.04 & 1.01 & 0.10 & 596.00 & 1.01 &   2 &   4 & 420.00 &   3 &   4 \\ 
+  0.06 & 1.00 & 0.05 & 750.00 & 1.05 &   3 &   2 & 70.00 &   3 &   2 \\ 
+  0.08 & 1.01 & 0.11 & 175.00 & 1.03 &   2 &   3 & 115.00 &   2 &   3 \\ 
+  0.12 & 1.01 & 0.06 & 473.00 & 1.01 &   2 &   4 & 341.00 &   2 &   4 \\ 
    \hline
 \end{tabular}
+\caption{MCMC diagnostics for the weights and the effective rank as a function of the noise standard deviation $s$ (four chains, one simulated data set per value of $s$). $\max(D_{\Reff})$ denotes the maximum difference in $\Reff$ between the four chains, $bulkESS$ denotes the bulk effective sample size, $(k_1,r_1)$ designates the couple of the block/dimension corresponding to $\max(\hat R(\sigma^{(r)}_k))$ and $(k_2,r_2)$ designates the couple of the block/dimension corresponding to $\min(bulkESS(\sigma^{(r)}_k))$. \label{tab:mcmc_diag}}
 \end{table}
 
 
 \subsubsection*{Estimation of the weights $\sigma_k^{(r)}$:}
-Figure~\ref{fig1} provides the empirical coverage of the 95\% credible intervals of the block weights for the active dimensions (dimensions 1 to 3), as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. The coverage was close to the nominal level for $s\leq0.04$. For the weights equal to zero, the coverage of the non-sparse sampler was 0, since its half-normal prior excludes the value 0, whereas the sparse sampler covered the true value in all cases. For the active weights at high noise levels, the non-sparse sampler was over-conservative, with a coverage close to 1, since its credible intervals widened. For the active weights, the coverage of the sparse sampler decreased when $s$ increased, because a weight that is not selected gets the degenerate interval $\{0\}$; as expected, this decrease was smaller for larger values of $\lambda$, which favour the inclusion. The weight of dimension 3, which is only present in block 3, was the first to be affected ($s>0.05$), whereas the coverage of the weight of dimension 2 on block 2 remained good until $s=0.08$.
-Figure~\ref{fig2} provides the estimated block weights of the active dimensions, with the 2.5\% and 97.5\% empirical quantiles over the $B$ replications, as a function of $s$. When the weights were non-null, they were accurately estimated by the two Bayesian samplers and by MCOA and OMCOA for $s\leq0.04$. The upward bias of MCOA and OMCOA increased with $s$, since these methods fit part of the noise, which inflates the estimated weights. The non-sparse Gibbs sampler degraded less. The sparse sampler behaved differently: a weight that is not detected is set to 0, so that the true zero weights were kept at 0, whereas the active weights were biased downwards at high noise levels; for instance, the weight $0.7$ of dimension 1 on block 1 was estimated between about $0.1$ and $0.3$ for $s\geq0.12$. This is a consequence of the selection, not an absence of bias.
+Figure~\ref{fig1} provides the empirical coverage of the 95\% credible intervals of the block weights of dimensions 1 to 3, as a function of the noise standard deviation $s$, for the non-sparse sampler and the sparse sampler with $\lambda=1$. The coverage was close to the nominal level for $s\leq0.04$. For the weights equal to zero, the coverage of the non-sparse sampler was 0, since its half-normal prior excludes the value 0, whereas the sparse sampler covered the true value in all cases. For the active weights at high noise levels, the non-sparse sampler was over-conservative, with a coverage close to 1, since its credible intervals widened. For the active weights, the coverage of the sparse sampler first decreased when $s$ increased, the weight of dimension 3 in block 3, which is only present in this block, being the first affected (coverage of about 0.5 at $s=0.08$). Near the thresholds, the posterior distribution of the weight mixes the spike at 0 and a slab component that underestimates the weight, so that the credible interval may miss the true value. At higher noise levels, the coverage increased again, although the weights were rarely selected (Figure~\ref{fig:choice_lambda}): as long as $P(\gamma_k^{(r)}=1\mid\X)$ is not negligible, the credible interval is of the form $[0,q_{0.975}]$, and the slab draws, which are diffuse when the signal is weak, make it wide enough to contain the true value. The interval is reduced to $\{0\}$ only when $P(\gamma_k^{(r)}=1\mid\X)<0.025$. For $s\geq 0.12$, the coverage is  not informative since the width of the intervals are very large (in mean greater than 0.90 for Gibbs sampler of OMCOA and in mean greater than 0.53 for Gibbs sampler of sparse OMCOA). Figure~\ref{fig2} provides the estimated block weights of the active dimensions, with the 2.5\% and 97.5\% empirical quantiles over the $B$ replications, as a function of $s$. When the weights were nonzero, they were accurately estimated by the two Bayesian samplers and by MCOA and OMCOA for $s\leq0.04$. The upward bias of MCOA and OMCOA increased with $s$, since these methods fit part of the noise, which inflates the estimated weights. The non-sparse Gibbs sampler degraded less. The sparse sampler behaved differently: a weight that is not detected is set to 0, so that the true zero weights were kept at 0, whereas the active weights were biased downwards at high noise levels; for instance, the weight $0.7$ of dimension 1 on block 1 was estimated between about $0.1$ and $0.3$ for $s\geq0.12$. This is a consequence of the selection, not an absence of bias.
 
 \begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure1.eps}
-  \caption{Empirical coverage probability of the weights $\sigma_k^{(r)}$ using gibbs-omcoa (in red), gibbs-sparse-omcoa (green for $\lambda=.1$, blue for $\lambda=1$ and purple for $\lambda=10$) as a function of the noise standard deviation $s$. \label{fig1}}
+  \includegraphics[width=\linewidth]{figs/cov_percent.eps}
+  \caption{Empirical coverage probability of the weights $\sigma_k^{(r)}$ using Gibbs sampler for OMCOA (in red), Gibbs sampler for sparse,OMCOA with $\lambda=1$ (in blue) as a function of the noise standard deviation $s$. \label{fig1}}
 \end{figure}
 
 
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{figs/figure2.eps}
-  \caption{Estimated block weights, with the 2.5\% and 97.5\% empirical quantiles over the $B=1000$ simulated data sets, for the three active dimensions (dimensions 1 through 3) obtained using the sequential approach (MCOA in red), the simultaneous approach (OMCOA in green), the Gibbs sampler for OMCOA (Gibbs OMCOA in light blue) and the sparse version (sparse Gibbs OMCOA with $\lambda=1$ in purple), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
+  \includegraphics[width=\linewidth]{figs/bias_estimation.eps}
+  \caption{Estimated block weights, with the 2.5\% and 97.5\% empirical quantiles over the $B=1000$ simulated data sets, for dimensions 1 to 3 (the dashed lines give the true values, including the zero weights), obtained using the sequential approach (MCOA in blue), the simultaneous approach (OMCOA in purple), the Gibbs sampler for OMCOA (Gibbs sampler for OMCOA in red) and the sparse version (Gibbs sampler for sparse OMCOA with $\lambda=1$ in green), as a function of the noise standard deviation $s$. For Bayesian models, the estimate is equal to the posterior mean.  \label{fig2}}
 \end{figure}
-For the inactive dimensions 4 and 5 (not shown), the estimated weights of MCOA, OMCOA and of the non-sparse sampler increased with $s$, since these methods fit the noise, whereas the sparse sampler kept them at 0 in almost all cases.
+For the inactive dimension 4 (not shown), the estimated weights of MCOA, OMCOA and of the non-sparse sampler increased with $s$, since these methods fit the noise, whereas the sparse sampler kept them at 0 in almost all cases.
 
 
 
-% \begin{figure}
-%   \includegraphics[width=\linewidth]{figs/figure3.eps}
-%   \caption{Estimated block weights and their empirical 95\%-CI of the two non actives dimensions (dimension 4 and 5) using the  the sparse version (gibbs sparse omcoa) as a function of the standard deviation $s$ of the noise and the slab parameter $\lambda$.  \label{fig3}}
-% \end{figure}
-
-
-
-\subsubsection*{Comparison of the estimates of the effective rank:} 
-
-
-
-\textcolor{red}{[Paragraph to be rewritten once Hoff's SVD and the Gavish--Donoho threshold have been rerun on the non-standardised blocks.]} Figure~\ref{fig6} provides the distribution of the estimated effective rank as a function of the noise standard deviation $s$, for the Gavish--Donoho criterion, the sparse Gibbs sampler and Hoff's Bayesian SVD. For values of $s$ less than 0.06, the sparse Gibbs sampler identified three active dimensions in more than 50\% of the simulated data, whereas the effective rank of 3, chosen according to the Hoff and Gavish-Donoho criteria, dropped very rapidly below 50\% ($s > 0.025$). When no dimension was detectable ($s>0.15$), Hoff’s Bayesian SVD model overestimated the effective rank because it retained five active dimensions in more than 75\% of cases; the sparse Gibbs sampler found a rank between 1 and 3 most of the time; and the Gavish-Donoho criterion estimated the effective rank to be 1 most of the time.   
+\subsubsection*{Comparison of the estimates of the effective rank:} Figure~\ref{fig6} provides the distribution of the estimated effective rank over the $B$ simulated data sets as a function of the noise standard deviation $s$, for the Gavish--Donoho threshold, the sparse Gibbs sampler and Hoff's Bayesian SVD. For $s=0.02$, the three methods recovered the true rank $\Reff=3$ in all the data sets. The Gavish--Donoho threshold was the first to underestimate the rank: it selected 2 dimensions in almost all the data sets from $s=0.04$, and 1 dimension in about 70\% of them for $s\geq0.12$. The sparse Gibbs sampler recovered $\Reff=3$ in almost all the data sets for $s\leq0.04$ (with a few cases of $\Reff=4$) and in about 75\% of them for $s=0.06$; for $s=0.08$, it mostly selected 2 dimensions (about 70\% of the data sets), after losing dimension 3, which is only present in block 3 (Figure~\ref{fig:choice_lambda}). This underestimation occurred although the default prior favours $\Reff=3$ or 4 (Table~\ref{tab:spike_param}): it is driven by the data. Hoff's Bayesian SVD performed better in this intermediate range: it recovered $\Reff=3$ in all the data sets for $s=0.06$ and in about 75\% of them for $s=0.08$. Hoff's method only estimates the rank of the concatenated matrix: it does not indicate in which blocks a dimension is active, which is the purpose of the sparse model. Moreover, a dimension carried by a single block is selected by the sparse model through the Bayes factor of this block alone, which requires a margin above the single-block detectability threshold (Section~5.2), whereas it contributes to a singular value of the concatenated block in Hoff's model. At high noise levels ($s\geq0.12$), the behaviours were reversed: Hoff's Bayesian SVD estimated $\Reff=0$ in most of the data sets (about 90\% for $s=0.18$), whereas the sparse sampler mostly kept $\Reff=1$ (between 55\% and 70\% of the data sets), i.e.\ dimension 1, which is shared by the three blocks. This is the borrowing of strength across blocks observed in Figure~\ref{fig:choice_lambda}: a dimension that is weak in each block but common to all of them remains detectable.   
 
 \begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure6.eps}
-  \caption{Distribution of the estimated effective rank with the Gavish--Donoho criterion, the sparse Gibbs sampler ($\lambda=1$) and Hoff's Bayesian SVD, as a function of the noise standard deviation $s$. \label{fig6}}
+  \includegraphics[width=\linewidth]{figs/Reff_comparison.eps}
+  \caption{Distribution of the estimated effective rank over the $B$ simulated data sets for the Gavish--Donoho threshold, the sparse Gibbs sampler ($\lambda=1$, $a_\theta=b_\theta=1$) and Hoff's Bayesian SVD, as a function of the noise standard deviation $s$ (true value $\Reff=3$). \label{fig6}}
 \end{figure}
 
+\section{Application to breast cancer multi-omics data}\label{sec:appli}
+ 
+\paragraph{Data.} We use the \texttt{breast.TCGA} data of the \textsf{R} package \texttt{mixOmics} \citep{rohart2017}, a subset of The Cancer Genome Atlas breast cancer data \citep{tcga2012} used to illustrate multiblock methods \citep{singh2019}. The training set contains $N=150$ tumours described by $K=3$ blocks: the expression of $p_1=184$ microRNAs, of $p_2=200$ genes (mRNA) and the abundance of $p_3=142$ proteins. The PAM50 subtype of the tumours (Basal, $n=45$; Her2, $n=30$; Luminal A, $n=75$) is not used in the fit, only for the interpretation. The variables were only centred: the samplers are invariant to the scale of the blocks, and a block normalisation is not needed (Section~4). The sparse Gibbs sampler was run with $\lambda=1$, $a_\theta=b_\theta=1$ and $R_{\max}=40$, with four chains of $T=6000$ iterations (burn-in $T_0=2000$, thinning 10), two started with all the indicators equal to 1 and two with all of them equal to 0.
+ 
+\paragraph{Dominant dimensions.} The leading dimensions were selected with a posterior probability equal to 1 in all the chains, and their weights were estimated with narrow credible intervals (Figure~\ref{fig:tcga_weights}). The first dimension is common to the three blocks: it explains about 17\%, 20\% and 21\% of the variance of the miRNA, mRNA and protein blocks, respectively ($(\sigma_k^{(1)}/\|\X_k\|)^2$). It is followed by a few strong dimensions which are mainly specific to one block, for instance a dimension which explains about 11\% of the variance of the mRNA block and 6\% of the miRNA block but is almost absent from the protein block, and a dimension specific to the protein block (about 12\% of its variance). Beyond these, a long series of dimensions explains less than 2--3\% of the variance of each block. The two dimensions most associated with the subtype are both active in the three blocks, with a posterior inclusion probability equal to 1 in each block and in each of the four chains, whatever their initialisation. The posterior means of the $R^2$ of the regression of their components on the subtype are $0.89$ (95\% credible interval $[0.885,0.898]$) and $0.61$ ($[0.58,0.65]$). Their components separate the three subtypes (Figure~\ref{fig:tcga_subtype}): the first one, which is the common dimension described above, opposes the Basal and Luminal A tumours, and the second one isolates the Her2 tumours. 
+The loadings of the first dimension are consistent with the biology of the subtypes. 
+The component of the first dimension being positive for the Luminal A tumours and negative for the Basal tumours, the variables with large positive loadings are more expressed in the Luminal A tumours: the hormone receptors ER-$\alpha$ and PR and the transcription factor GATA3 among the proteins (loadings 0.55, 0.41 and 0.28), and oestrogen-regulated genes such as STC2, NTN4 and ZNF552 among the mRNAs. Conversely, the proliferation markers Cyclin B1 (protein), ASPM and CCNA2 (mRNA) have negative loadings, as do almost all the miRNAs with the largest loadings, which are therefore more expressed in the Basal tumours: miR-9 (both precursors), the miR-17-92 family (miR-17, miR-20a, miR-106a), miR-146a and the hypoxia-induced miR-210. The second dimension is driven by the Her2 tumours, whose component is negative while it is positive for both the Basal and the Luminal A tumours. The proteins with the largest negative loadings, i.e.\ more abundant in the Her2 tumours, are HER2 itself ($-0.41$) and its phosphorylated form HER2\_pY1248 ($-0.33$), together with the phosphorylated EGFR ($-0.26$) of the same receptor family and the androgen receptor AR ($-0.22$), whereas the progesterone receptor PR has a positive loading ($0.30$), in agreement with the hormone receptor negative status of most HER2-enriched tumours. Among the miRNAs, miR-30a and miR-181c/d have positive loadings, i.e.\ are less expressed in the Her2 tumours. The mRNA block contributes less specifically to this dimension, its largest loadings being positive (STC2, NDRG2, CDK18). Since the positive side of this component gathers two subtypes, its positive loadings indicate a lower expression in the Her2 tumours rather than a marker of a given subtype. Thus, two dimensions shared by the three blocks, identified without using the subtype, recover the PAM50 classification.
+ 
+\paragraph{Effective rank.} In contrast, the effective rank was not identified. In the chains started with all the dimensions active, $\Reff$ remained equal to $R_{\max}=40$; in the chains started with all of them inactive, it started at about 25 and was still slowly increasing at the end of the run (Figure~\ref{fig:tcga_diag}). The noise precisions of the two groups of chains also differed (e.g.\ $\tau_3\approx8.0$ versus $7.1$), the chains started from $\gamma=0$ moving slowly towards the others. The weak dimensions therefore mix very slowly, as anticipated in Section~4, and their inclusion probabilities averaged over the chains are not reliable. This saturation is consistent with short runs of the sampler for $R_{\max}=10$, $20$ and $40$, for which $P(\Reff=R_{\max}\mid\X)\approx1$, and with the Gavish--Donoho threshold, which retains 30, 19 and 28 dimensions for the miRNA, mRNA and protein blocks separately.
+ 
+Additional experiments (Appendix~\ref{sec:saturation}) point to a misspecification of the noise rather than to a failure of the sampler. With blocks of the same dimensions made of i.i.d.\ Gaussian noise, the sampler returned $\Reff\approx0$--$1$ from both initialisations. With blocks made of independent columns having the standard deviations of the TCGA variables, which range from 0.2 to 2.5 within a block, but no common structure, it reproduced the behaviour observed on the real data: saturation at $R_{\max}$ from the chains started with all the dimensions active, and a slow increase from the others. Since the model assumes a common noise variance within each block, the variables with a large variance are explained by additional dimensions. Standardising the variables did not remove the saturation on the real data, since their spectrum decreases slowly without a clear gap between signal and noise: with $N=150$ tumours, many weak but genuine correlations are detectable.
+ 
+On such data, $\Reff$ measures the departure from the low-rank plus white noise model rather than a number of latent factors, and it grows with $R_{\max}$ and $N$. The dominant dimensions, their pattern of activity across the blocks and their explained variances remain interpretable and stable across the chains. A natural extension is a noise precision per variable, $\tau_{kj}$; the full conditionals of the loadings $\V_k$ are then matrix Bingham--von Mises--Fisher distributions, which can be simulated with the algorithm of \citet{hoff2009}.
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.6\linewidth]{figs/components_subtype.pdf}
+  \caption{Breast cancer data: posterior means of the two components most associated with the PAM50 subtype, both active in the three blocks, coloured by subtype. \label{fig:tcga_subtype}}
+\end{figure}
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{figs/weights_all.pdf}
+  \caption{Breast cancer data: posterior means and 95\% credible intervals of the proportions of variance $(\sigma_k^{(r)}/\|\X_k\|)^2$ explained by each dimension in each block, the dimensions being ordered by total explained variance. Draws of the two chains started with all the dimensions active ($\gamma_k^{(r)}=1$); the chains started with $\gamma_k^{(r)}=0$ give the same weights for the leading dimensions (Appendix~\ref{sec:saturation}). \label{fig:tcga_weights}}
+\end{figure}
 
+\section{Discussion}\label{sec:discussion}
+ 
+We have proposed a Bayesian formulation of the canonical factorization of multiblock data with orthonormal block loadings, whose posterior mode is computed by the OMCOA algorithm, and a sparse version which selects, for each dimension, the blocks in which it is active. The orthonormality of the loadings gives full conditional distributions of the matrix von Mises--Fisher type, which can be simulated exactly column by column, and the spike-and-slab prior on the block weights has a closed-form Bayes factor. The model is identified as soon as the profiles of the block weights of the dimensions are distinct, a weaker condition than that of MCOA, whose dimensions are only identified by weighted sums of the squared block weights (Proposition~\ref{prop:identif}). With a slab scaled by the norm of each block and the Jeffreys prior on the noise precisions, the posterior distribution of the components, of the loadings and of the indicators does not depend on the scale of the blocks, so that no block weighting or standardisation has to be chosen. The slab indexed on the noise level, in the spirit of Zellner's $g$-prior, gave almost the same selection.
+ 
+The posterior distribution of the indicators $\gamma_k^{(r)}$ provides, beyond an estimate of the effective rank $\Reff$, the pattern of activity of each dimension across the blocks, with its uncertainty. In the simulations, the selection was driven by the data rather than by the prior: the three priors on the inclusion probabilities, which imply very different prior distributions of $\Reff$, gave similar selection probabilities, and the weights were lost in the order predicted by the single-block detectability thresholds. Since the inclusion probability $\theta_r$ of a dimension is shared by the blocks, a dimension which is weak in each block but common to all of them remained detectable beyond these thresholds, whereas Hoff's Bayesian SVD of the concatenated matrix then estimated an effective rank of zero in most data sets. Conversely, a dimension carried by a single block is selected from the evidence of this block alone, and was lost at lower noise levels than with Hoff's Bayesian SVD, which only estimates the rank of the concatenated matrix and does not indicate which blocks carry each dimension.
+ 
+On the breast cancer data, the dimensions with the largest weights were selected with probability one in all the chains, and the two dimensions shared by the three blocks that are most associated with the PAM50 subtype recovered the classification of the tumours, with loadings consistent with the known biology of the subtypes. The effective rank was not identified, however: it reached the maximal rank, and the weak dimensions mixed very slowly. Our experiments relate this behaviour to the noise model rather than to the sampler: a common noise variance within each block cannot account for variables whose variances differ by an order of magnitude, and the spectrum of these data has no clear gap between signal and noise. This points to the main limitations of the approach, and to several extensions.
+ 
+\paragraph{Noise model.} The assumption of an i.i.d.\ Gaussian noise within each block is the main limitation for omics data. A noise precision $\tau_{kj}$ per variable keeps the conjugacy of the noise precisions, but the full conditional distribution of the loadings $\V_k$ then becomes a matrix Bingham--von Mises--Fisher distribution, which can still be simulated with the algorithm of \citet{hoff2009}. This extension would also make the comparison with methods which standardise the variables more meaningful. Heavier-tailed noise distributions could be introduced through scale mixtures of normals, at the price of one additional latent variable per entry.
+ 
+\paragraph{Mixing of the indicators.} The indicators are drawn with the block weights integrated out, but given the loadings. When a dimension is inactive, its loadings are uniform, and the dimension can be reactivated only when a uniform draw happens to align with the signal, which is slow in high dimension; conversely, an active dimension whose loadings are aligned with the data is rarely deactivated. Both effects were visible on the real data. A move which updates jointly $\gamma_k^{(r)}$, $\sigma_k^{(r)}$ and $\vv_k^{(r)}$, with the loadings integrated out through the normalising constant of the von Mises--Fisher distribution, or tempering strategies, should improve the mixing. In the meantime, we recommend running chains started with all the dimensions active and with none of them, as done here.
+ 
+\paragraph{Prior on the effective rank.} With independent Beta priors on the inclusion probabilities, the prior expectation of $\Reff$ grows linearly with the maximal rank $R_{\max}$. The prior $\theta_r\sim\Be(\alpha/R_{\max},1)$ of Section~4 makes it nearly independent of $R_{\max}$; a nonparametric version, with an unbounded number of dimensions as in the Indian buffet process \citep{griffiths2011} or with increasing shrinkage of the successive dimensions \citep{bhattacharya2011,legramanti2020}, would remove the choice of $R_{\max}$ altogether, at the cost of an adaptive sampler.
+ 
+\paragraph{Other extensions.} The Bayesian formulation handles missing entries, or missing blocks for some observations, by data augmentation, as in the Bayesian SVD of \citet{zhai2023}; this is the case of the test set of the breast cancer data, which has no protein block. The computational cost of an iteration grows linearly with $R_{\max}$ and with the total number of variables, and was of the order of a few tenths of a second for $R_{\max}=40$ on the breast cancer data; for much larger data sets, a variational approximation of the posterior distribution would be a natural complement, the Gibbs sampler providing a reference to assess it.
+ 
+\paragraph{Conclusion.} The sparse Bayesian OMCOA turns the choice of the number of dimensions of a multiblock factorization into a posterior inference on which dimensions are active in which blocks. It is invariant to the scale of the blocks, borrows strength across blocks for the dimensions they share, and provides credible intervals for the block weights and posterior probabilities for the effective rank. On real data, the inference on the dominant dimensions was stable and interpretable, while the inference on the effective rank requires a noise model adapted to the data. The methods are implemented in the \textsf{R} package  \href{https://github.com/GALHARRET/BayesCanoFacto}{\texttt{BayesCanoFacto}} available on GitHub.
 
-% We compare\item $\Sigma_1=\diag(.7,.5,0), \Sigma_1=\diag(.6,.4,0), \Sigma_1=\diag(.5,0,0),$ the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with.6MCOA and OMCOA.
-% The diagonal matrices depend on a parameter $t\in[0,1]$:
-% \[
-% \Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
-% \]
-% where
-% \begin{itemize}
-%   \item for $t=0$, all the blocks share the same profile:
-%   $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
-%   \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
-%   $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
-% \end{itemize}
-
-
-% \begin{lemma} \label{lemma1}
-% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R)$, the maximum of $\trace(\T^\intercal\X\h)$ with the constraint $\T^\intercal.\T=I_R$ is $\T=\textbf{U}.\textbf{V}^\intercal$ where the columns of $\textbf{U}$ (respectively $\textbf{V}$) are the $R$ first left (respectively right) singular vectors of $\X\h$. (see \cite{cliff66}) 
-% \end{lemma}
-
-% \begin{proof}
-% 	Consider the SVD of $\X.\h =\textbf{U}.\Sigma.\textbf{V}^t$. We have $\trace(\textbf{T}^t.\textbf{U}.\Sigma.\textbf{V}^t)=\trace(\Sigma.\textbf{V}^t.\textbf{T}^t.\textbf{U})$
-% 	($\trace(\textbf{A}.\textbf{B})=\trace(\textbf{B}.\textbf{A})$). The matrix $\textbf{W}=\textbf{V}^t.\textbf{T}^t.\textbf{U}$ is orthogonal. 
-% The problem of maximization remains to maximizing 
-% \[\trace(\Sigma.\textbf{W})=\sum_{h=1}^H\sigma^2_h.w_{hh}.\]
-% Since $\textbf{W}$ is orthogonal, $|w_{hh}| \leq 1$ for all $h$. The trace of $\Sigma.\textbf{W}$ is maximal for $w_{hh}=1$, that implies $\textbf{W}=I_H$ and $\textbf{T}=\textbf{U}.\textbf{V}^t$. Moreover, the maximum of the trace is  $\sum_{h=1}^H\sigma^2_h$. 
-
-% \end{proof}
-
-% \begin{lemma} \label{lemma2}
-% 	For given matrices $\X\in\mathcal M_{N,P}(\mathbb R),\h\in\mathcal M_{P,R}(\mathbb R), \T \in \mathcal M_{N,R}(\mathbb R)$ we have 
-% 	\[\trace(\textbf{X}^\intercal.\textbf{T}.\textbf{H}^\intercal)=\trace(\textbf{T}^\intercal\textbf{X}\textbf{H}).\]
-% \end{lemma}
-
-%  \begin{proof}
-%  $\trace(\X^\intercal\T\h^\intercal)=\trace(\h^\intercal\X^\intercal\T)=\trace(\T^\intercal\X\h).$
-%  The first equality comes from $\trace(\textbf{A}\textbf{B})=\trace(\textbf{A}\textbf{B})$ for $\textbf{A},\textbf{B}$ of dimension $N,P$ and $P,N$. The second equality comes from the equality of the trace of a square matrix and its transpose.
-%  \end{proof}
-
-
-% \medskip
-% \noindent
-% \textbf{Remark.} This proof guarantees convergence of the values of the criterion, but not necessarily uniqueness of the limit point. Uniqueness of the solution is established separately, via the orthogonality of the columns of $\V_k$ for all $k$.
-
-% \section{Comparison of MCOA and OMCOA}
-% \subsection{Simulation study}
-% MCOA and OMCOA are compared on simulated data. $K=3$ blocks $\X_1,\X_2,\X_3$ with respectively
-% $p_1=10$, $p_2=15$, $p_3=20$ variables and $N=100$ observations are generated from
-% \[
-% \X_k=\U\Sigma_k\V_k^\intercal+\EE_k, \qquad k=1,2,3,
-% \]
-% where $\U\in\mathcal M_{N,R}(\mathbb R)$ (column-centered) and $\V_k\in\mathcal M_{p_k,R}(\mathbb R)$ have orthonormal
-% columns, $R=3$, $\Sigma_k$ is diagonal and $\EE_k$ is a Gaussian noise term.
-% We compare the estimation of $\Sigma_1,\ldots,\Sigma_K$ obtained with MCOA and OMCOA.
-% The diagonal matrices depend on a parameter $t\in[0,1]$:
-% \[
-% \Sigma_k(t)=(1-t)\,\Sigma^{(0)}_k+t\,\Sigma_k^{(1)},
-% \]
-% where
-% \begin{itemize}
-%   \item for $t=0$, all the blocks share the same profile:
-%   $\Sigma^{(0)}_1=\Sigma^{(0)}_2=\Sigma^{(0)}_3=\diag(0.7,\,0.5,\,0.3)$;
-%   \item for $t=1$, each block has its own dominant dimension of the common space $\U$ (permuted profiles):
-%   $\Sigma^{(1)}_1=\diag(0.7,\,0.5,\,0.3)$, $\Sigma^{(1)}_2=\diag(0.5,\,0.3,\,0.7)$, $\Sigma^{(1)}_3=\diag(0.3,\,0.7,\,0.5)$.
-% \end{itemize}
-% In both cases $\sum_{r}(\sigma_k^{(r)})^2=0.83$ for each block. Moreover, the singular values of the
-% noise-free concatenated matrix are $\bigl(\sum_k(\sigma_k^{(r)}(t))^2\bigr)^{1/2}$: they are well separated for $t=0$
-% and all equal to $\sqrt{0.83}$ for $t=1$, since $\sum_k\Sigma_k^{(1)\,2}=0.83\,\textbf{I}_3$.
-% The noise is scaled so that $\|\EE_k\|^2=\frac{0.10}{0.90}\,\|\U\Sigma_k\V_k^\intercal\|^2$, i.e.\ it accounts for about
-% $10\%$ of the variance of each block. We use $t\in\{0,0.1,\ldots,1\}$ and $B=1000$ replications.
-
-% At each replication, the estimated axes are reordered by the permutation
-% \[
-% \hat\pi=\arg\max_{\pi\in\mathfrak S_R}\sum_{r=1}^{R}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\pi(r))}\bigr)\bigr|,
-% \]
-% the absolute value accounting for the sign indeterminacy of the axes.
-% The accuracy of the estimation of $\Sigma_1,\ldots,\Sigma_K$ is assessed by the mean absolute error
-% over the $K$ blocks and the $R$ dimensions:
-% \[
-% \mathrm{MAE}=\frac{1}{KR}\sum_{k=1}^{K}\sum_{r=1}^{R}
-% \bigl|\hat\sigma_k^{(\hat\pi(r))}-\sigma_k^{(r)}\bigr|.
-% \]
-
-% \subsection{Results}
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.8\linewidth]{figs/plot_t0.png}
-%   \caption{Common profile ($t=0$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
-%   over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t0}}
-% \end{figure}
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.8\linewidth]{figs/plot_t1.png}
-%   \caption{Permuted profiles ($t=1$): median and 10--90\% empirical quantiles of $\hat\sigma^{(\hat\pi(r))}_k$
-%   over the $B=1000$ replications (red: dim~1, green: dim~2, blue: dim~3).\label{fig_t1}}
-% \end{figure}
-
-% Figures~\ref{fig_t0} and~\ref{fig_t1} show the estimates obtained with MCOA and OMCOA for $t=0$ and $t=1$
-% respectively. As expected, both methods give very close estimates when the blocks share a common profile
-% (Figure~\ref{fig_t0}). When the profiles are permuted, OMCOA outperforms MCOA in terms of both bias and
-% precision (Figure~\ref{fig_t1}). In both scenarios, the OMCOA estimates show very low variability.
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.8\linewidth]{figs/explained_var.png}
-%   \caption{Distribution of the percentage of explained variance $V$ over the $B=1000$ replications.\label{var_expl}}
-% \end{figure}
-
-% Figure~\ref{var_expl} shows the empirical distribution of the percentage of variance of the concatenated
-% matrix $\X$ explained by the $R$ dimensions,
-% \[
-% V=100\times\frac{\sum_{k,r}\bigl(\hat\sigma^{(r)}_k\bigr)^2}{\|\X\|^2},
-% \qquad \|\X\|^2=\sum_{k=1}^{K}\|\X_k\|^2,
-% \]
-% to be compared with the percentage of variance due to the signal, which is about $90\%$ by construction.
-% OMCOA slightly exceeds this value in all cases, since part of the noise is captured by the fitted
-% dimensions, whereas MCOA clearly underestimates it when the profiles are permuted ($t=1$).
-
-% Figure~\ref{comparison_t} shows the distribution of the MAE as a function of $t$. MCOA and OMCOA coincide as
-% long as the singular values of $\X$ are well separated; MCOA breaks down when they get close ($t\geq 0.8$).
-% Indeed, MCOA starts with the SVD of $\X$: when the singular values are close, $\u^{(1)}$ is an arbitrary
-% direction of $\mathrm{span}(\U)$ driven by the noise, and this error propagates to the next dimensions through
-% the deflation. OMCOA fits all the blocks simultaneously, so that the block-specific profiles identify $\U$.
-% Figure~\ref{comparison_cos} illustrates the resulting misestimation of the axes $\u^{(1)},\ldots,\u^{(R)}$
-% by MCOA for $t\geq 0.8$.
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.5\linewidth]{figs/comparaison_t.png}
-%   \caption{Median and 10--90\% empirical quantiles of the MAE as a function of $t$ ($B=1000$ replications).\label{comparison_t}}
-% \end{figure}
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.5\linewidth]{figs/comparaison_cos.png}
-%   \caption{Median and 10--90\% empirical quantiles of the worst axis recovery
-%   $\displaystyle\min_{r}\bigl|\cos\bigl(\u^{(r)},\hat\u^{(\hat\pi(r))}\bigr)\bigr|$ as a function of $t$
-%   ($B=1000$ replications).\label{comparison_cos}}
-% \end{figure}
-
-% \section*{Conclusion}
-% \cite{Bougeard024} have compared estimations for the canonical factorisation problem. In this work, we propose on optimal version of Multiple COinertia Analysis that performs better on the simulated data. Constraining the matrices $(\V_1,\dots,\V_K)$ to be orthogonal ensures uniqueness of the solution. In particular, if $|\mathbf{E}_k|=0$, the OMCOA method recovers the exact canonical factorization while other methods do not guarantee this."    
-% Furthermore, in practical applications the canonical factorisation is more readily interpreted under orthogonal configurations, as these yield a clearer decomposition of the effects.
 
 
 \clearpage
+
+
 
 \bibliographystyle{apalike}
 \bibliography{Biblio}
 
 
 \appendix
-\section{Appendix: proofs of the propositions}
+\section{Proofs of the propositions}
 
 \begin{proof}[Proposition 1]
 	The criterion to be minimized is:
@@ -938,25 +808,105 @@ which is the Bayes factor of $\gamma_k^{(r)}=1$ against $\gamma_k^{(r)}=0$. The 
 $\gamma_k^{(r)}=1$ is obtained by completing the square.
 \end{proof}
 
-\section{MCMC diagnostics}
+\section{Algorithms:}
+\subsection{Gibbs-OMCOA \label{sec:gibbs_omcoa_algo}}
 
+\begin{algorithm}[ht]
+\caption{Gibbs sampler for OMCOA}\label{alg:gibbs_omcoa}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; dimension $R<\min_kp_k$; number of iterations $T$; burn-in $T_0$;
+           prior precision $\lambda$
+  \State \textbf{Initialization:} $\U=\Q\tilde\U$, $\V_k$, $\Sigma_k$ from OMCOA (or MCOA, or at random);
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State $\F_{\U}\gets\sum_{k}\tau_k\,\X_k\V_k\Sigma_k$;\quad update $\tilde\U$ by one column-wise sweep of $\vMF(\Q^\intercal\F_{\U})$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State $\F_{\V_k}\gets\tau_k\,\X_k^\intercal\U\Sigma_k$;\quad update $\V_k$ by one column-wise sweep of $\vMF(\F_{\V_k})$
+        \State $\lambda_k\gets\lambda/\|\X_k\|^2$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$;\quad draw
+                  $\sigma_k^{(r)}\sim\mathcal N^+\bigl(\tau_k d_k^{(r)}/(\tau_k+\lambda_k),\,1/(\tau_k+\lambda_k)\bigr)$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\V_1,\ldots,\V_K,\Sigma_1,\ldots,\Sigma_K,\tau_1,\ldots,\tau_K\bigr)$ \EndIf
+  \EndFor
+  \State \textbf{Post-processing:} align each stored draw on a reference solution (Section~\ref{sec:align})
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Gibbs-Sparse-OMCOA \label{sec:gibbs_sparse_omcoa_algo}}
+\begin{algorithm}[ht]
+\caption{Sparse Gibbs sampler for OMCOA}\label{alg:gibbs_sparse_omcoa}
+\begin{algorithmic}[1]
+  \Require centered blocks $\X_1,\ldots,\X_K$; maximal rank $R<\min_kp_k$; iterations $T$; burn-in $T_0$;
+           slab precision $\lambda$; hyperparameters $a_\theta,b_\theta$
+  \State \textbf{Initialization:} $\U,\V_k,\Sigma_k$ from OMCOA with $R$ dimensions on the blocks divided by their Frobenius norms, weights brought back to the original scale; $\gamma_k^{(r)}\gets1$ (or 0); $\theta_r\gets a_\theta/(a_\theta+b_\theta)$;
+         $\tau_k\gets(N-1)p_k\big/\|\X_k-\U\Sigma_k\V_k^\intercal\|^2$
+  \For{$t=1,\ldots,T$}
+     \State update $\tilde\U$ by one sweep of $\vMF\bigl(\Q^\intercal\sum_k\tau_k\X_k\V_k\Sigma_k\bigr)$;\quad $\U\gets\Q\tilde\U$
+     \For{$k=1,\ldots,K$}
+        \State update $\V_k$ by one sweep of $\vMF\bigl(\tau_k\X_k^\intercal\U\Sigma_k\bigr)$
+        \For{$r=1,\ldots,R$}
+           \State $d_k^{(r)}\gets{\uu^{(r)}}^\intercal\X_k\vv_k^{(r)}$,\quad $\omega_k\gets\tau_k+\lambda/\|\X_k\|^2$,\quad $m_k^{(r)}\gets\tau_kd_k^{(r)}/\omega_k$
+           \State draw $\gamma_k^{(r)}\sim\Bern\Bigl(\dfrac{\theta_rB_k^{(r)}}{\theta_rB_k^{(r)}+1-\theta_r}\Bigr)$
+           \State \textbf{if} $\gamma_k^{(r)}=1$ \textbf{then} draw $\sigma_k^{(r)}\sim\mathcal N^+\bigl(m_k^{(r)},\omega_k^{-1}\bigr)$ \textbf{else} $\sigma_k^{(r)}\gets0$
+        \EndFor
+        \State draw $\tau_k\sim\Ga\bigl((N-1)p_k/2,\ \|\X_k-\U\Sigma_k\V_k^\intercal\|^2/2\bigr)$
+     \EndFor
+     \For{$r=1,\ldots,R$}
+        \State draw $\theta_r\sim\Be\bigl(a_\theta+\sum_k\gamma_k^{(r)},\ b_\theta+K-\sum_k\gamma_k^{(r)}\bigr)$
+     \EndFor
+     \If{$t>T_0$} store $\bigl(\U,\Sigma_1,\ldots,\Sigma_K,\boldsymbol\gamma,\boldsymbol\theta,\boldsymbol\tau\bigr)$ \EndIf
+  \EndFor
+  \State align the stored draws (permutation and signs) on a reference $\U_{\mathrm{ref}}$
+  \State \Return the aligned draws
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{MCMC diagnostics}\label{sec:mcmc_diag}
+\clearpage
 \begin{figure}
- \includegraphics[width=\linewidth]{figs/diagnostic_plot_sig_06.png}
- \caption{} 
+ \includegraphics[width=\linewidth]{figs/diagnostic1.eps}
+ \caption{MCMC diagnostics for $s=0.06$: running mean of $\Reff$ and traces of the noise precisions $\tau_k$ for the four chains.\label{fig:diag1}} 
 \end{figure}
 
-
-\section{Analyisis of sensitivity}
-
 \begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure1a.eps}
-  \caption{Empirical probability that a dimension is selected in a block, as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig1a}}
+ \includegraphics[width=\linewidth]{figs/diagnostic2.eps}
+ \caption{MCMC diagnostics for $s=0.08$: running mean of $\Reff$ and traces of the noise precisions $\tau_k$ for the four chains.\label{fig:diag2}} 
 \end{figure}
 
+\section{Saturation of the effective rank on the breast cancer data}\label{sec:saturation}
+ 
+Table~\ref{tab:saturation} reports short runs of the sparse Gibbs sampler ($R_{\max}=20$, $\lambda=1$, $a_\theta=b_\theta=1$) on three kinds of data with the dimensions of the breast cancer data ($N=150$, $p_k=184,200,142$), from the two initialisations of the indicators. \textcolor{red}{[Short runs of 800--1000 iterations (burn-in 400--500); to be rerun with the settings of the main analysis and several replications before publication.]}
+ 
+\begin{table}[ht]
+\centering
+\begin{tabular}{lcccc}
+  \hline
+  & \multicolumn{2}{c}{$\gamma$ initialised to 1} & \multicolumn{2}{c}{$\gamma$ initialised to 0} \\
+  Data & $\EE[\Reff\mid\X]$ & active per block & $\EE[\Reff\mid\X]$ & active per block \\
+  \hline
+  i.i.d.\ Gaussian noise & 0.7 & 0.3 / 0.1 / 0.2 & 1.3 & 0.4 / 0.6 / 0.5 \\
+  heteroscedastic noise$^a$ & 20 & 6.0 / 4.8 / 15.2 & 12.5 & 3.3 / 2.6 / 8.4 \\
+  TCGA, standardised & 20 & 17.1 / 15.0 / 15.9 & 15.1 & 11.7 / 9.9 / 11.8 \\
+  \hline
+\end{tabular}
+\caption{Posterior mean of $\Reff$ and mean number of active dimensions in the miRNA / mRNA / protein blocks, for $R_{\max}=20$. $^a$Independent columns with the standard deviations of the TCGA variables and no common structure. \label{tab:saturation}}
+\end{table}
+ 
 \begin{figure}
-  \includegraphics[width=\linewidth]{figs/figure2a.eps}
-  \caption{Empirical effective rank as a function of the noise standard deviation $s$ and of the slab precision $\lambda$. \label{fig2a}}
+ \includegraphics[width=\linewidth]{figs/weights_by_init.pdf}
+ \caption{Breast cancer data: posterior means and 95\% credible intervals of the proportions of variance $(\sigma_k^{(r)}/\|\X_k\|)^2$, for the chains started with all the dimensions active and with none of them, the dimensions being ordered as in Figure~\ref{fig:tcga_weights}.}
 \end{figure}
+ 
+\begin{figure}
+ \includegraphics[width=\linewidth]{figs/diagnostics.pdf}
+ \caption{Breast cancer data, MCMC diagnostics of the sparse Gibbs sampler ($R_{\max}=40$): running mean of $\Reff$ and traces of the noise precisions $\tau_k$ for the four chains (two started with $\gamma=1$, two with $\gamma=0$). \label{fig:tcga_diag}}
+\end{figure}
+
 
 
 \end{document}

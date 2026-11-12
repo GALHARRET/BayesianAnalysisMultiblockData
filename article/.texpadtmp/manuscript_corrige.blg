@@ -3,61 +3,61 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: /Users/jean-michelgalharret/Documents/GitHub/BayesianAnalysisMultiblockData/article/.texpadtmp/manuscript_corrige.aux
 The style file: apalike.bst
 Database file #1: ../Biblio.bib
-Repeated entry---line 239 of file ../Biblio.bib
+Repeated entry---line 252 of file ../Biblio.bib
  : @article{feng2018
  :                  ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 249 of file ../Biblio.bib
+Repeated entry---line 262 of file ../Biblio.bib
  : @article{gaynanova2019
  :                       ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 260 of file ../Biblio.bib
+Repeated entry---line 273 of file ../Biblio.bib
  : @article{klami2015
  :                   ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 271 of file ../Biblio.bib
+Repeated entry---line 284 of file ../Biblio.bib
  : @article{argelaguet2018
  :                        ,
 I'm skipping whatever remains of this entry
-You've used 20 entries,
+You've used 27 entries,
             1935 wiz_defined-function locations,
-            616 strings with 7317 characters,
-and the built_in function-call counts, 8617 in all, are:
-= -- 859
-> -- 337
-< -- 14
-+ -- 118
-- -- 112
-* -- 783
-:= -- 1477
-add.period$ -- 61
-call.type$ -- 20
-change.case$ -- 155
-chr.to.int$ -- 20
-cite$ -- 20
-duplicate$ -- 293
-empty$ -- 616
-format.name$ -- 146
-if$ -- 1674
+            662 strings with 8586 characters,
+and the built_in function-call counts, 11734 in all, are:
+= -- 1166
+> -- 477
+< -- 17
++ -- 168
+- -- 160
+* -- 1079
+:= -- 2015
+add.period$ -- 82
+call.type$ -- 27
+change.case$ -- 214
+chr.to.int$ -- 27
+cite$ -- 27
+duplicate$ -- 391
+empty$ -- 828
+format.name$ -- 205
+if$ -- 2269
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 20
-newline$ -- 103
-num.names$ -- 62
-pop$ -- 106
+missing$ -- 27
+newline$ -- 138
+num.names$ -- 83
+pop$ -- 148
 preamble$ -- 1
-purify$ -- 155
+purify$ -- 214
 quote$ -- 0
-skip$ -- 226
+skip$ -- 299
 stack$ -- 0
-substring$ -- 746
-swap$ -- 29
+substring$ -- 1012
+swap$ -- 36
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 120
+type$ -- 162
 warning$ -- 0
-while$ -- 78
+while$ -- 105
 width$ -- 0
-write$ -- 264
+write$ -- 355
 (There were 4 error messages)
